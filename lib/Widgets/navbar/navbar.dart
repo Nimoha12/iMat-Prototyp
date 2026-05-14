@@ -5,12 +5,6 @@ import 'package:imat_repo/Widgets/navbar/cart.button.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
 
-// Bygger iMat-appens toppmeny.
-// Innehåller logga, sökfält och navigationsikoner.
-// Används som AppBar i hela applikationen.
-// Ger snabb åtkomst till varukorg, favoriter och konto.
-
-
 class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   const IMatNavbar({super.key});
 
@@ -21,48 +15,101 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       toolbarHeight: 70,
       titleSpacing: 0,
-      title: Row(
-        children: [
-          const SizedBox(width: 16),
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isSmallScreen = constraints.maxWidth < 900;
 
-          // ⭐ Logga
-          const IMatLogo(),
-          const SizedBox(width: 24),
+          return Row(
+            children: [
+              const SizedBox(width: 16),
 
-          // ⭐ Sökfält
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                height: 40,
-                child: TextField(
-                  style: IMatText.bodyM,
-                  decoration: InputDecoration(
-                    hintText: "Sök varor...",
-                    hintStyle: IMatText.bodyS.copyWith(color: Colors.grey),
-                    filled: true,
-                    fillColor: IMatColors.white,
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
+              // Klickbar logga som leder till startsidan
+              IMatLogo(
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/');
+                },
+              ),
+              const SizedBox(width: 24),
+
+              //  Kortare sökfält (mer luftigt)
+              //  Kortare sökfält (mer luftigt)
+              Expanded(
+                flex: isSmallScreen ? 2 : 3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 600,
+                      ), // ✅ Begränsar maxbredden
+                      child: SizedBox(
+                        height: 38,
+                        child: TextField(
+                          style: IMatText.bodyM,
+                          decoration: InputDecoration(
+                            hintText: "Sök varor...",
+                            hintStyle: IMatText.bodyS.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                            filled: true,
+                            fillColor: IMatColors.white,
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Colors.grey,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-
-          // ⭐ Ikoner
-          const CartButton(),
-          const NavIcon(icon: Icons.favorite_border, label: "Favoriter"),
-          const NavIcon(icon: Icons.history, label: "Historik"),
-          const NavIcon(icon: Icons.help_outline, label: "Hjälp"),
-          const NavIcon(icon: Icons.person_outline, label: "Logga in"),
-
-          const SizedBox(width: 12),
-        ],
+              //Ikoner (klickbara)
+              CartButton(
+                onTap: () {
+                  // TODO: Navigera till varukorg
+                },
+              ),
+              NavIcon(
+                icon: Icons.favorite_border,
+                label: "Favoriter",
+                onTap: () {
+                  // TODO: Navigera till favoriter
+                },
+              ),
+              NavIcon(
+                icon: Icons.history,
+                label: "Historik",
+                onTap: () {
+                  // TODO: Navigera till historik
+                },
+              ),
+              NavIcon(
+                icon: Icons.help_outline,
+                label: "Hjälp",
+                onTap: () {
+                  // TODO: Navigera till hjälp
+                },
+              ),
+              NavIcon(
+                icon: Icons.person_outline,
+                label: "Logga in",
+                onTap: () {
+                  // TODO: Navigera till login
+                },
+              ),
+              const SizedBox(width: 12),
+            ],
+          );
+        },
       ),
     );
   }

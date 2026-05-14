@@ -2,44 +2,67 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Widgets/home/category_grid/category.dart';
 
-// Visar sex populära kategorier på startsidan.
-// Grid-layout med ikon + text för varje kategori.
-// Anpassad för att vara kompakt och centrerad.
-// Används för snabb navigering till produktkategorier.
-
-
 class CategoryGridHome extends StatelessWidget {
   const CategoryGridHome({super.key});
 
   final List<Category> homeCategories = const [
-    Category(category: ProductCategory.DAIRIES, label: "Mejeri & Ägg", icon: Icons.egg),
-    Category(category: ProductCategory.VEGETABLE_FRUIT, label: "Frukt & Grönt", icon: Icons.eco),
-    Category(category: ProductCategory.MEAT, label: "Kött", icon: Icons.set_meal),
-    Category(category: ProductCategory.BREAD, label: "Bröd", icon: Icons.bakery_dining),
-    Category(category: ProductCategory.COLD_DRINKS, label: "Drycker", icon: Icons.local_drink),
-    Category(category: ProductCategory.PASTA, label: "Torrvaror", icon: Icons.rice_bowl),
+    Category(
+      category: ProductCategory.DAIRIES,
+      label: "Mejeri & Ägg",
+      icon: Icons.egg,
+      bgImagePath: "assets/category_bg/dairy.jpg",
+    ),
+    Category(
+      category: ProductCategory.VEGETABLE_FRUIT,
+      label: "Frukt & Grönt",
+      icon: Icons.eco,
+      bgImagePath: "assets/category_bg/fruitveg.jpg",
+    ),
+    Category(
+      category: ProductCategory.MEAT,
+      label: "Kött & fisk",
+      iconPath: "assets/icons/meat.png",
+      bgImagePath: "assets/category_bg/meatfish.jpg",
+    ),
+    Category(
+      category: ProductCategory.BREAD,
+      label: "Bröd",
+      iconPath: "assets/icons/bread.png",
+      bgImagePath: "assets/category_bg/bread.jpg",
+    ),
+    Category(
+      category: ProductCategory.COLD_DRINKS,
+      label: "Drycker",
+      icon: Icons.local_drink,
+      bgImagePath: "assets/category_bg/drinks.jpg",
+    ),
+    Category(
+      category: ProductCategory.PASTA,
+      label: "Torrvaror",
+      iconPath: "assets/icons/grains.png",
+      bgImagePath: "assets/category_bg/pantry.jpg",
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final double maxGridWidth = screenWidth > 1200 ? 900.0 : screenWidth - 48.0;
-
+    final double maxGridWidth = screenWidth > 1400 ? 1200.0 : screenWidth - 48.0;
 
     return Center(
       child: SizedBox(
         width: maxGridWidth,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: homeCategories.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, // 3 per rad = 6 totalt i två rader
+              crossAxisCount: 3,
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
-              childAspectRatio: 1.1, // 👈
+              childAspectRatio: 2.0,
             ),
             itemBuilder: (context, index) {
               final category = homeCategories[index];
@@ -59,11 +82,13 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasImage = category.bgImagePath != null;
+
     return InkWell(
       onTap: () {},
+      borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -73,17 +98,53 @@ class _CategoryCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            Icon(category.icon, size: 32, color: IMatColors.black),
-            const SizedBox(height: 8),
-            Text(
-              category.label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+            if (hasImage)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  category.bgImagePath!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
+            if (hasImage)
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.black.withValues(alpha: 0.25),
+                ),
+              ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (category.iconPath != null)
+                    Image.asset(
+                      category.iconPath!,
+                      width: 40,
+                      height: 40,
+                      color: hasImage ? Colors.white : IMatColors.black,
+                    )
+                  else if (category.icon != null)
+                    Icon(
+                      category.icon!,
+                      size: 40,
+                      color: hasImage ? Colors.white : IMatColors.black,
+                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    category.label,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: hasImage ? Colors.white : IMatColors.black,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

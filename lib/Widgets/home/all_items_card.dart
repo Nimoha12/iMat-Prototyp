@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
 
 // Visar en informationsruta bredvid hero-sektionen.
-// Innehåller titel, beskrivning och knapp till alla varor.
-// Används för snabb navigering till hela sortimentet.
-// Liten, kompakt card-komponent.
+// Anpassad för att matcha hero-sektionens höjd och layout.
 
 class AllItemsCard extends StatelessWidget {
   const AllItemsCard({super.key});
@@ -13,23 +11,40 @@ class AllItemsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: IMatColors.accent,
-        borderRadius: BorderRadius.circular(12),
-        border : Border.all(
-          color: IMatColors.accent,
-          width: 1.5
+        color: IMatColors.green,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: IMatColors.green,
+          width: 1.5,
         ),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 32,
+        vertical: 28,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Alla varor", style: IMatText.headingM),
-          const SizedBox(height: 12),
-          Text("Bläddra bland alla produkter i butiken.",
-              style: IMatText.bodyS),
-          const SizedBox(height: 24),
+          Text(
+            "Alla varor",
+            style: IMatText.headingM.copyWith(
+              color: IMatColors.white,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          Text(
+            "Bläddra bland alla produkter i butiken.",
+            style: IMatText.bodyS.copyWith(
+              color: IMatColors.white,
+              height: 1.4,
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
           ElevatedButton(
             style: IMatButton.primary,
             onPressed: () {},

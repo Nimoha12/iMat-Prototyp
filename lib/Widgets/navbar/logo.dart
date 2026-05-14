@@ -15,15 +15,16 @@ class IMatLogo extends StatelessWidget {
             "i",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
             ),
           ),
           Text(
             "Mat",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 32,
+              fontSize: 34,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
