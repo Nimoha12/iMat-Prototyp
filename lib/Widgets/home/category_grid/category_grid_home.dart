@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Widgets/home/category_grid/category.dart';
 
-//Visar 6 utvalda kategorier på startsdian 
-//Det är inte alla kategorier, bara de vanliga
+// Visar sex populära kategorier på startsidan.
+// Grid-layout med ikon + text för varje kategori.
+// Anpassad för att vara kompakt och centrerad.
+// Används för snabb navigering till produktkategorier.
+
 
 class CategoryGridHome extends StatelessWidget {
   const CategoryGridHome({super.key});

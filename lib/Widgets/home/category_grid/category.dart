@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 //Denna fil innehåller datamodellen för produktkategoruer. 
 //Här finns en enum med alla kategorier från backend
 //Samt en klass som beskriver varje kategori med namn och ikon
+//Håller kategoridata på ett strukturerat sätt.
+
 enum ProductCategory {
   MELONS,
   FLOUR_SUGAR_SALT,

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
 
+// Visar den stora hero-bilden högst upp på startsidan.
+// Innehåller välkomsttext och en knapp för populära varor.
+// Har grön overlay och stor, tydlig typografi.
+// Bygger första intrycket av iMat.
+
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
 

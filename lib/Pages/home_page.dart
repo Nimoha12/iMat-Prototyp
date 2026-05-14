@@ -5,6 +5,12 @@ import 'package:imat_repo/Widgets/home/all_items_card.dart';
 import 'package:imat_repo/Widgets/home/category_grid/category_grid_home.dart';
 import 'package:imat_repo/Widgets/navbar/navbar.dart';
 
+// Bygger hela startsidan för iMat.
+// Visar navbar, hero, alla-varor-kortet och kategorigrid.
+// Använder ListView för scroll och responsiv layout.
+// Huvudentrypoint för användaren i appen.
+
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 

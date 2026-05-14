@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
 
+// Visar en informationsruta bredvid hero-sektionen.
+// Innehåller titel, beskrivning och knapp till alla varor.
+// Används för snabb navigering till hela sortimentet.
+// Liten, kompakt card-komponent.
+
 class AllItemsCard extends StatelessWidget {
   const AllItemsCard({super.key});
 

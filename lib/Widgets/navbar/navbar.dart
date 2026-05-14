@@ -5,6 +5,12 @@ import 'package:imat_repo/Widgets/navbar/cart.button.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
 
+// Bygger iMat-appens toppmeny.
+// Innehåller logga, sökfält och navigationsikoner.
+// Används som AppBar i hela applikationen.
+// Ger snabb åtkomst till varukorg, favoriter och konto.
+
+
 class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   const IMatNavbar({super.key});
 
