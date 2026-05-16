@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/model/imat_data_handler.dart';
+import 'package:provider/provider.dart'; // Provider
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'Pages/home_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  // Wrappar appen i Provider så att AllProductsPage kan hitta ImatDataHandler
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ImatDataHandler(),
+      child: const MyApp(),
+    ),
+  );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -18,7 +27,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: false, 
         scaffoldBackgroundColor: IMatColors.beige,
         fontFamily: 'Inter', 
-        
       ),
       home: const HomePage(),
     );
@@ -110,3 +118,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+

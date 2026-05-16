@@ -10,10 +10,14 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool canGoBack =
+    ModalRoute.of(context)?.settings.name != '/';
+
     return AppBar(
       backgroundColor: IMatColors.green,
       elevation: 0,
-      toolbarHeight: 70,
+      toolbarHeight: 78,
+      automaticallyImplyLeading: false,
       titleSpacing: 0,
       title: LayoutBuilder(
         builder: (context, constraints) {
@@ -21,18 +25,39 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
 
           return Row(
             children: [
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
+
+              // Visa endast tillbaka-knapp om man kan gå tillbaka
+              if (canGoBack)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    tooltip: "Tillbaka",
+                  ),
+                ),
 
               // Klickbar logga som leder till startsidan
               IMatLogo(
                 onTap: () {
-                  Navigator.pushReplacementNamed(context, '/');
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/',
+                    (route) => false,
+                  );
                 },
               ),
+
               const SizedBox(width: 24),
 
-              //  Kortare sökfält (mer luftigt)
-              //  Kortare sökfält (mer luftigt)
+              // Kortare sökfält (mer luftigt)
               Expanded(
                 flex: isSmallScreen ? 2 : 3,
                 child: Padding(
@@ -41,15 +66,15 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxWidth: 600,
-                      ), // ✅ Begränsar maxbredden
+                        maxWidth: 620,
+                      ),
                       child: SizedBox(
-                        height: 38,
+                        height: 46,
                         child: TextField(
                           style: IMatText.bodyM,
                           decoration: InputDecoration(
                             hintText: "Sök varor...",
-                            hintStyle: IMatText.bodyS.copyWith(
+                            hintStyle: IMatText.bodyM.copyWith(
                               color: Colors.grey[600],
                             ),
                             filled: true,
@@ -57,12 +82,14 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                             prefixIcon: const Icon(
                               Icons.search,
                               color: Colors.grey,
+                              size: 28,
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
+                              horizontal: 16,
+                              vertical: 10,
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide.none,
                             ),
                           ),
@@ -72,40 +99,38 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              //Ikoner (klickbara)
+
+              // Ikoner
               CartButton(
                 onTap: () {
                   // TODO: Navigera till varukorg
                 },
               ),
+
               NavIcon(
                 icon: Icons.favorite_border,
                 label: "Favoriter",
-                onTap: () {
-                  // TODO: Navigera till favoriter
-                },
+                onTap: () {},
               ),
+
               NavIcon(
                 icon: Icons.history,
                 label: "Historik",
-                onTap: () {
-                  // TODO: Navigera till historik
-                },
+                onTap: () {},
               ),
+
               NavIcon(
                 icon: Icons.help_outline,
                 label: "Hjälp",
-                onTap: () {
-                  // TODO: Navigera till hjälp
-                },
+                onTap: () {},
               ),
+
               NavIcon(
                 icon: Icons.person_outline,
                 label: "Logga in",
-                onTap: () {
-                  // TODO: Navigera till login
-                },
+                onTap: () {},
               ),
+
               const SizedBox(width: 12),
             ],
           );
@@ -115,5 +140,5 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(70);
+  Size get preferredSize => const Size.fromHeight(78);
 }

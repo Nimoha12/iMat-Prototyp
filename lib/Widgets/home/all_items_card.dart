@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
+import 'package:imat_repo/Pages/all_products/all_products_page.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
 
 // Visar en informationsruta bredvid hero-sektionen.
@@ -47,7 +49,14 @@ class AllItemsCard extends StatelessWidget {
 
           ElevatedButton(
             style: IMatButton.primary,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AllCategoriesPage(),
+                  ),
+                );
+            },
             child: const Text("Visa alla varor"),
           ),
         ],

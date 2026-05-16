@@ -1,7 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Widgets/home/category_grid/category.dart';
+import 'package:imat_repo/model/imat/product.dart';
 
+import 'package:imat_repo/Pages/all_products/category_page.dart';
+import 'package:imat_repo/Pages/all_products/ui_categories.dart'; // behövs för mapping
+
+// 🔹 Mappar ProductCategory → UiCategory (kort & konsist)
+UiCategory mapProductToUi(ProductCategory cat) {
+  if (categoryMap[UiCategory.fruktOchGront]!.contains(cat)) {
+    return UiCategory.fruktOchGront;
+  }
+  if (categoryMap[UiCategory.kottOchFisk]!.contains(cat)) {
+    return UiCategory.kottOchFisk;
+  }
+  if (categoryMap[UiCategory.mejeriAgg]!.contains(cat)) {
+    return UiCategory.mejeriAgg;
+  }
+  if (categoryMap[UiCategory.torrvaror]!.contains(cat)) {
+    return UiCategory.torrvaror;
+  }
+  if (categoryMap[UiCategory.brod]!.contains(cat)) {
+    return UiCategory.brod;
+  }
+  if (categoryMap[UiCategory.snacks]!.contains(cat)) {
+    return UiCategory.snacks;
+  }
+  return UiCategory.dryck;
+}
+
+// 🔹 Visar 6 kategorier på startsidan (din originaldesign)
 class CategoryGridHome extends StatelessWidget {
   const CategoryGridHome({super.key});
 
@@ -75,6 +103,7 @@ class CategoryGridHome extends StatelessWidget {
   }
 }
 
+// 🔹 Enskilt kategori-kort (din originaldesign)
 class _CategoryCard extends StatelessWidget {
   final Category category;
 
@@ -85,7 +114,18 @@ class _CategoryCard extends StatelessWidget {
     final hasImage = category.bgImagePath != null;
 
     return InkWell(
-      onTap: () {},
+      // 🔹 Navigerar nu korrekt till CategoryPage
+      onTap: () {
+        final uiCat = mapProductToUi(category.category);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CategoryPage(uiCategory: uiCat),
+          ),
+        );
+      },
+
       borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
@@ -110,6 +150,7 @@ class _CategoryCard extends StatelessWidget {
                   height: double.infinity,
                 ),
               ),
+
             if (hasImage)
               Container(
                 decoration: BoxDecoration(
@@ -117,6 +158,7 @@ class _CategoryCard extends StatelessWidget {
                   color: Colors.black.withValues(alpha: 0.25),
                 ),
               ),
+
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -134,7 +176,9 @@ class _CategoryCard extends StatelessWidget {
                       size: 40,
                       color: hasImage ? Colors.white : IMatColors.black,
                     ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     category.label,
                     textAlign: TextAlign.center,

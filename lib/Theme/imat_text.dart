@@ -38,4 +38,29 @@ class IMatText {
     fontWeight: FontWeight.w400,
     color: IMatColors.black,
   );
+
+  static final bodyXS = GoogleFonts.inter(
+  fontSize: 14,
+  fontWeight: FontWeight.w400,
+  color: IMatColors.black,
+);
+
+static final h1 = GoogleFonts.inter(
+  fontSize: 32,
+  fontWeight: FontWeight.w700,
+  color: IMatColors.black,
+);
+
+static final h2 = GoogleFonts.inter(
+  fontSize: 26,
+  fontWeight: FontWeight.w700,
+  color: IMatColors.black,
+);
+
+static final h3 = GoogleFonts.inter(
+  fontSize: 22,
+  fontWeight: FontWeight.w600,
+  color: IMatColors.black,
+);
+  
 }
