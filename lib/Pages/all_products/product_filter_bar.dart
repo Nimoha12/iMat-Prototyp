@@ -107,7 +107,7 @@ class ProductFilterBar extends StatelessWidget {
           const SizedBox(height: 8),
 
           DropdownButtonFormField<String>(
-            value: sortBy,
+            initialValue: sortBy,
             decoration: InputDecoration(
               filled: true,
               fillColor: IMatColors.white,
