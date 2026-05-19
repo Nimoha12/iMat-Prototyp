@@ -104,14 +104,13 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
               CartButton(
                 onTap: () {
                   Navigator.push(
-                  context,
-
-                  PageRouteBuilder(
-                    opaque: false,
-
-                    pageBuilder: (_, __, ___) => const Cart(),
-                  ),
-                );
+                    context,
+                    PageRouteBuilder(
+                      opaque: false,
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const Cart(),
+                    ),
+                  );
                 },
               ),
 
