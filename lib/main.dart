@@ -3,6 +3,8 @@ import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart'; // Provider
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'Pages/home_page.dart';
+import 'Widgets/home/login_overlay_scope.dart';
+import 'Widgets/home/login_page.dart';
 
 void main() {
   // Wrappar appen i Provider så att AllProductsPage kan hitta ImatDataHandler
@@ -14,9 +16,34 @@ void main() {
   );
 }
 
-
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool showLoginWidget = false;
+  bool isLoggedIn = false;
+
+  void showLoginOverlay() {
+    setState(() {
+      showLoginWidget = true;
+    });
+  }
+
+  void hideLoginOverlay() {
+    setState(() {
+      showLoginWidget = false;
+    });
+  }
+
+  void markLoggedIn() {
+    setState(() {
+      isLoggedIn = true;
+    });
+  }
 
   // This widget is the root of your application.
   @override
@@ -24,11 +51,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'iMat',
       theme: ThemeData(
-        useMaterial3: false, 
+        useMaterial3: false,
         scaffoldBackgroundColor: IMatColors.beige,
-        fontFamily: 'Inter', 
+        fontFamily: 'Inter',
       ),
       home: const HomePage(),
+      builder: (context, child) {
+        return LoginOverlayScope(
+          isLoggedIn: isLoggedIn,
+          showLoginOverlay: showLoginOverlay,
+          child: Stack(
+            children: [
+              ?child,
+              if (showLoginWidget)
+                LoginOverlay(
+                  onClose: hideLoginOverlay,
+                  onLoginSuccess: markLoggedIn,
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -118,4 +161,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-

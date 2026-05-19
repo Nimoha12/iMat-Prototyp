@@ -7,8 +7,9 @@ import 'hover_close_icon.dart';
 
 class LoginOverlay extends StatefulWidget {
   final VoidCallback onClose;
+  final VoidCallback? onLoginSuccess;
 
-  const LoginOverlay({super.key, required this.onClose});
+  const LoginOverlay({super.key, required this.onClose, this.onLoginSuccess});
 
   @override
   State<LoginOverlay> createState() => _LoginOverlayState();
@@ -186,6 +187,7 @@ class _LoginOverlayState extends State<LoginOverlay> {
       _isSending = false;
     });
 
+    widget.onLoginSuccess?.call();
     widget.onClose();
   }
 }

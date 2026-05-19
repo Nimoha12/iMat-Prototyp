@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/Cart.dart';
+import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/Widgets/navbar/cart.button.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
@@ -11,9 +12,25 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
 
   const IMatNavbar({super.key, this.onLoginTap});
 
+  void _onFavoritesTapLoggedIn(BuildContext context) {
+    // TODO: Fyll i vad Favoriter ska göra när användaren är inloggad.
+  }
+
+  void _onHistoryTapLoggedIn(BuildContext context) {
+    // TODO: Fyll i vad Historik ska göra när användaren är inloggad.
+  }
+
+  void _onUserTapLoggedIn(BuildContext context) {
+    // TODO: Fyll i vad användarknappen ska göra när användaren är inloggad.
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool canGoBack = ModalRoute.of(context)?.settings.name != '/';
+    final loginOverlay = LoginOverlayScope.maybeOf(context);
+    final bool isLoggedIn = loginOverlay?.isLoggedIn ?? false;
+    final VoidCallback showLogin =
+        onLoginTap ?? loginOverlay?.showLoginOverlay ?? () {};
 
     return AppBar(
       backgroundColor: IMatColors.green,
@@ -117,17 +134,27 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
               NavIcon(
                 icon: Icons.favorite_border,
                 label: "Favoriter",
-                onTap: () {},
+                onTap: isLoggedIn
+                    ? () => _onFavoritesTapLoggedIn(context)
+                    : showLogin,
               ),
 
-              NavIcon(icon: Icons.history, label: "Historik", onTap: () {}),
+              NavIcon(
+                icon: Icons.history,
+                label: "Historik",
+                onTap: isLoggedIn
+                    ? () => _onHistoryTapLoggedIn(context)
+                    : showLogin,
+              ),
 
               NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
 
               NavIcon(
-                icon: Icons.person_outline,
-                label: "Logga in",
-                onTap: onLoginTap ?? () {},
+                icon: isLoggedIn ? Icons.account_circle : Icons.person_outline,
+                label: isLoggedIn ? "Användare" : "Logga in",
+                onTap: isLoggedIn
+                    ? () => _onUserTapLoggedIn(context)
+                    : showLogin,
               ),
 
               const SizedBox(width: 12),
