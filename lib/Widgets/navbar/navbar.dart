@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Pages/history/history_page.dart';
 import 'package:imat_repo/Widgets/Cart.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/Widgets/navbar/cart.button.dart';
@@ -17,7 +18,10 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   void _onHistoryTapLoggedIn(BuildContext context) {
-    // TODO: Fyll i vad Historik ska göra när användaren är inloggad.
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const HistoryPage()),
+    );
   }
 
   void _onUserTapLoggedIn(BuildContext context) {
