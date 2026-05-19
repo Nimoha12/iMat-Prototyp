@@ -6,12 +6,13 @@ import 'nav_icon.dart';
 import 'logo.dart';
 
 class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
-  const IMatNavbar({super.key});
+  final VoidCallback? onLoginTap;
+
+  const IMatNavbar({super.key, this.onLoginTap});
 
   @override
   Widget build(BuildContext context) {
-    final bool canGoBack =
-    ModalRoute.of(context)?.settings.name != '/';
+    final bool canGoBack = ModalRoute.of(context)?.settings.name != '/';
 
     return AppBar(
       backgroundColor: IMatColors.green,
@@ -65,9 +66,7 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 620,
-                      ),
+                      constraints: const BoxConstraints(maxWidth: 620),
                       child: SizedBox(
                         height: 46,
                         child: TextField(
@@ -113,22 +112,14 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                 onTap: () {},
               ),
 
-              NavIcon(
-                icon: Icons.history,
-                label: "Historik",
-                onTap: () {},
-              ),
+              NavIcon(icon: Icons.history, label: "Historik", onTap: () {}),
 
-              NavIcon(
-                icon: Icons.help_outline,
-                label: "Hjälp",
-                onTap: () {},
-              ),
+              NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
 
               NavIcon(
                 icon: Icons.person_outline,
                 label: "Logga in",
-                onTap: () {},
+                onTap: onLoginTap ?? () {},
               ),
 
               const SizedBox(width: 12),

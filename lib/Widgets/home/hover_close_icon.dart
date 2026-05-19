@@ -26,11 +26,7 @@ class _HoverCloseIconState extends State<HoverCloseIcon> {
           onTap: widget.onClose,
           child: const Padding(
             padding: EdgeInsets.all(6),
-            child: Icon(
-              Icons.close,
-              size: 26,
-              color: Colors.black,
-            ),
+            child: Icon(Icons.close, size: 26, color: Colors.black),
           ),
         ),
       ),
