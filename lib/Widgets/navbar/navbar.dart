@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Pages/favorites/favorites_page.dart';
 import 'package:imat_repo/Pages/history/history_page.dart';
 import 'package:imat_repo/Widgets/Cart.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
@@ -14,7 +15,10 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   const IMatNavbar({super.key, this.onLoginTap});
 
   void _onFavoritesTapLoggedIn(BuildContext context) {
-    // TODO: Fyll i vad Favoriter ska göra när användaren är inloggad.
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FavoritesPage()),
+    );
   }
 
   void _onHistoryTapLoggedIn(BuildContext context) {
@@ -33,8 +37,11 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
     final bool canGoBack = ModalRoute.of(context)?.settings.name != '/';
     final loginOverlay = LoginOverlayScope.maybeOf(context);
     final bool isLoggedIn = loginOverlay?.isLoggedIn ?? false;
-    final VoidCallback showLogin =
-        onLoginTap ?? loginOverlay?.showLoginOverlay ?? () {};
+    final ShowLoginOverlay showLogin =
+        loginOverlay?.showLoginOverlay ??
+        ({LoginSuccessAction? onLoginSuccess}) {
+          onLoginTap?.call();
+        };
 
     return AppBar(
       backgroundColor: IMatColors.green,
@@ -140,7 +147,9 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                 label: "Favoriter",
                 onTap: isLoggedIn
                     ? () => _onFavoritesTapLoggedIn(context)
-                    : showLogin,
+                    : () => showLogin(
+                        onLoginSuccess: () => _onFavoritesTapLoggedIn(context),
+                      ),
               ),
 
               NavIcon(
@@ -148,7 +157,9 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                 label: "Historik",
                 onTap: isLoggedIn
                     ? () => _onHistoryTapLoggedIn(context)
-                    : showLogin,
+                    : () => showLogin(
+                        onLoginSuccess: () => _onHistoryTapLoggedIn(context),
+                      ),
               ),
 
               NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
@@ -158,7 +169,7 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                 label: isLoggedIn ? "Användare" : "Logga in",
                 onTap: isLoggedIn
                     ? () => _onUserTapLoggedIn(context)
-                    : showLogin,
+                    : () => showLogin(),
               ),
 
               const SizedBox(width: 12),

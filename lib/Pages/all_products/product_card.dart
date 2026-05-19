@@ -9,17 +9,12 @@ import 'package:provider/provider.dart';
 class ProductCard extends StatelessWidget {
   final Product product;
 
-  const ProductCard({
-    super.key,
-    required this.product,
-  });
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final iMat = Provider.of<ImatDataHandler>(
-      context,
-      listen: false,
-    );
+    final iMat = context.watch<ImatDataHandler>();
+    final isFavorite = iMat.isFavorite(product);
 
     final unit = product.unit.replaceAll("kr/", "");
 
@@ -27,12 +22,10 @@ class ProductCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: IMatColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: IMatColors.border,
-        ),
+        border: Border.all(color: IMatColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -44,16 +37,38 @@ class ProductCard extends StatelessWidget {
         children: [
           SizedBox(
             height: 140,
-            child: iMat.getImage(product),
+            child: Stack(
+              children: [
+                Positioned.fill(child: iMat.getImage(product)),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Material(
+                    color: IMatColors.white.withValues(alpha: 0.92),
+                    shape: const CircleBorder(),
+                    child: IconButton(
+                      tooltip: isFavorite
+                          ? "Ta bort från favoriter"
+                          : "Lägg till i favoriter",
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : IMatColors.green,
+                      ),
+                      onPressed: () {
+                        iMat.toggleFavorite(product);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 16),
 
           Text(
             product.name,
-            style: IMatText.bodyL.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: IMatText.bodyL.copyWith(fontWeight: FontWeight.w700),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -77,17 +92,13 @@ class ProductCard extends StatelessWidget {
                 backgroundColor: IMatColors.green,
                 foregroundColor: IMatColors.white,
                 elevation: 0,
-                textStyle: IMatText.bodyM.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               onPressed: () {
-                iMat.shoppingCartAdd(
-                  ShoppingItem(product, amount: 1),
-                );
+                iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
               },
               child: const Text("Lägg till"),
             ),

@@ -26,9 +26,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool showLoginWidget = false;
   bool isLoggedIn = false;
+  VoidCallback? onLoginSuccessAction;
 
-  void showLoginOverlay() {
+  void showLoginOverlay({VoidCallback? onLoginSuccess}) {
     setState(() {
+      onLoginSuccessAction = onLoginSuccess;
       showLoginWidget = true;
     });
   }
@@ -36,13 +38,18 @@ class _MyAppState extends State<MyApp> {
   void hideLoginOverlay() {
     setState(() {
       showLoginWidget = false;
+      onLoginSuccessAction = null;
     });
   }
 
   void markLoggedIn() {
+    final afterLogin = onLoginSuccessAction;
     setState(() {
       isLoggedIn = true;
+      showLoginWidget = false;
+      onLoginSuccessAction = null;
     });
+    afterLogin?.call();
   }
 
   // This widget is the root of your application.

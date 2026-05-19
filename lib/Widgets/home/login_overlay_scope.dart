@@ -1,8 +1,11 @@
 import 'package:flutter/widgets.dart';
 
+typedef LoginSuccessAction = void Function();
+typedef ShowLoginOverlay = void Function({LoginSuccessAction? onLoginSuccess});
+
 class LoginOverlayScope extends InheritedWidget {
   final bool isLoggedIn;
-  final VoidCallback showLoginOverlay;
+  final ShowLoginOverlay showLoginOverlay;
 
   const LoginOverlayScope({
     super.key,
