@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/Cart.dart';
 import 'package:imat_repo/Widgets/navbar/cart.button.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
@@ -102,7 +103,15 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
               // Ikoner
               CartButton(
                 onTap: () {
-                  // TODO: Navigera till varukorg
+                  Navigator.push(
+                  context,
+
+                  PageRouteBuilder(
+                    opaque: false,
+
+                    pageBuilder: (_, __, ___) => const Cart(),
+                  ),
+                );
                 },
               ),
 
