@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:imat_repo/Pages/all_products/product_card.dart';
+import 'package:imat_repo/Pages/all_products/categorized_product_sections.dart';
 import 'package:imat_repo/Pages/all_products/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
@@ -89,53 +89,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
               const SizedBox(height: 24),
 
-              if (favorites.isNotEmpty) ...[
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: favoriteProductsByCategory.keys.map((uiCategory) {
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        final context = sectionKeys[uiCategory]!.currentContext;
-
-                        if (context == null) {
-                          return;
-                        }
-
-                        Scrollable.ensureVisible(
-                          context,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          color: IMatColors.greenLight,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: IMatColors.border),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 16,
-                          ),
-                          child: Text(
-                            uiCategory.label,
-                            style: IMatText.bodyM.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: IMatColors.green,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-
-                const SizedBox(height: 32),
-              ],
-
               if (favorites.isEmpty)
                 Text(
                   "Du har inga favoritvaror än.",
@@ -144,29 +97,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   ),
                 )
               else
-                ...favoriteProductsByCategory.entries.map((entry) {
-                  return Padding(
-                    key: sectionKeys[entry.key],
-                    padding: const EdgeInsets.only(bottom: 48),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(entry.key.label, style: IMatText.h3),
-                        const SizedBox(height: 16),
-                        Wrap(
-                          spacing: 24,
-                          runSpacing: 24,
-                          children: entry.value.map((product) {
-                            return SizedBox(
-                              width: 260,
-                              child: ProductCard(product: product),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                CategorizedProductSections(
+                  productsByCategory: favoriteProductsByCategory,
+                  sectionKeys: sectionKeys,
+                ),
             ],
           ),
         ),
