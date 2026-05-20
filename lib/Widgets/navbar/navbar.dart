@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/Profile_page.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Pages/favorites/favorites_page.dart';
@@ -7,11 +8,13 @@ import 'package:imat_repo/Pages/search/search_page.dart';
 import 'package:imat_repo/Widgets/Cart.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/Widgets/navbar/cart.button.dart';
+import 'package:imat_repo/model/AuthState.dart';
+import 'package:provider/provider.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
 
 class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback? onLoginTap;
+   final VoidCallback? onLoginTap;
 
   const IMatNavbar({super.key, this.onLoginTap});
 
@@ -30,7 +33,12 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   void _onUserTapLoggedIn(BuildContext context) {
-    // TODO: Fyll i vad användarknappen ska göra när användaren är inloggad.
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const ProfilePage(),
+    ),
+  );
   }
 
   void _onSearchSubmitted(BuildContext context, String query) {
@@ -50,7 +58,7 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final bool canGoBack = ModalRoute.of(context)?.settings.name != '/';
     final loginOverlay = LoginOverlayScope.maybeOf(context);
-    final bool isLoggedIn = loginOverlay?.isLoggedIn ?? false;
+    final bool isLoggedIn = context.watch<AuthState>().isLoggedIn;
     final ShowLoginOverlay showLogin =
         loginOverlay?.showLoginOverlay ??
         ({LoginSuccessAction? onLoginSuccess}) {
