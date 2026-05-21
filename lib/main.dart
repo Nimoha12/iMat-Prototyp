@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/model/AuthState.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart'; // Provider
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'Pages/home_page.dart';
+import 'Pages/checkout_page.dart';
 import 'Widgets/home/login_overlay_scope.dart';
 import 'Widgets/home/login_page.dart';
 
 void main() {
-  // Wrappar appen i Provider så att AllProductsPage kan hitta ImatDataHandler
+  // Wrap the app in providers so the whole app can access AuthState and ImatDataHandler.
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ImatDataHandler(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ImatDataHandler()),
+        ChangeNotifierProvider(create: (_) => AuthState()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -25,7 +30,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool showLoginWidget = false;
-  bool isLoggedIn = false;
   VoidCallback? onLoginSuccessAction;
 
   void showLoginOverlay({VoidCallback? onLoginSuccess}) {
@@ -44,17 +48,23 @@ class _MyAppState extends State<MyApp> {
 
   void markLoggedIn() {
     final afterLogin = onLoginSuccessAction;
+
     setState(() {
-      isLoggedIn = true;
       showLoginWidget = false;
       onLoginSuccessAction = null;
     });
+
+    context.read<AuthState>().login();
+
     afterLogin?.call();
+
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthState>();
+
     return MaterialApp(
       title: 'iMat',
       theme: ThemeData(
@@ -63,13 +73,16 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'Inter',
       ),
       home: const HomePage(),
+      routes: {
+        '/checkout': (_) => const CheckoutPage(),
+      },
       builder: (context, child) {
         return LoginOverlayScope(
-          isLoggedIn: isLoggedIn,
+          isLoggedIn: authState.isLoggedIn,
           showLoginOverlay: showLoginOverlay,
           child: Stack(
             children: [
-              ?child,
+              if (child != null) child,
               if (showLoginWidget)
                 LoginOverlay(
                   onClose: hideLoginOverlay,
