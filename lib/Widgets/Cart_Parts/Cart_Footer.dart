@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/checkout_page.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 
 import 'package:provider/provider.dart';
@@ -59,6 +60,12 @@ class CartFooter extends StatelessWidget {
               ),
 
               onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    settings: const RouteSettings(name: '/checkout'),
+                    builder: (_) => const CheckoutPage(),
+                  ),
+                );
               },
 
               child: const Text(
