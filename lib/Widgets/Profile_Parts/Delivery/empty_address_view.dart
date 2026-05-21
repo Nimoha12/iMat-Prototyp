@@ -11,13 +11,13 @@ class EmptyAddressView
   Widget build(BuildContext context) {
 
     return Container(
-      height: 300,
+      height: 180,
 
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF8F8F8),
 
         borderRadius:
-            BorderRadius.circular(20),
+            BorderRadius.circular(14),
 
         border: Border.all(
           color: Colors.grey.shade300,
@@ -33,17 +33,18 @@ class EmptyAddressView
 
             Icon(
               Icons.location_on,
-              size: 90,
+              size: 28,
               color: Colors.grey,
             ),
 
-            SizedBox(height: 20),
+            SizedBox(height: 12),
 
             Text(
               'Inga adresser sparade',
 
               style: TextStyle(
-                fontSize: 34,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],

@@ -21,7 +21,7 @@ class SettingsRadioOption extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(
-        bottom: 18,
+        bottom: 12,
       ),
 
       child: InkWell(
@@ -56,7 +56,7 @@ class SettingsRadioOption extends StatelessWidget {
               title,
 
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 18,
               ),
             ),
           ],

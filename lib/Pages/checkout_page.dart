@@ -17,7 +17,10 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  static const double _stepContentHeight = 390;
+  static const double _stageWidth = 660;
+  static const double _stepContentHeight = 430;
+  static const double _backButtonWidth = 150;
+  static const double _buttonGap = 12;
 
   int _step = 0;
   int _selectedDate = 0;
@@ -124,29 +127,36 @@ class _CheckoutPageState extends State<CheckoutPage> {
               onBackToShop: () => Navigator.of(context).pop(),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(36, 34, 36, 48),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 660),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: _stepContentHeight,
-                          child: SingleChildScrollView(
-                            child: Align(
-                              alignment: Alignment.topCenter,
-                              child: _buildStepContent(isLoggedIn),
-                            ),
+              child: LayoutBuilder(
+                builder: (context, _) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(36, 24, 36, 28),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: _stageWidth,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: _stepContentHeight,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: _buildStepContent(isLoggedIn),
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              if (!_orderPlaced && (_step > 0 || isLoggedIn))
+                                _buildNavigation(isLoggedIn),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 18),
-                        if (!_orderPlaced && (_step > 0 || isLoggedIn))
-                          _buildNavigation(isLoggedIn),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -174,27 +184,29 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildLoginCard() {
     return _Panel(
+      width: 430,
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('Logga in', textAlign: TextAlign.center, style: IMatText.h1),
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           _LabeledField(
             label: 'E-postadress',
             hint: 'din.epost@example.com',
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           _LabeledField(
             label: 'Lösenord',
             hint: 'Ange ditt lösenord',
             controller: _passwordController,
             obscureText: true,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
           SizedBox(
-            height: 62,
+            height: 58,
             child: ElevatedButton(
               onPressed: _canLogin ? _login : null,
               style: _primaryStyle(),
@@ -207,41 +219,39 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildLoggedInCard() {
-    return Center(
-      child: _Panel(
-        width: 360,
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 26),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Du är inloggad',
-                    style: IMatText.headingM.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+    return _Panel(
+      width: 360,
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 26),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Du är inloggad',
+                  style: IMatText.headingM.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Dina uppgifter fylls i automatiskt i nästa steg.',
-                    style: IMatText.bodyXS.copyWith(
-                      color: IMatColors.textSecondary,
-                      height: 1.35,
-                    ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Dina uppgifter fylls i automatiskt i nästa steg.',
+                  style: IMatText.bodyXS.copyWith(
+                    color: IMatColors.textSecondary,
+                    height: 1.35,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const Icon(
-              Icons.check_circle,
-              color: IMatColors.green,
-              size: 34,
-            ),
-          ],
-        ),
+          ),
+          const Icon(
+            Icons.check_circle,
+            color: IMatColors.green,
+            size: 34,
+          ),
+        ],
       ),
     );
   }
@@ -279,11 +289,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildDeliveryCard() {
     return _Panel(
+      width: 610,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _PanelTitle(icon: Icons.local_shipping, title: 'Leveranstid'),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -298,10 +311,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(_dates[index].weekday, style: IMatText.bodyXS),
+                            Text(
+                              _dates[index].weekday,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: IMatText.bodyXS,
+                            ),
                             const SizedBox(height: 4),
                             Text(
                               _dates[index].date,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: IMatText.bodyXS.copyWith(
                                 fontWeight: FontWeight.w800,
                               ),
@@ -312,7 +332,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: _OptionGrid(
                   title: 'Tid',
@@ -324,6 +344,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         child: Center(
                           child: Text(
                             _times[index],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                             style: IMatText.bodyXS.copyWith(
                               fontWeight: FontWeight.w700,
@@ -343,11 +365,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildDetailsCard() {
     return _Panel(
+      width: 610,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Dina uppgifter', style: IMatText.h2),
-          const SizedBox(height: 16),
+          Text(
+            'Dina uppgifter',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: IMatText.h2,
+          ),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -356,7 +386,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   controller: _firstNameController,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               SizedBox(
                 width: 150,
                 child: _LabeledField(
@@ -365,14 +395,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   keyboardType: TextInputType.number,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               SizedBox(
                 width: 150,
                 child: _LabeledField(label: 'Ort', controller: _cityController),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -381,7 +411,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   controller: _lastNameController,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: _LabeledField(
                   label: 'Gatuadress',
@@ -390,7 +420,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -400,7 +430,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   keyboardType: TextInputType.phone,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: _LabeledField(
                   label: 'E-postadress',
@@ -417,11 +447,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildPaymentCard() {
     return _Panel(
+      width: 560,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _PanelTitle(icon: Icons.credit_card, title: 'Välj betalningssätt'),
-          const SizedBox(height: 22),
+          const SizedBox(height: 18),
           Row(
             children: [
               for (final method in ['Faktura', 'Betalkort', 'Swish']) ...[
@@ -436,7 +469,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ],
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           if (_payment == 'Faktura')
             _LabeledField(
               label: 'E-post för faktura',
@@ -458,7 +491,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   controller: _cardNumberController,
                   keyboardType: TextInputType.number,
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
@@ -518,88 +551,98 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
     }
 
-    return Column(
-      children: [
-        _Panel(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return _Panel(
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Granska din beställning',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: IMatText.h2,
+          ),
+          const SizedBox(height: 10),
+          Row(
             children: [
-              Text('Granska din beställning', style: IMatText.h2),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _SummaryBox(
-                      title: 'Leveranstid',
-                      lines: [
-                        _dates[_selectedDate].fullLabel,
-                        _times[_selectedTime],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _SummaryBox(
-                      title: 'Leveransadress',
-                      lines: [_addressController.text, _addressLine],
-                    ),
-                  ),
-                ],
+              Expanded(
+                child: _SummaryBox(
+                  title: 'Leveranstid',
+                  lines: [_dates[_selectedDate].fullLabel, _times[_selectedTime]],
+                ),
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _SummaryBox(
-                      title: 'Kontaktinformation',
-                      lines: [
-                        _fullName,
-                        _phoneController.text,
-                        _invoiceEmailController.text,
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _SummaryBox(
-                      title: 'Betalning',
-                      lines: [_payment],
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: _SummaryBox(
+                  title: 'Leveransadress',
+                  lines: [_addressController.text, _addressLine],
+                ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 18),
-        _Panel(
-          child: _OrderSummary(items: items, total: total),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _SummaryBox(
+                  title: 'Kontaktinformation',
+                  lines: [
+                    _fullName,
+                    _phoneController.text,
+                    _invoiceEmailController.text,
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _SummaryBox(title: 'Betalning', lines: [_payment]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _OrderSummary(items: items, total: total),
+        ],
+      ),
     );
   }
 
   Widget _buildNavigation(bool isLoggedIn) {
+    if (_step == 0) {
+      return Center(
+        child: SizedBox(
+          width: _stageWidth - _backButtonWidth - _buttonGap,
+          height: 60,
+          child: ElevatedButton(
+            onPressed: _canContinue(isLoggedIn) ? _next : null,
+            style: _primaryStyle(),
+            child: const Text('Fortsätt →'),
+          ),
+        ),
+      );
+    }
+
     return Row(
       children: [
-        if (_step > 0)
-          SizedBox(
-            width: 150,
-            height: 60,
-            child: OutlinedButton(
-              onPressed: () => setState(() => _step--),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: IMatColors.green,
-                side: const BorderSide(color: IMatColors.green, width: 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+        SizedBox(
+          width: _backButtonWidth,
+          height: 60,
+          child: OutlinedButton(
+            onPressed: () => setState(() => _step--),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: IMatColors.green,
+              side: const BorderSide(color: IMatColors.green, width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text('← Tillbaka'),
+              textStyle: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
+            child: const Text('← Tillbaka'),
           ),
-        if (_step == 0) const SizedBox(width: 150),
-        if (_step > 0 || _step == 0) const SizedBox(width: 12),
+        ),
+        const SizedBox(width: _buttonGap),
         Expanded(
           child: SizedBox(
             height: 60,
@@ -728,36 +771,46 @@ class _CheckoutSidebar extends StatelessWidget {
       width: 300,
       color: const Color(0xFFF1EDE4),
       padding: const EdgeInsets.fromLTRB(28, 34, 22, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton.icon(
-              onPressed: onBackToShop,
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Tillbaka till handla'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: IMatColors.green,
-                foregroundColor: IMatColors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 250,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton.icon(
+                    onPressed: onBackToShop,
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Tillbaka till handla'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: IMatColors.green,
+                      foregroundColor: IMatColors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 28),
+                for (int index = 0; index < labels.length; index++)
+                  _StepIndicator(
+                    number: index + 1,
+                    label: labels[index],
+                    isActive: step == index,
+                    isDone: step > index,
+                    showLine: index < labels.length - 1,
+                  ),
+              ],
             ),
           ),
-          const SizedBox(height: 28),
-          for (int index = 0; index < labels.length; index++)
-            _StepIndicator(
-              number: index + 1,
-              label: labels[index],
-              isActive: step == index,
-              isDone: step > index,
-              showLine: index < labels.length - 1,
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -808,13 +861,19 @@ class _StepIndicator extends StatelessWidget {
           ],
         ),
         const SizedBox(width: 12),
-        Padding(
-          padding: const EdgeInsets.only(top: 7),
-          child: Text(
-            label,
-            style: IMatText.bodyS.copyWith(
-              color: isActive || isDone ? IMatColors.black : IMatColors.textSecondary,
-              fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 7),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: IMatText.bodyS.copyWith(
+                color: isActive || isDone
+                    ? IMatColors.black
+                    : IMatColors.textSecondary,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -867,7 +926,14 @@ class _PanelTitle extends StatelessWidget {
       children: [
         Icon(icon, color: IMatColors.green, size: 34),
         const SizedBox(width: 12),
-        Text(title, style: IMatText.h2),
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: IMatText.h2,
+          ),
+        ),
       ],
     );
   }
@@ -895,6 +961,8 @@ class _LabeledField extends StatelessWidget {
       children: [
         Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 7),
@@ -938,7 +1006,7 @@ class _OptionGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: IMatColors.border),
         borderRadius: BorderRadius.circular(8),
@@ -946,16 +1014,25 @@ class _OptionGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 10),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 1.05,
-            children: children,
+          Text(title, style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final tileWidth = (constraints.maxWidth - 18) / 3;
+
+              return Wrap(
+                spacing: 9,
+                runSpacing: 9,
+                children: [
+                  for (final child in children)
+                    SizedBox(
+                      width: tileWidth,
+                      height: tileWidth / 1.08,
+                      child: child,
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -1022,6 +1099,8 @@ class _PaymentTab extends StatelessWidget {
         ),
         child: Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: IMatText.bodyXS.copyWith(fontWeight: FontWeight.w800),
         ),
       ),
@@ -1037,21 +1116,42 @@ class _SummaryBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final visibleLines = lines
+        .where((line) => line.trim().isNotEmpty)
+        .take(2)
+        .toList();
+    final hiddenCount =
+        lines.where((line) => line.trim().isNotEmpty).length -
+        visibleLines.length;
+
     return Container(
-      height: 94,
-      padding: const EdgeInsets.all(12),
+      constraints: const BoxConstraints(minHeight: 68),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
         border: Border.all(color: IMatColors.border),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: IMatText.bodyXS.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 6),
-          for (final line in lines.where((line) => line.trim().isNotEmpty))
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: IMatText.bodyXS.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 4),
+          for (final line in visibleLines)
             Text(
               line,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: IMatText.bodyXS.copyWith(color: IMatColors.textSecondary),
+            ),
+          if (hiddenCount > 0)
+            Text(
+              '+ $hiddenCount rad${hiddenCount == 1 ? '' : 'er'}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: IMatText.bodyXS.copyWith(color: IMatColors.textSecondary),
@@ -1070,50 +1170,98 @@ class _OrderSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final visibleItems = items.take(1).toList();
+    final hiddenCount = items.length - visibleItems.length;
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: IMatColors.green, width: 2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ordersammanfattning', style: IMatText.h2),
-          const SizedBox(height: 20),
-          Text('${items.length} vara', style: IMatText.bodyM),
-          const SizedBox(height: 18),
-          for (final item in items) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'Ordersammanfattning',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: IMatText.h3,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Flexible(
+                child: Text(
+                  _itemCountLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: IMatText.bodyS,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          for (final item in visibleItems) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
                     item.product.name,
-                    style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
                   ),
                 ),
-                Text(
-                  '${item.total.toStringAsFixed(2)} kr',
-                  style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    '${item.total.toStringAsFixed(2)} kr',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               '${_formatAmount(item.amount)} x ${item.product.price.toStringAsFixed(2)} kr',
-              style: IMatText.bodyS,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: IMatText.bodyXS,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 5),
           ],
-          const Divider(height: 30, color: IMatColors.green),
+          if (hiddenCount > 0) ...[
+            Text(
+              '+ $hiddenCount fler varor',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: IMatText.bodyXS.copyWith(color: IMatColors.textSecondary),
+            ),
+            const SizedBox(height: 5),
+          ],
+          const Divider(height: 14, color: IMatColors.green),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Totalt:', style: IMatText.h3),
-              Text(
-                '${total.toStringAsFixed(2)} kr',
-                style: IMatText.h2.copyWith(color: IMatColors.green),
+              Flexible(
+                child: Text(
+                  '${total.toStringAsFixed(2)} kr',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: IMatText.h3.copyWith(color: IMatColors.green),
+                ),
               ),
             ],
           ),
@@ -1127,6 +1275,13 @@ class _OrderSummary extends StatelessWidget {
       return amount.toInt().toString();
     }
     return amount.toStringAsFixed(1);
+  }
+
+  String get _itemCountLabel {
+    if (items.length == 1) {
+      return '1 vara';
+    }
+    return '${items.length} varor';
   }
 }
 

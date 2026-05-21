@@ -3,114 +3,75 @@ import 'package:imat_repo/Widgets/Profile_Parts/Settings_Page/Settings_Radio_Opt
 import 'package:imat_repo/Widgets/Profile_Parts/Settings_Page/Settings_Section.dart';
 
 class SettingsPage extends StatefulWidget {
-
   const SettingsPage({
     super.key,
   });
 
   @override
-  State<SettingsPage> createState() =>
-      _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState
-    extends State<SettingsPage> {
-
+class _SettingsPageState extends State<SettingsPage> {
   String textSize = 'medium';
   String contrast = 'standard';
   String language = 'sv';
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32),
-
       child: Center(
         child: Container(
-          constraints:
-              const BoxConstraints(
-            maxWidth: 1000,
+          constraints: const BoxConstraints(
+            maxWidth: 760,
           ),
-
-          padding: const EdgeInsets.all(32),
-
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.white,
-
-            borderRadius:
-                BorderRadius.circular(20),
-
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: Colors.grey.shade300,
             ),
           ),
-
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              //////////////////////////////////////////////////
-              /// TITLE
-              //////////////////////////////////////////////////
-
               const Text(
                 'Inställningar',
-
                 style: TextStyle(
-                  fontSize: 40,
+                  fontSize: 36,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              const SizedBox(height: 36),
-
-              //////////////////////////////////////////////////
-              /// TEXT SIZE
-              //////////////////////////////////////////////////
-
+              const SizedBox(height: 28),
               SettingsSection(
                 title: 'Textstorlek',
-
                 children: [
-
                   SettingsRadioOption(
                     title: 'Liten',
                     value: 'small',
                     groupValue: textSize,
-
                     onChanged: (value) {
-
                       setState(() {
                         textSize = value!;
                       });
                     },
                   ),
-
                   SettingsRadioOption(
-                    title:
-                        'Mellan (Rekommenderas)',
-
+                    title: 'Mellan (Rekommenderas)',
                     value: 'medium',
                     groupValue: textSize,
-
                     onChanged: (value) {
-
                       setState(() {
                         textSize = value!;
                       });
                     },
                   ),
-
                   SettingsRadioOption(
                     title: 'Stor',
                     value: 'large',
                     groupValue: textSize,
-
                     onChanged: (value) {
-
                       setState(() {
                         textSize = value!;
                       });
@@ -118,38 +79,25 @@ class _SettingsPageState
                   ),
                 ],
               ),
-
-              const Divider(height: 60),
-
-              //////////////////////////////////////////////////
-              /// CONTRAST
-              //////////////////////////////////////////////////
-
+              const Divider(height: 40),
               SettingsSection(
                 title: 'Kontrastläge',
-
                 children: [
-
                   SettingsRadioOption(
                     title: 'Standard',
                     value: 'standard',
                     groupValue: contrast,
-
                     onChanged: (value) {
-
                       setState(() {
                         contrast = value!;
                       });
                     },
                   ),
-
                   SettingsRadioOption(
                     title: 'Hög kontrast',
                     value: 'high',
                     groupValue: contrast,
-
                     onChanged: (value) {
-
                       setState(() {
                         contrast = value!;
                       });
@@ -157,38 +105,25 @@ class _SettingsPageState
                   ),
                 ],
               ),
-
-              const Divider(height: 90),
-
-              //////////////////////////////////////////////////
-              /// LANGUAGE
-              //////////////////////////////////////////////////
-
+              const Divider(height: 40),
               SettingsSection(
                 title: 'Språk',
-
                 children: [
-
                   SettingsRadioOption(
                     title: 'Svenska',
                     value: 'sv',
                     groupValue: language,
-
                     onChanged: (value) {
-
                       setState(() {
                         language = value!;
                       });
                     },
                   ),
-
                   SettingsRadioOption(
                     title: 'English',
                     value: 'en',
                     groupValue: language,
-
                     onChanged: (value) {
-
                       setState(() {
                         language = value!;
                       });
@@ -196,54 +131,34 @@ class _SettingsPageState
                   ),
                 ],
               ),
-
-              const SizedBox(height: 50),
-
-              //////////////////////////////////////////////////
-              /// INFO BOX
-              //////////////////////////////////////////////////
-
+              const SizedBox(height: 28),
               Container(
                 width: double.infinity,
-
-                padding:
-                    const EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 18,
                 ),
-
                 decoration: BoxDecoration(
-                  color:
-                      const Color(0xFFF1F7F4),
-
-                  borderRadius:
-                      BorderRadius.circular(16),
-
+                  color: const Color(0xFFF1F7F4),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color:
-                        const Color(0xFF3F8A73),
-
+                    color: const Color(0xFF3F8A73),
                     width: 2,
                   ),
                 ),
-
                 child: const Row(
                   children: [
-
-                    Text(
-                      '💡',
-                      style:
-                          TextStyle(fontSize: 24),
+                    Icon(
+                      Icons.lightbulb,
+                      size: 28,
+                      color: Color(0xFF3F8A73),
                     ),
-
                     SizedBox(width: 14),
-
                     Expanded(
                       child: Text(
                         'Tips: Inställningarna sparas automatiskt och gäller för hela webbplatsen.',
-
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       ),
                     ),

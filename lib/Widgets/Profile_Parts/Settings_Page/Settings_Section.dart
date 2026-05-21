@@ -29,12 +29,12 @@ class SettingsSection
           title,
 
           style: const TextStyle(
-            fontSize: 38,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
 
-        const SizedBox(height: 30),
+        const SizedBox(height: 12),
 
         //////////////////////////////////////////////////////
         /// OPTIONS

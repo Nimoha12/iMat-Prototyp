@@ -2,90 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Delivery/add_address_form.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Delivery/empty_address_view.dart';
 
-
-class DeliveryAddressesPage
-    extends StatefulWidget {
-
+class DeliveryAddressesPage extends StatefulWidget {
   const DeliveryAddressesPage({
     super.key,
   });
 
   @override
-  State<DeliveryAddressesPage>
-      createState() =>
-          _DeliveryAddressesPageState();
+  State<DeliveryAddressesPage> createState() => _DeliveryAddressesPageState();
 }
 
-class _DeliveryAddressesPageState
-    extends State<DeliveryAddressesPage> {
-
+class _DeliveryAddressesPageState extends State<DeliveryAddressesPage> {
   bool isAddingAddress = false;
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32),
-
       child: Center(
         child: Container(
-          constraints:
-              const BoxConstraints(
-            maxWidth: 1000,
+          constraints: const BoxConstraints(
+            maxWidth: 760,
           ),
-
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Colors.grey.shade300,
+            ),
+          ),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Row(
                 children: [
-
-                  const Text(
-                    'Mina leveransadresser',
-
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+                  const Expanded(
+                    child: Text(
+                      'Mina leveransadresser',
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-
-                  const Spacer(),
-
+                  const SizedBox(width: 16),
                   ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xFF3F8A73),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3F8A73),
                     ),
-
                     onPressed: () {
-
                       setState(() {
                         isAddingAddress = true;
                       });
                     },
-
                     child: const Text(
                       '+ Lägg till adress',
                       style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-          ),
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 32),
-
+              const SizedBox(height: 28),
               isAddingAddress
                   ? AddAddressForm(
                       onCancel: () {
-
                         setState(() {
                           isAddingAddress = false;
                         });
