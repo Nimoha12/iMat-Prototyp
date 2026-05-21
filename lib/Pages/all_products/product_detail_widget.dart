@@ -140,6 +140,8 @@ class ProductDetailWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
+
+        // ⭐ FIXAD PRISRUTA — ingen dubbel "kr/kg"
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -150,16 +152,9 @@ class ProductDetailWidget extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(width: 12),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 3),
-              child: Text(
-                product.unit,
-                style: IMatText.bodyS.copyWith(color: IMatColors.textSecondary),
-              ),
-            ),
           ],
         ),
+
         const SizedBox(height: 24),
         Wrap(
           spacing: 12,
@@ -291,22 +286,17 @@ class ProductDetailWidget extends StatelessWidget {
     return SizedBox(
       width: 44,
       height: 44,
-
       child: ElevatedButton(
         onPressed: onPressed,
-
         style: ElevatedButton.styleFrom(
           backgroundColor: IMatColors.green,
           foregroundColor: IMatColors.white,
           elevation: 0,
-
           padding: EdgeInsets.zero,
-
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-
         child: Icon(icon),
       ),
     );

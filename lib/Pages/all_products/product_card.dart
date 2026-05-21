@@ -5,9 +5,9 @@ import 'package:imat_repo/Widgets/add_to_cart_button.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
-import "package:imat_repo/Pages/all_products/product_detail_widget.dart";
-import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:provider/provider.dart';
+
+import 'product_detail_overlay.dart'; // overlay-versionen
 
 class ProductCard extends StatefulWidget {
   final Product product;
@@ -58,12 +58,16 @@ class _ProductCardState extends State<ProductCard>
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
+
+      // Öppna produktdetalj som overlay
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                IMatScaffold(body: ProductDetailWidget(product: widget.product)),
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            opaque: false,
+            barrierColor: Colors.black.withOpacity(0.5),
+            pageBuilder: (_, __, ___) {
+              return ProductDetailOverlay(product: widget.product);
+            },
           ),
         );
       },
@@ -98,11 +102,13 @@ class _ProductCardState extends State<ProductCard>
                     right: 0,
                     child: GestureDetector(
                       onTap: () {
+                        // If not logged in, show login popup instead of toggling favorite
                         if (loginScope != null && !loginScope.isLoggedIn) {
                           loginScope.showLoginOverlay();
                           return;
                         }
 
+                        // Logged in: animate and toggle favorite
                         triggerPop();
                         iMat.toggleFavorite(widget.product);
                       },
