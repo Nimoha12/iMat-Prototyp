@@ -100,4 +100,13 @@ class ShoppingCart {
   */
 
   static const _items = 'items';
+
+  int get totalItems {
+  int sum = 0;
+  for (final item in items) {
+    sum += item.amount.toInt();
+  }
+  return sum;
+}
+
 }

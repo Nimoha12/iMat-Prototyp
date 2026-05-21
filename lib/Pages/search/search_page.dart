@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/all_products/category_page.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_repo/Pages/all_products/categorized_product_sections.dart';
 import 'package:imat_repo/Pages/all_products/ui_categories.dart';
@@ -96,7 +97,12 @@ class _SearchPageState extends State<SearchPage> {
               else
                 CategorizedProductSections(
                   productsByCategory: searchResult.productsByCategory,
-                  sectionKeys: sectionKeys,
+                  onCategoryHeaderTap: (uiCat){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryPage(uiCategory: uiCat)));
+                  },
                 ),
             ],
           ),

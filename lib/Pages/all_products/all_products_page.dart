@@ -8,7 +8,7 @@ import 'package:imat_repo/Theme/imat_colors.dart';
 
 import 'ui_categories.dart';
 import 'product_card.dart';
-import 'product_filter_bar.dart';
+import 'product_filter_panel.dart';
 
 class AllProductsPage extends StatefulWidget {
   final UiCategory uiCategory;
@@ -135,13 +135,16 @@ class _AllProductsPageState extends State<AllProductsPage> {
             const SizedBox(height: 24),
 
             // Filterrad
-            ProductFilterBar(
+            ProductFilterPanel(
               maxPrice: maxPrice,
               onPriceChange: (v) => setState(() => maxPrice = v),
               ecoFilter: ecoFilter,
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
+              selectedCategory: null,
+              onCategoryChange: (_){},
+              onClose: () {},
             ),
             const SizedBox(height: 24),
 

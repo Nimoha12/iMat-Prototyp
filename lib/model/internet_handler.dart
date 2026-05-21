@@ -10,6 +10,7 @@ import 'package:imat_repo/model/imat/shopping_cart.dart';
 import 'package:imat_repo/model/imat/user.dart';
 import 'dart:convert';
 
+
 import 'package:imat_repo/model/imat/util/functions.dart';
 
 // A class that handles the communication over the internet.

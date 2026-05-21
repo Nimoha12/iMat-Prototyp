@@ -7,13 +7,91 @@ import 'package:imat_repo/Pages/search/search_page.dart';
 import 'package:imat_repo/Widgets/Cart.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/Widgets/navbar/cart.button.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'dart:math';
 import 'nav_icon.dart';
 import 'logo.dart';
 
-class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
+class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onLoginTap;
 
   const IMatNavbar({super.key, this.onLoginTap});
+
+  @override
+  State<IMatNavbar> createState() => _IMatNavbarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(78);
+}
+
+class _IMatNavbarState extends State<IMatNavbar>
+    with SingleTickerProviderStateMixin {
+  final SpeechToText _speech = SpeechToText();
+  final TextEditingController _controller = TextEditingController();
+
+  bool _isListening = false; // röd mic + stopp
+  late AnimationController _pulseController; // puls
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+      lowerBound: 0.8,
+      upperBound: 1.2,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _pulseController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _pulseController.forward();
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _startListening() async {
+    bool available = await _speech.initialize();
+    if (!available) return;
+
+    setState(() {
+      _isListening = true;
+    });
+
+    _pulseController.forward();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Lyssnar…")),
+    );
+
+    _speech.listen(
+      onResult: (result) {
+        setState(() {
+          _controller.text = result.recognizedWords;
+        });
+
+        if (result.finalResult) {
+          _stopListening();
+          _onSearchSubmitted(context, result.recognizedWords);
+        }
+      },
+    );
+  }
+
+  void _stopListening() {
+    _speech.stop();
+    setState(() {
+      _isListening = false;
+    });
+    _pulseController.stop();
+    _pulseController.value = 1.0;
+  }
 
   void _onFavoritesTapLoggedIn(BuildContext context) {
     Navigator.push(
@@ -35,10 +113,7 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
 
   void _onSearchSubmitted(BuildContext context, String query) {
     final trimmedQuery = query.trim();
-
-    if (trimmedQuery.isEmpty) {
-      return;
-    }
+    if (trimmedQuery.isEmpty) return;
 
     Navigator.push(
       context,
@@ -54,7 +129,7 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
     final ShowLoginOverlay showLogin =
         loginOverlay?.showLoginOverlay ??
         ({LoginSuccessAction? onLoginSuccess}) {
-          onLoginTap?.call();
+          widget.onLoginTap?.call();
         };
 
     return AppBar(
@@ -70,23 +145,6 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
           return Row(
             children: [
               const SizedBox(width: 12),
-
-              // Visa endast tillbaka-knapp om man kan gå tillbaka
-              if (canGoBack)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 32,
-                    ),
-                    tooltip: "Tillbaka",
-                  ),
-                ),
 
               // Klickbar logga som leder till startsidan
               IMatLogo(
@@ -113,6 +171,7 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                       child: SizedBox(
                         height: 46,
                         child: TextField(
+                          controller: _controller,
                           style: IMatText.bodyM,
                           textInputAction: TextInputAction.search,
                           onSubmitted: (query) {
@@ -130,6 +189,33 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
                               color: Colors.grey,
                               size: 28,
                             ),
+
+                            // ⭐ RÖSTKNAPP MED PULS + RÖD FÄRG + STOPP
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                _isListening
+                                    ? _stopListening()
+                                    : _startListening();
+                              },
+                              child: AnimatedBuilder(
+                                animation: _pulseController,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _isListening
+                                        ? _pulseController.value
+                                        : 1.0,
+                                    child: Icon(
+                                      _isListening ? Icons.mic : Icons.mic_none,
+                                      color: _isListening
+                                          ? Colors.red
+                                          : Colors.grey,
+                                      size: 28,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 10,
@@ -197,7 +283,4 @@ class IMatNavbar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(78);
 }
