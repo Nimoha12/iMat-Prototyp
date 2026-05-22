@@ -29,7 +29,9 @@ class _ProfilePageState
         context.watch<AuthState>();
 
     return Scaffold(
-      appBar: const IMatNavbar(),
+      appBar: const IMatNavbar(
+  activePage: NavbarPage.profile,
+),
       backgroundColor:
           const Color(0xFFF6F3ED),
       body: authState.isLoggedIn

@@ -14,10 +14,23 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
 
-class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
-  final VoidCallback? onLoginTap;
+enum NavbarPage {
+  none,
+  favorites,
+  history,
+  profile,
+}
 
-  const IMatNavbar({super.key, this.onLoginTap});
+class IMatNavbar extends StatefulWidget  implements PreferredSizeWidget {
+
+  final VoidCallback? onLoginTap;
+  final NavbarPage activePage;
+
+  const IMatNavbar({
+    super.key,
+    this.onLoginTap,
+    this.activePage = NavbarPage.none,
+  });
 
   @override
   State<IMatNavbar> createState() => _IMatNavbarState();
@@ -252,8 +265,14 @@ class _IMatNavbarState extends State<IMatNavbar>
                 },
               ),
 
+              
               NavIcon(
-                icon: Icons.favorite_border,
+                selected:
+                  widget.activePage == NavbarPage.favorites,
+                icon: widget.activePage ==
+                      NavbarPage.favorites
+                  ? Icons.favorite
+                  : Icons.favorite_border,
                 label: "Favoriter",
                 onTap: isLoggedIn
                     ? () => _onFavoritesTapLoggedIn(context)
@@ -263,8 +282,10 @@ class _IMatNavbarState extends State<IMatNavbar>
               ),
 
               NavIcon(
-                icon: Icons.history,
-                label: "Historik",
+              selected:
+                  widget.activePage == NavbarPage.history,
+              icon: Icons.history,
+              label: "Historik",
                 onTap: isLoggedIn
                     ? () => _onHistoryTapLoggedIn(context)
                     : () => showLogin(
@@ -275,7 +296,11 @@ class _IMatNavbarState extends State<IMatNavbar>
               NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
 
               NavIcon(
-                icon: isLoggedIn ? Icons.account_circle : Icons.person_outline,
+                selected:
+                widget.activePage == NavbarPage.profile,
+                icon: isLoggedIn
+                ? Icons.account_circle
+                : Icons.person_outline,
                 label: isLoggedIn ? "Användare" : "Logga in",
                 onTap: isLoggedIn
                     ? () => _onUserTapLoggedIn(context)

@@ -1,33 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Theme/imat_colors.dart';
 
 class NavIcon extends StatelessWidget {
   final IconData icon;
   final String label;
-  final VoidCallback? onTap; // 🔹 Lägg till onTap här
+  final VoidCallback? onTap;
+  final bool selected;
 
   const NavIcon({
     super.key,
     required this.icon,
     required this.label,
-    this.onTap, // 🔹 Gör parametern valfri
+    this.onTap,
+    this.selected = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = selected
+        ? IMatColors.green
+        : Colors.white;
+
     return InkWell(
-      onTap: onTap, // 🔹 Gör ikonen klickbar
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+      onTap: onTap,
+      child: Container(
+        width: 110,
+        height: 78,
+        color: selected
+            ? const Color(0xFFF6F3ED)
+            : Colors.transparent,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(height: 4),
+            Icon(
+              icon,
+              color: iconColor,
+              size: 32,
+            ),
+            const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: iconColor,
+                fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),
             ),

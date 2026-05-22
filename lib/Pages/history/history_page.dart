@@ -24,7 +24,9 @@ class HistoryPage extends StatelessWidget {
     final orders = _mockOrders(products);
 
     return Scaffold(
-      appBar: const IMatNavbar(),
+      appBar: const IMatNavbar(
+  activePage: NavbarPage.history,
+),
       body: CustomScrollView(
         slivers: [
           SliverPadding(

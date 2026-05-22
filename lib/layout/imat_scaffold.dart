@@ -9,7 +9,9 @@ class IMatScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const IMatNavbar(), // din befintliga navbar
+      appBar: const IMatNavbar(
+  activePage: NavbarPage.favorites,
+), // din befintliga navbar
       body: body,
     );
   }
