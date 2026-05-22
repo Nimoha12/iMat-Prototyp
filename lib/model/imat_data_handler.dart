@@ -8,8 +8,6 @@ import 'package:imat_repo/model/imat/order.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat/product_detail.dart';
 
-
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:imat_repo/model/imat/settings.dart';
@@ -17,8 +15,6 @@ import 'package:imat_repo/model/imat/shopping_cart.dart';
 import 'package:imat_repo/model/imat/shopping_item.dart';
 import 'package:imat_repo/model/imat/user.dart';
 import 'package:imat_repo/model/internet_handler.dart';
-
-
 
 class ImatDataHandler extends ChangeNotifier {
   // Initializes the IMatDataHandler
@@ -321,20 +317,54 @@ class ImatDataHandler extends ChangeNotifier {
     notifyListeners();
   }
 
-  void placeOrder() async {
-    await InternetHandler.placeOrder();
+  Future<void> placeOrder() async {
+    final orderedItems = _shoppingCart.items
+        .map((item) => ShoppingItem(item.product, amount: item.amount))
+        .toList();
+
+    if (orderedItems.isEmpty) {
+      return;
+    }
+
+    final previousOrderCount = _orders.length;
+    final localOrder = Order(_nextOrderNumber(), DateTime.now(), orderedItems);
+    _orders.insert(0, localOrder);
     _shoppingCart.clear();
     notifyListeners();
 
-    // Reload orders
-    var response = await InternetHandler.getOrders();
+    await InternetHandler.placeOrder();
 
-    //print('Orders $response');
-    var jsonData = jsonDecode(response) as List;
+    final response = await InternetHandler.getOrders();
+    if (response.trim().isEmpty) {
+      return;
+    }
 
-    _orders.clear();
-    _orders.addAll(jsonData.map((item) => Order.fromJson(item)).toList());
+    final jsonData = jsonDecode(response) as List;
+    final serverOrders = jsonData.map((item) => Order.fromJson(item)).toList();
+
+    _orders
+      ..clear()
+      ..addAll(serverOrders);
+
+    if (serverOrders.length <= previousOrderCount) {
+      _orders.insert(0, localOrder);
+    }
+
     notifyListeners();
+  }
+
+  int _nextOrderNumber() {
+    if (_orders.isEmpty) {
+      return 1;
+    }
+
+    return _orders.map((order) => order.orderNumber).reduce((
+          highest,
+          orderNumber,
+        ) {
+          return orderNumber > highest ? orderNumber : highest;
+        }) +
+        1;
   }
 
   ///

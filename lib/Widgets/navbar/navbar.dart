@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Pages/profile_page.dart';
+import 'package:imat_repo/Pages/Profile_page.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Pages/favorites/favorites_page.dart';
@@ -14,15 +14,9 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'nav_icon.dart';
 import 'logo.dart';
 
-enum NavbarPage {
-  none,
-  favorites,
-  history,
-  profile,
-}
+enum NavbarPage { none, favorites, history, profile }
 
-class IMatNavbar extends StatefulWidget  implements PreferredSizeWidget {
-
+class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onLoginTap;
   final NavbarPage activePage;
 
@@ -51,18 +45,19 @@ class _IMatNavbarState extends State<IMatNavbar>
   void initState() {
     super.initState();
 
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-      lowerBound: 0.8,
-      upperBound: 1.2,
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _pulseController.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          _pulseController.forward();
-        }
-      });
+    _pulseController =
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 900),
+          lowerBound: 0.8,
+          upperBound: 1.2,
+        )..addStatusListener((status) {
+          if (status == AnimationStatus.completed) {
+            _pulseController.reverse();
+          } else if (status == AnimationStatus.dismissed) {
+            _pulseController.forward();
+          }
+        });
   }
 
   @override
@@ -81,9 +76,9 @@ class _IMatNavbarState extends State<IMatNavbar>
 
     _pulseController.forward();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Lyssnar…")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Lyssnar…")));
 
     _speech.listen(
       onResult: (result) {
@@ -124,11 +119,9 @@ class _IMatNavbarState extends State<IMatNavbar>
 
   void _onUserTapLoggedIn(BuildContext context) {
     Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const ProfilePage(),
-    ),
-  );
+      context,
+      MaterialPageRoute(builder: (_) => const ProfilePage()),
+    );
   }
 
   void _onSearchSubmitted(BuildContext context, String query) {
@@ -265,14 +258,11 @@ class _IMatNavbarState extends State<IMatNavbar>
                 },
               ),
 
-              
               NavIcon(
-                selected:
-                  widget.activePage == NavbarPage.favorites,
-                icon: widget.activePage ==
-                      NavbarPage.favorites
-                  ? Icons.favorite
-                  : Icons.favorite_border,
+                selected: widget.activePage == NavbarPage.favorites,
+                icon: widget.activePage == NavbarPage.favorites
+                    ? Icons.favorite
+                    : Icons.favorite_border,
                 label: "Favoriter",
                 onTap: isLoggedIn
                     ? () => _onFavoritesTapLoggedIn(context)
@@ -282,10 +272,9 @@ class _IMatNavbarState extends State<IMatNavbar>
               ),
 
               NavIcon(
-              selected:
-                  widget.activePage == NavbarPage.history,
-              icon: Icons.history,
-              label: "Historik",
+                selected: widget.activePage == NavbarPage.history,
+                icon: Icons.history,
+                label: "Historik",
                 onTap: isLoggedIn
                     ? () => _onHistoryTapLoggedIn(context)
                     : () => showLogin(
@@ -296,11 +285,8 @@ class _IMatNavbarState extends State<IMatNavbar>
               NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
 
               NavIcon(
-                selected:
-                widget.activePage == NavbarPage.profile,
-                icon: isLoggedIn
-                ? Icons.account_circle
-                : Icons.person_outline,
+                selected: widget.activePage == NavbarPage.profile,
+                icon: isLoggedIn ? Icons.account_circle : Icons.person_outline,
                 label: isLoggedIn ? "Användare" : "Logga in",
                 onTap: isLoggedIn
                     ? () => _onUserTapLoggedIn(context)
