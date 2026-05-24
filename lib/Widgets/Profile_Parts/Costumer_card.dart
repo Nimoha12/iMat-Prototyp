@@ -5,20 +5,18 @@ import 'package:provider/provider.dart';
 
 class CustomerCard extends StatefulWidget {
   final bool isEditing;
-  final VoidCallback onEditPressed;
 
   const CustomerCard({
     super.key,
     required this.isEditing,
-    required this.onEditPressed,
   });
 
   @override
   State<CustomerCard> createState() =>
-      _CustomerCardState();
+      CustomerCardState();
 }
 
-class _CustomerCardState
+class CustomerCardState
     extends State<CustomerCard> {
 
   bool initialized = false;
@@ -146,38 +144,13 @@ class _CustomerCardState
 
           children: [
 
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
-
-              children: [
-
-                const Text(
-                  "Konto & Leverans",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
-                ),
-
-                ElevatedButton(
-                  onPressed: () {
-
-                    if (widget.isEditing) {
-                      saveCustomer();
-                    }
-
-                    widget.onEditPressed();
-                  },
-
-                  child: Text(
-                    widget.isEditing
-                        ? "Spara"
-                        : "Redigera",
-                  ),
-                ),
-              ],
+            const Text(
+              "Konto & Leverans",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight:
+                    FontWeight.bold,
+              ),
             ),
 
             const SizedBox(height: 32),

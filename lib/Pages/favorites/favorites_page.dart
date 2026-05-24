@@ -5,6 +5,8 @@ import 'package:imat_repo/Pages/all_products/categorized_product_sections.dart';
 import 'package:imat_repo/Pages/all_products/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
+import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
@@ -54,12 +56,15 @@ class _FavoritesPageState extends State<FavoritesPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
-
               const SizedBox(height: 24),
-
-              Text("Favoriter", style: IMatText.h2),
-
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const CloseProfileButton(),
+                  const SizedBox(width: 20),
+                  Text('Favoriter', style: IMatText.h2),
+                ],
+              ),
               const SizedBox(height: 24),
 
               if (favorites.isEmpty)

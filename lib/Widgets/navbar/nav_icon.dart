@@ -22,13 +22,18 @@ class NavIcon extends StatelessWidget {
         : Colors.white;
 
     return InkWell(
+      borderRadius: BorderRadius.circular(18),
       onTap: onTap,
       child: Container(
         width: 110,
-        height: 78,
-        color: selected
-            ? const Color(0xFFF6F3ED)
-            : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFFF6F3ED) : Colors.transparent,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(18),
+            topRight: Radius.circular(18),
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

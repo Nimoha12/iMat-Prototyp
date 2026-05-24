@@ -15,8 +15,8 @@ class LogoutButton
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 110,
-      height: 52,
+      width: 92,
+      height: 44,
 
       child: OutlinedButton(
         onPressed: () {
@@ -52,10 +52,9 @@ class LogoutButton
 
         child: const Text(
           "Logga ut",
-
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),

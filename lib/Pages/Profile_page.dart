@@ -1,29 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Costumer_card.dart';
-
-import 'package:imat_repo/Widgets/Profile_Parts/Header/LogoutButton%20.dart';
+import 'package:imat_repo/Widgets/Profile_Parts/Header/LogoutButton .dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Payment_Card.dart';
-
 import 'package:imat_repo/Widgets/navbar/navbar.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() =>
-      _ProfilePageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool editingCustomer = false;
-  bool editingPayment = false;
+  bool _editing = false;
+
+  final GlobalKey<CustomerCardState> _customerKey = GlobalKey();
+  final GlobalKey<PaymentCardState> _paymentKey = GlobalKey();
+
+  void _toggleEditing() {
+    if (_editing) {
+      _customerKey.currentState?.saveCustomer();
+      _paymentKey.currentState?.saveCard();
+    }
+
+    setState(() {
+      _editing = !_editing;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F3ED),
 
-      appBar: const IMatNavbar(),
+      appBar: const IMatNavbar(
+        activePage: NavbarPage.profile,
+      ),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -31,47 +43,43 @@ class _ProfilePageState extends State<ProfilePage> {
 
           child: Column(
             children: [
-
               //////////////////////////////////////////////////////
               /// HEADER
               //////////////////////////////////////////////////////
 
               Row(
-  mainAxisAlignment:
-      MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
 
-  children: [
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
 
-    Row(
-      children: [
+                        icon: const Icon(
+                          Icons.close,
+                          size: 42,
+                        ),
+                      ),
 
-        IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+                      const SizedBox(width: 36),
 
-          icon: const Icon(
-            Icons.close,
-            size: 42,
-          ),
-        ),
+                      const Text(
+                        "Min profil",
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
 
-        const SizedBox(width: 28),
-
-        const Text(
-          "Min profil",
-
-          style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    ),
-
-    const LogoutButton(),
-  ],
-),
+                  const LogoutButton(),
+                ],
+              ),
 
               const SizedBox(height: 40),
 
@@ -79,42 +87,76 @@ class _ProfilePageState extends State<ProfilePage> {
               /// CONTENT
               //////////////////////////////////////////////////////
 
-              Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.stretch,
 
-                children: [
+                  children: [
+                    //////////////////////////////////////////////////
+                    /// CUSTOMER CARD
+                    //////////////////////////////////////////////////
 
-                  Expanded(
-                    child: CustomerCard(
-                      isEditing:
-                          editingCustomer,
-
-                      onEditPressed: () {
-                        setState(() {
-                          editingCustomer =
-                              !editingCustomer;
-                        });
-                      },
+                    Expanded(
+                      child: CustomerCard(
+                        key: _customerKey,
+                        isEditing: _editing,
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(width: 24),
+                    const SizedBox(width: 24),
 
-                  Expanded(
-                    child: PaymentCard(
-                      isEditing:
-                          editingPayment,
+                    //////////////////////////////////////////////////
+                    /// PAYMENT COLUMN
+                    //////////////////////////////////////////////////
 
-                      onEditPressed: () {
-                        setState(() {
-                          editingPayment =
-                              !editingPayment;
-                        });
-                      },
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.stretch,
+
+                        children: [
+                          Align(
+  alignment: Alignment.center,
+  child: SizedBox(
+    width: 400, // adjust as needed
+    height: 72,
+    child: ElevatedButton.icon(
+      onPressed: _toggleEditing,
+      icon: Icon(
+        _editing ? Icons.save : Icons.edit,
+        size: 28,
+      ),
+      label: Text(
+        _editing ? 'Spara' : 'Redigera',
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF3B7B67),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    ),
+  ),
+),
+
+                          const SizedBox(height: 24),
+
+                          Expanded(
+                            child: PaymentCard(
+                              key: _paymentKey,
+                              isEditing: _editing,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

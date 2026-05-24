@@ -125,7 +125,7 @@ class ProductFilterPanel extends StatelessWidget {
             const SizedBox(height: 8),
 
             DropdownButtonFormField<String>(
-              value: sortBy,
+              initialValue: sortBy,
               items: const [
                 DropdownMenuItem(value: "none", child: Text("Ingen sortering")),
                 DropdownMenuItem(value: "priceAsc", child: Text("Pris: Lågt till högt")),
