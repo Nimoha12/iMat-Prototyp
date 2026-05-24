@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Widgets/Profile_Parts/Accunt_Overview/Profile_Content_Card.dart';
+import 'package:imat_repo/Pages/profile_page.dart';
 
 
 
-class AccountOverviewPage
-    extends StatelessWidget {
+
+class AccountOverviewPage extends StatelessWidget {
 
   const AccountOverviewPage({
     super.key,
@@ -22,7 +22,7 @@ class AccountOverviewPage
               const BoxConstraints(
             maxWidth: 820,
           ),
-          child: const ProfileContentCard(),
+          child: const ProfilePage(),
         ),
       ),
     );

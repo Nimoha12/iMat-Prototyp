@@ -54,35 +54,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      );
-                    },
-                    child: Text(
-                      "Hem",
-                      style: IMatText.bodyL.copyWith(
-                        color: IMatColors.green,
-                        fontWeight: FontWeight.w700,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: Icon(Icons.chevron_right, size: 24),
-                  ),
-                  Text(
-                    "Favoriter",
-                    style: IMatText.bodyL.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
+              
 
               const SizedBox(height: 24),
 

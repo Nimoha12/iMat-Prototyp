@@ -681,6 +681,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void _next() {
+    final iMat = context.read<ImatDataHandler>();
     if (_step == 2) {
       _saveCustomer();
     }
@@ -692,6 +693,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (_step == 4) {
       context.read<ImatDataHandler>().placeOrder();
       setState(() => _orderPlaced = true);
+      final customer = iMat.getCustomer();
+
+      customer.firstName = _firstNameController.text;
+      customer.lastName = _lastNameController.text;
+      customer.mobilePhoneNumber = _phoneController.text;
+      customer.email = _invoiceEmailController.text;
+
+      customer.address = _addressController.text;
+      customer.postCode = _postCodeController.text;
+      customer.postAddress = _cityController.text;
+
+      iMat.setCustomer(customer);
       return;
     }
 

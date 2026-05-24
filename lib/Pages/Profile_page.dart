@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Widgets/Profile_Parts/Header/profile_header.dart';
-import 'package:imat_repo/Widgets/Profile_Parts/Logged_in_Profile_View.dart';
-import 'package:imat_repo/Widgets/Profile_Parts/Not_logged_in_View.dart';
+import 'package:imat_repo/Widgets/Profile_Parts/Costumer_card.dart';
+
+import 'package:imat_repo/Widgets/Profile_Parts/Header/LogoutButton%20.dart';
+import 'package:imat_repo/Widgets/Profile_Parts/Payment_Card.dart';
+
 import 'package:imat_repo/Widgets/navbar/navbar.dart';
-import 'package:imat_repo/model/AuthState.dart';
-import 'package:imat_repo/model/Profile/profile_section.dart';
-
-import 'package:provider/provider.dart';
-
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,51 +14,112 @@ class ProfilePage extends StatefulWidget {
       _ProfilePageState();
 }
 
-class _ProfilePageState
-    extends State<ProfilePage> {
-
-  ProfileSection selectedSection =
-      ProfileSection.overview;
+class _ProfilePageState extends State<ProfilePage> {
+  bool editingCustomer = false;
+  bool editingPayment = false;
 
   @override
   Widget build(BuildContext context) {
-    final authState =
-        context.watch<AuthState>();
-
     return Scaffold(
-      appBar: const IMatNavbar(
-  activePage: NavbarPage.profile,
+      backgroundColor: const Color(0xFFF6F3ED),
+
+      appBar: const IMatNavbar(),
+
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+
+          child: Column(
+            children: [
+
+              //////////////////////////////////////////////////////
+              /// HEADER
+              //////////////////////////////////////////////////////
+
+              Row(
+  mainAxisAlignment:
+      MainAxisAlignment.spaceBetween,
+
+  children: [
+
+    Row(
+      children: [
+
+        IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+
+          icon: const Icon(
+            Icons.close,
+            size: 42,
+          ),
+        ),
+
+        const SizedBox(width: 28),
+
+        const Text(
+          "Min profil",
+
+          style: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+
+    const LogoutButton(),
+  ],
 ),
-      backgroundColor:
-          const Color(0xFFF6F3ED),
-      body: authState.isLoggedIn
-          ? Column(
-              children: [
-                ProfileHeader(
-                  selectedSection: selectedSection,
-                  onTabSelected: (section) {
-                    setState(() {
-                      selectedSection = section;
-                    });
-                  },
-                ),
-                Expanded(
-                  child:
-                      LoggedInProfileView(
-                    selectedSection:
-                        selectedSection,
-                    onTabSelected:
-                        (section) {
-                      setState(() {
-                        selectedSection =
-                            section;
-                      });
-                    },
+
+              const SizedBox(height: 40),
+
+              //////////////////////////////////////////////////////
+              /// CONTENT
+              //////////////////////////////////////////////////////
+
+              Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+
+                children: [
+
+                  Expanded(
+                    child: CustomerCard(
+                      isEditing:
+                          editingCustomer,
+
+                      onEditPressed: () {
+                        setState(() {
+                          editingCustomer =
+                              !editingCustomer;
+                        });
+                      },
+                    ),
                   ),
-                ),
-              ],
-            )
-          : const NotLoggedInView(),
+
+                  const SizedBox(width: 24),
+
+                  Expanded(
+                    child: PaymentCard(
+                      isEditing:
+                          editingPayment,
+
+                      onEditPressed: () {
+                        setState(() {
+                          editingPayment =
+                              !editingPayment;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
