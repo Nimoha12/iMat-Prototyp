@@ -27,86 +27,70 @@ class ProductDetailWidget extends StatelessWidget {
 
     final double amount = shoppingItem.amount;
 
-    final unit = product.unit.replaceAll("kr/", "");
-
-    final details = [
-      _DetailData("Varumärke", detail?.brand),
-      _DetailData("Ursprung", detail?.origin),
-      _DetailData("Innehåll", detail?.contents),
-      _DetailData("Beskrivning", detail?.description),
-    ].where((item) => item.content != null && item.content!.trim().isNotEmpty);
+    final unit = product.unit.replaceAll('kr/', '');
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isNarrow = constraints.maxWidth < 820;
+        final bool shouldScroll = isNarrow || constraints.maxHeight < 760;
+
         final content = Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1120),
-            child: Container(
-              margin: const EdgeInsets.all(24),
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: IMatColors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: IMatColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Flex(
-                direction: isNarrow ? Axis.vertical : Axis.horizontal,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: isNarrow ? double.infinity : 300,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          height: isNarrow ? 220 : 280,
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            color: IMatColors.chipBackground,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: iMat.getImage(product),
-                        ),
-                        const SizedBox(height: 16),
-                        _cartControl(
+            constraints: const BoxConstraints(maxWidth: 1180),
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: IMatColors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: IMatColors.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Flex(
+                  direction: isNarrow ? Axis.vertical : Axis.horizontal,
+                  crossAxisAlignment: shouldScroll
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.stretch,
+                  children: [
+                    _ImagePanel(
+                      productImage: iMat.getImage(product),
+                      isNarrow: isNarrow,
+                    ),
+                    _SoftDivider(isNarrow: isNarrow),
+                    if (isNarrow)
+                      _productInfo(
+                        detail: detail,
+                        unit: unit,
+                        amount: amount,
+                        iMat: iMat,
+                        shoppingItem: shoppingItem,
+                        isNarrow: isNarrow,
+                      )
+                    else
+                      Expanded(
+                        child: _productInfo(
+                          detail: detail,
+                          unit: unit,
                           amount: amount,
                           iMat: iMat,
-                          product: product,
                           shoppingItem: shoppingItem,
+                          isNarrow: isNarrow,
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: isNarrow ? 0 : 32, height: isNarrow ? 24 : 0),
-                  if (isNarrow)
-                    _productInfo(
-                      details: details,
-                      unit: unit,
-                      isNarrow: isNarrow,
-                    )
-                  else
-                    Expanded(
-                      child: _productInfo(
-                        details: details,
-                        unit: unit,
-                        isNarrow: isNarrow,
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         );
 
-        if (isNarrow || constraints.maxHeight < 620) {
+        if (shouldScroll) {
           return SingleChildScrollView(child: content);
         }
 
@@ -116,58 +100,66 @@ class ProductDetailWidget extends StatelessWidget {
   }
 
   Widget _productInfo({
-    required Iterable<_DetailData> details,
+    required ProductDetail? detail,
     required String unit,
+    required double amount,
+    required ImatDataHandler iMat,
+    required ShoppingItem shoppingItem,
     required bool isNarrow,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text(
-                product.name,
-                style: IMatText.h2.copyWith(fontWeight: FontWeight.w800),
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            isNarrow ? 24 : 34,
+            isNarrow ? 24 : 32,
+            isNarrow ? 24 : 34,
+            isNarrow ? 26 : 32,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      product.name,
+                      style: IMatText.h1.copyWith(
+                        fontSize: isNarrow ? 34 : 40,
+                        fontWeight: FontWeight.w900,
+                        height: 1.05,
+                      ),
+                    ),
+                  ),
+                  if (product.isEcological) ...[
+                    const SizedBox(width: 12),
+                    _ecoBadge(),
+                  ],
+                ],
               ),
-            ),
-            if (product.isEcological) ...[
-              const SizedBox(width: 12),
-              _ecoBadge(),
-            ],
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // ⭐ FIXAD PRISRUTA — ingen dubbel "kr/kg"
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              "${product.price.toStringAsFixed(2)} kr/$unit",
-              style: IMatText.h2.copyWith(
-                color: IMatColors.green,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: details
-              .map(
-                (item) => _detailTile(
-                  title: item.title,
-                  content: item.content!,
-                  isNarrow: isNarrow,
+              _ProductMeta(detail: detail),
+              const SizedBox(height: 22),
+              _PurchasePanel(
+                price: product.price,
+                unit: unit,
+                isNarrow: isNarrow,
+                cartControl: _cartControl(
+                  amount: amount,
+                  iMat: iMat,
+                  product: product,
+                  shoppingItem: shoppingItem,
                 ),
-              )
-              .toList(),
+              ),
+              const SizedBox(height: 22),
+              _DetailTabs(
+                contents: detail?.contents,
+                description: detail?.description,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -175,47 +167,17 @@ class ProductDetailWidget extends StatelessWidget {
 
   Widget _ecoBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.green.shade100,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         "Ekologisk",
-        style: IMatText.bodyS.copyWith(
+        style: IMatText.bodyM.copyWith(
           color: Colors.green.shade900,
           fontWeight: FontWeight.w700,
         ),
-      ),
-    );
-  }
-
-  Widget _detailTile({
-    required String title,
-    required String content,
-    required bool isNarrow,
-  }) {
-    return Container(
-      width: isNarrow ? double.infinity : (title == "Beskrivning" ? 520 : 250),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: IMatColors.chipBackground,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: IMatColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: IMatText.bodyS.copyWith(
-              fontWeight: FontWeight.w700,
-              color: IMatColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(content, style: IMatText.bodyM.copyWith(height: 1.35)),
-        ],
       ),
     );
   }
@@ -234,15 +196,15 @@ class ProductDetailWidget extends StatelessWidget {
             backgroundColor: IMatColors.green,
             foregroundColor: IMatColors.white,
             elevation: 0,
-            textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
+            textStyle: IMatText.bodyL.copyWith(fontWeight: FontWeight.w800),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
           onPressed: () {
             iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
           },
-          child: const Text("Lägg till"),
+          child: const Text('Lägg till'),
         ),
       );
     }
@@ -252,7 +214,7 @@ class ProductDetailWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: IMatColors.chipBackground,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: IMatColors.border),
       ),
       child: Row(
@@ -293,9 +255,7 @@ class ProductDetailWidget extends StatelessWidget {
           foregroundColor: IMatColors.white,
           elevation: 0,
           padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Icon(icon),
       ),
@@ -303,9 +263,212 @@ class ProductDetailWidget extends StatelessWidget {
   }
 }
 
-class _DetailData {
-  final String title;
-  final String? content;
+class _ProductMeta extends StatelessWidget {
+  final ProductDetail? detail;
 
-  const _DetailData(this.title, this.content);
+  const _ProductMeta({required this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    final values = [
+      detail?.brand,
+      detail?.origin,
+    ].where((value) => value != null && value.trim().isNotEmpty).toList();
+
+    if (values.isEmpty) {
+      return const SizedBox(height: 8);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        values.map((value) => value!).join('  /  '),
+        style: IMatText.bodyL.copyWith(
+          color: IMatColors.textSecondary,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _PurchasePanel extends StatelessWidget {
+  final double price;
+  final String unit;
+  final bool isNarrow;
+  final Widget cartControl;
+
+  const _PurchasePanel({
+    required this.price,
+    required this.unit,
+    required this.isNarrow,
+    required this.cartControl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final priceText = Text(
+      '${price.toStringAsFixed(2)} kr/$unit',
+      style: IMatText.h1.copyWith(
+        color: IMatColors.green,
+        fontSize: 36,
+        fontWeight: FontWeight.w900,
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: IMatColors.greenLight,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: IMatColors.green.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [priceText, const SizedBox(height: 14), cartControl],
+      ),
+    );
+  }
+}
+
+class _DetailTabs extends StatelessWidget {
+  final String? contents;
+  final String? description;
+
+  const _DetailTabs({required this.contents, required this.description});
+
+  @override
+  Widget build(BuildContext context) {
+    final tabs = [
+      _DetailTabData('Innehåll', contents),
+      _DetailTabData('Beskrivning', description),
+    ].where((tab) => tab.content.trim().isNotEmpty).toList();
+
+    if (tabs.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: IMatColors.chipBackground,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: IMatColors.border),
+        ),
+        child: Text(
+          'Ingen extra produktinformation finns tillgänglig.',
+          style: IMatText.bodyL.copyWith(color: IMatColors.textSecondary),
+        ),
+      );
+    }
+
+    return DefaultTabController(
+      length: tabs.length,
+      child: Container(
+        decoration: BoxDecoration(
+          color: IMatColors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: IMatColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TabBar(
+              isScrollable: false,
+              labelColor: IMatColors.green,
+              unselectedLabelColor: IMatColors.textSecondary,
+              indicator: BoxDecoration(
+                color: IMatColors.greenLight,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              indicatorPadding: const EdgeInsets.all(6),
+              labelStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w900),
+              unselectedLabelStyle: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+              tabs: [
+                for (final tab in tabs)
+                  Tab(
+                    height: 52,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Text(tab.title),
+                    ),
+                  ),
+              ],
+            ),
+            const Divider(height: 1, color: IMatColors.border),
+            SizedBox(
+              height: 132,
+              child: TabBarView(
+                children: [
+                  for (final tab in tabs)
+                    SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        tab.content,
+                        style: IMatText.bodyL.copyWith(height: 1.35),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ImagePanel extends StatelessWidget {
+  final Widget productImage;
+  final bool isNarrow;
+
+  const _ImagePanel({required this.productImage, required this.isNarrow});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: isNarrow ? double.infinity : 430,
+      height: isNarrow ? 280 : null,
+      padding: EdgeInsets.all(isNarrow ? 26 : 36),
+      color: IMatColors.white,
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: isNarrow ? 260 : 330,
+              height: isNarrow ? 260 : 330,
+              child: productImage,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailTabData {
+  final String title;
+  final String content;
+
+  _DetailTabData(this.title, String? content) : content = content?.trim() ?? '';
+}
+
+class _SoftDivider extends StatelessWidget {
+  final bool isNarrow;
+
+  const _SoftDivider({required this.isNarrow});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: isNarrow ? double.infinity : 1,
+      height: isNarrow ? 1 : null,
+      child: const DecoratedBox(
+        decoration: BoxDecoration(color: IMatColors.border),
+      ),
+    );
+  }
 }

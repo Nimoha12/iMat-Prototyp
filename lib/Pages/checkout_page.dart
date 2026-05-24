@@ -246,11 +246,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ],
             ),
           ),
-          const Icon(
-            Icons.check_circle,
-            color: IMatColors.green,
-            size: 34,
-          ),
+          const Icon(Icons.check_circle, color: IMatColors.green, size: 34),
         ],
       ),
     );
@@ -569,7 +565,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
               Expanded(
                 child: _SummaryBox(
                   title: 'Leveranstid',
-                  lines: [_dates[_selectedDate].fullLabel, _times[_selectedTime]],
+                  lines: [
+                    _dates[_selectedDate].fullLabel,
+                    _times[_selectedTime],
+                  ],
                 ),
               ),
               const SizedBox(width: 10),
@@ -635,9 +634,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: IMatText.bodyM.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
             ),
             child: const Text('← Tillbaka'),
           ),
@@ -680,8 +677,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
     setState(() {});
   }
 
+<<<<<<< HEAD
   void _next() {
     final iMat = context.read<ImatDataHandler>();
+=======
+  Future<void> _next() async {
+>>>>>>> eaf660c0c805d8608d3ac1e517783ac98394a1e2
     if (_step == 2) {
       _saveCustomer();
     }
@@ -691,7 +692,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     if (_step == 4) {
-      context.read<ImatDataHandler>().placeOrder();
+      final iMat = context.read<ImatDataHandler>();
+      await iMat.placeOrder();
+      if (!mounted) return;
       setState(() => _orderPlaced = true);
       final customer = iMat.getCustomer();
 
@@ -846,7 +849,9 @@ class _StepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive || isDone ? IMatColors.green : const Color(0xFFB8B2A4);
+    final color = isActive || isDone
+        ? IMatColors.green
+        : const Color(0xFFB8B2A4);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1027,7 +1032,10 @@ class _OptionGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800)),
+          Text(
+            title,
+            style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 8),
           LayoutBuilder(
             builder: (context, constraints) {
