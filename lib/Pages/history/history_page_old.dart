@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
-import 'package:imat_repo/Widgets/navbar/navbar.dart';
+import 'package:imat_repo/Widgets/Navigation/navbar.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat/shopping_item.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';

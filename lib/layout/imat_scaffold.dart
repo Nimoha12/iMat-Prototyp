@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Widgets/navbar/navbar.dart';
+import 'package:imat_repo/Widgets/Navigation/navbar.dart';
 
 class IMatScaffold extends StatelessWidget {
   final Widget body;
@@ -9,9 +9,7 @@ class IMatScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const IMatNavbar(
-  activePage: NavbarPage.favorites,
-), // din befintliga navbar
+      appBar: const IMatNavbar(), // gemensam navbar
       body: body,
     );
   }

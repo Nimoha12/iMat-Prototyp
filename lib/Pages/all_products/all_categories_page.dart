@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Pages/all_products/product_filter_panel.dart';
+import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
 import 'package:provider/provider.dart';
 
 import 'package:imat_repo/layout/imat_scaffold.dart';
@@ -10,11 +10,12 @@ import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 
 import 'category_page.dart';
-import 'category_quick_acess.dart';
-import 'categorized_product_sections.dart';
-import 'ui_categories.dart';
-
-import 'product_ui_category_extension.dart';
+import '../../Widgets/Category/category_quick_acess.dart';
+import '../../Widgets/Category/categorized_product_sections.dart';
+import '../../Widgets/Category/ui_categories.dart';
+import '../../Widgets/Category/product_ui_category_extension.dart';
+import '../../Widgets/Navigation/filter_button.dart';
+import '../../Widgets/Navigation/breadcrumb_bar.dart'; // ✅ gemensam breadcrumb-komponent
 
 class AllCategoriesPage extends StatefulWidget {
   const AllCategoriesPage({super.key});
@@ -30,6 +31,28 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
   UiCategory? selectedCategory;
 
   bool filterOpen = false;
+
+  final ScrollController _scrollController = ScrollController();
+  bool showScrollButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 300 && !showScrollButton) {
+        setState(() => showScrollButton = true);
+      } else if (_scrollController.offset <= 300 && showScrollButton) {
+        setState(() => showScrollButton = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,80 +93,34 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
     return IMatScaffold(
       body: Stack(
         children: [
-          // HUVUDINNEHÅLL
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/',
-                              (route) => false,
-                            );
-                          },
-                          child: Text(
-                            "Hem",
-                            style: IMatText.bodyS.copyWith(
-                              color: IMatColors.green,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                        const Icon(Icons.chevron_right, size: 18),
-                        Text(
-                          "Alla varor",
-                          style: IMatText.bodyS.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    // ✅ Gemensam breadcrumb-komponent (ersätter hårdkodad rad)
+                    BreadcrumbBar(
+                      items: [
+                        BreadcrumbItem(label: "Alla varor"),
                       ],
                     ),
 
                     const SizedBox(height: 24),
 
-                    Text("Alla varor", style: IMatText.h2),
-
-                    const SizedBox(height: 16),
-
-                    // Filter-knapp (optimerad)
-                    ElevatedButton.icon(
-                      onPressed: () => setState(() => filterOpen = true),
-                      icon: Icon(
-                        Icons.filter_list,
-                        color: IMatColors.green,
-                        size: 22,
-                      ),
-                      label: Text(
-                        "Filtrera bland varor",
-                        style: IMatText.bodyM.copyWith(
-                          fontWeight: FontWeight.w800, // kraftfullare text
-                          color: IMatColors.black,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: IMatColors.white,
-                        foregroundColor: IMatColors.black,
-                        elevation: 3, // subtil höjd
-                        shadowColor: IMatColors.green.withOpacity(0.25),
-                        side: BorderSide(
-                          color: IMatColors.green,
-                          width: 2,
-                        ), // tydlig outline
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
-                        ),
+                    // ⭐ Rubrik + filterknapp i samma rad (samma som CategoryPage)
+                    SizedBox(
+                      width: 1396,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Alla varor", style: IMatText.h2),
+                          FilterButton(
+                            onPressed: () => setState(() => filterOpen = true),
+                          ),
+                        ],
                       ),
                     ),
 
@@ -179,7 +156,6 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
             ),
           ),
 
-          // OVERLAY
           if (filterOpen)
             Positioned.fill(
               child: GestureDetector(
@@ -192,7 +168,6 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
               ),
             ),
 
-          // SLIDE-IN PANEL
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -211,6 +186,17 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
               onClose: () => setState(() => filterOpen = false),
             ),
           ),
+
+          if (showScrollButton)
+            Positioned(
+              right: 24,
+              bottom: 24,
+              child: FloatingActionButton(
+                backgroundColor: IMatColors.green,
+                onPressed: () => _scrollController.jumpTo(0),
+                child: const Icon(Icons.arrow_upward, color: Colors.white),
+              ),
+            ),
         ],
       ),
     );

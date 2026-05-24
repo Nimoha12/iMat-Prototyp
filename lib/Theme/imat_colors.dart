@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 
 class IMatColors {
-  static const green = Color(0xFF2F6E5D);
+  // Ljusare och mer färgglad version av originalgrön (#2F6E5D → #3A7D6B)
+  // Ger bättre kontrast mot vit text utan att bli limegrön
+  static const green = Color(0xFF3A7D6B);
 
-  static const greenLight = Color(0xFFE4F0EC);
+  // Lättare bakgrundsgrön för hover och sekundära ytor (#E4F0EC → #E8F3EF)
+  static const greenLight = Color(0xFFE8F3EF);
 
-  static const greenHover = Color(0xFF3F8571);
+  // Hover-färg något ljusare för bättre synlighet (#3F8571 → #4A947E)
+  static const greenHover = Color(0xFF4A947E);
 
-  static const beige = Color(0xFFF7F4EE);
+  // Beige justerad marginellt för varmare ton (#F7F4EE → #F5F0E8)
+  static const beige = Color(0xFFF5F0E8);
 
-  static const white = Color(0xFFFFFFFF);
+  static const white = Colors.white;
+  static const black = Colors.black;
 
-  static const black = Color(0xFF1F1F1F);
+  // Lättare grå för bättre kontrast mot beige (#D9D9D9 → #D0D0D0)
+  static const border = Color(0xFFD0D0D0);
 
-  static const border = Color(0xFFD9D9D9);
-
-  static const textSecondary = Color(0xFF5F5F5F);
+  // Sekundär textfärg något mörkare för bättre läsbarhet (#5F5F5F → #4A4A4A)
+  static const textSecondary = Color(0xFF4A4A4A);
 
   static const chipBackground = Color(0xFFF1F1F1);
-
-  static const selectedChip = Color(0xFF2F6E5D);
+  static const selectedChip = Color(0xFF3A7D6B); // matchar huvudgrön
 }

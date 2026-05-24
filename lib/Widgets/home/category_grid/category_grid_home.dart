@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Pages/all_products/ui_categories.dart';
-import 'package:imat_repo/Theme/imat_colors.dart';
+import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Widgets/home/category_grid/category.dart';
 import 'package:imat_repo/model/imat/product.dart';
-
 import 'package:imat_repo/Pages/all_products/category_page.dart';
-
 
 extension CategoryToUi on Category {
   UiCategory get uiCategory {
@@ -92,7 +89,7 @@ class CategoryGridHome extends StatelessWidget {
   }
 }
 
-//Enskilt kategori-kort (din originaldesign)
+//Enskilt kategori-kort (förbättrad tillgänglighet)
 class _CategoryCard extends StatelessWidget {
   final Category category;
 
@@ -103,11 +100,8 @@ class _CategoryCard extends StatelessWidget {
     final hasImage = category.bgImagePath != null;
 
     return InkWell(
-      // Navigerar nu korrekt till CategoryPage
       onTap: () {
         final uiCat = category.uiCategory;
-
-
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -115,16 +109,15 @@ class _CategoryCard extends StatelessWidget {
           ),
         );
       },
-
       borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -141,11 +134,12 @@ class _CategoryCard extends StatelessWidget {
                 ),
               ),
 
+            // Lättare overlay för bättre kontrast
             if (hasImage)
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.black.withValues(alpha: 0.25),
+                  color: Colors.black.withValues(alpha: 0.35),
                 ),
               ),
 
@@ -153,29 +147,38 @@ class _CategoryCard extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Större ikon för bättre synlighet
                   if (category.iconPath != null)
                     Image.asset(
                       category.iconPath!,
-                      width: 40,
-                      height: 40,
-                      color: hasImage ? Colors.white : IMatColors.black,
+                      width: 60,
+                      height: 60,
+                      color: Colors.white,
                     )
                   else if (category.icon != null)
                     Icon(
                       category.icon!,
-                      size: 40,
-                      color: hasImage ? Colors.white : IMatColors.black,
+                      size: 60,
+                      color: Colors.white,
                     ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 14),
 
+                  // Större och tydligare text
                   Text(
                     category.label,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: hasImage ? Colors.white : IMatColors.black,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                          color: Colors.black54,
+                        ),
+                      ],
                     ),
                   ),
                 ],

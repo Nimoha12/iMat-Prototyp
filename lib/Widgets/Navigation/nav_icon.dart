@@ -17,33 +17,37 @@ class NavIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = selected
-        ? IMatColors.green
-        : Colors.white;
+    // Förbättrad kontrast och tydlighet för äldre användare
+    final iconColor = selected ? IMatColors.green : IMatColors.white;
+    final textColor = selected ? IMatColors.greenHover : IMatColors.white;
 
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 110,
-        height: 78,
+        width: 120, // något bredare för luft
+        height: 88, // högre för större ikon + text
         color: selected
-            ? const Color(0xFFF6F3ED)
+            ? IMatColors.greenLight // ljus bakgrund vid val
             : Colors.transparent,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Större ikon för bättre synlighet
             Icon(
               icon,
               color: iconColor,
-              size: 32,
+              size: 38, // tidigare 32
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
+            // Större text med bättre kontrast
             Text(
               label,
+              textAlign: TextAlign.center,
               style: TextStyle(
-                color: iconColor,
+                color: textColor,
                 fontWeight: FontWeight.w600,
-                fontSize: 12,
+                fontSize: 16, // tidigare 12
+                letterSpacing: 0.3, // lite mer luft mellan bokstäver
               ),
             ),
           ],

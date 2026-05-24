@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Pages/all_products/product_card.dart';
+import 'package:imat_repo/Widgets/product/product_card.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/model/imat/product.dart';
 

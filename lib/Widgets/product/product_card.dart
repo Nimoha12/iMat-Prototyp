@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
-import 'package:imat_repo/Widgets/add_to_cart_button.dart';
+import 'package:imat_repo/Widgets/Cart_Parts/add_to_cart_button.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
+
 
 import 'product_detail_overlay.dart'; // overlay-versionen
 

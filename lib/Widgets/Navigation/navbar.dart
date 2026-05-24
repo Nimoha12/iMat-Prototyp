@@ -5,9 +5,9 @@ import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Pages/favorites/favorites_page.dart';
 import 'package:imat_repo/Pages/history/history_page.dart';
 import 'package:imat_repo/Pages/search/search_page.dart';
-import 'package:imat_repo/Widgets/Cart.dart';
+import 'package:imat_repo/Widgets/Cart_Parts/Cart.dart';
+import 'package:imat_repo/Widgets/Navigation/cart.button.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
-import 'package:imat_repo/Widgets/navbar/cart.button.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -30,7 +30,7 @@ class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
   State<IMatNavbar> createState() => _IMatNavbarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(78);
+  Size get preferredSize => const Size.fromHeight(88); // något högre för större innehåll
 }
 
 class _IMatNavbarState extends State<IMatNavbar>
@@ -45,19 +45,18 @@ class _IMatNavbarState extends State<IMatNavbar>
   void initState() {
     super.initState();
 
-    _pulseController =
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 900),
-          lowerBound: 0.8,
-          upperBound: 1.2,
-        )..addStatusListener((status) {
-          if (status == AnimationStatus.completed) {
-            _pulseController.reverse();
-          } else if (status == AnimationStatus.dismissed) {
-            _pulseController.forward();
-          }
-        });
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+      lowerBound: 0.8,
+      upperBound: 1.2,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _pulseController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _pulseController.forward();
+        }
+      });
   }
 
   @override
@@ -147,7 +146,7 @@ class _IMatNavbarState extends State<IMatNavbar>
     return AppBar(
       backgroundColor: IMatColors.green,
       elevation: 0,
-      toolbarHeight: 78,
+      toolbarHeight: 88,
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       title: LayoutBuilder(
@@ -181,17 +180,17 @@ class _IMatNavbarState extends State<IMatNavbar>
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 620),
                       child: SizedBox(
-                        height: 46,
+                        height: 50,
                         child: TextField(
                           controller: _controller,
-                          style: IMatText.bodyM,
+                          style: IMatText.bodyL, // större text i sökfält
                           textInputAction: TextInputAction.search,
                           onSubmitted: (query) {
                             _onSearchSubmitted(context, query);
                           },
                           decoration: InputDecoration(
                             hintText: "Sök varor...",
-                            hintStyle: IMatText.bodyM.copyWith(
+                            hintStyle: IMatText.bodyL.copyWith(
                               color: Colors.grey[600],
                             ),
                             filled: true,
@@ -199,10 +198,10 @@ class _IMatNavbarState extends State<IMatNavbar>
                             prefixIcon: const Icon(
                               Icons.search,
                               color: Colors.grey,
-                              size: 28,
+                              size: 30, // något större ikon
                             ),
 
-                            // ⭐ RÖSTKNAPP MED PULS + RÖD FÄRG + STOPP
+                            // Röstknapp med puls
                             suffixIcon: GestureDetector(
                               onTap: () {
                                 _isListening
@@ -217,11 +216,13 @@ class _IMatNavbarState extends State<IMatNavbar>
                                         ? _pulseController.value
                                         : 1.0,
                                     child: Icon(
-                                      _isListening ? Icons.mic : Icons.mic_none,
+                                      _isListening
+                                          ? Icons.mic
+                                          : Icons.mic_none,
                                       color: _isListening
                                           ? Colors.red
                                           : Colors.grey,
-                                      size: 28,
+                                      size: 30,
                                     ),
                                   );
                                 },
@@ -251,8 +252,9 @@ class _IMatNavbarState extends State<IMatNavbar>
                     context,
                     PageRouteBuilder(
                       opaque: false,
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const Cart(),
+                      pageBuilder:
+                          (context, animation, secondaryAnimation) =>
+                              const Cart(),
                     ),
                   );
                 },
@@ -267,8 +269,9 @@ class _IMatNavbarState extends State<IMatNavbar>
                 onTap: isLoggedIn
                     ? () => _onFavoritesTapLoggedIn(context)
                     : () => showLogin(
-                        onLoginSuccess: () => _onFavoritesTapLoggedIn(context),
-                      ),
+                          onLoginSuccess: () =>
+                              _onFavoritesTapLoggedIn(context),
+                        ),
               ),
 
               NavIcon(
@@ -278,15 +281,22 @@ class _IMatNavbarState extends State<IMatNavbar>
                 onTap: isLoggedIn
                     ? () => _onHistoryTapLoggedIn(context)
                     : () => showLogin(
-                        onLoginSuccess: () => _onHistoryTapLoggedIn(context),
-                      ),
+                          onLoginSuccess: () =>
+                              _onHistoryTapLoggedIn(context),
+                        ),
               ),
 
-              NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
+              NavIcon(
+                icon: Icons.help_outline,
+                label: "Hjälp",
+                onTap: () {},
+              ),
 
               NavIcon(
                 selected: widget.activePage == NavbarPage.profile,
-                icon: isLoggedIn ? Icons.account_circle : Icons.person_outline,
+                icon: isLoggedIn
+                    ? Icons.account_circle
+                    : Icons.person_outline,
                 label: isLoggedIn ? "Användare" : "Logga in",
                 onTap: isLoggedIn
                     ? () => _onUserTapLoggedIn(context)

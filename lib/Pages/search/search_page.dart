@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/all_products/category_page.dart';
 import 'package:provider/provider.dart';
-import 'package:imat_repo/Pages/all_products/categorized_product_sections.dart';
-import 'package:imat_repo/Pages/all_products/ui_categories.dart';
+import 'package:imat_repo/Widgets/Category/categorized_product_sections.dart';
+import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';

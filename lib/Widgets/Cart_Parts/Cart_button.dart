@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Widgets/Cart.dart';
+import 'package:imat_repo/Widgets/Cart_Parts/Cart.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 

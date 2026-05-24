@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Widgets/Navigation/navbar.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Header/profile_header.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Logged_in_Profile_View.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Not_logged_in_View.dart';
-import 'package:imat_repo/Widgets/navbar/navbar.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:imat_repo/model/Profile/profile_section.dart';
 

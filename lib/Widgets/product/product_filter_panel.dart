@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
-import 'ui_categories.dart';
+import '../Category/ui_categories.dart';
 
 enum EcoFilter { alla, eco, inteEco }
 
