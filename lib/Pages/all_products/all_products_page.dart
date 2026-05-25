@@ -96,7 +96,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
                     );
                   },
                   child: Text(
-                    "Alla varor",
+                    "A",
                     style: IMatText.bodyS.copyWith(
                       color: IMatColors.green,
                       decoration: TextDecoration.underline,
