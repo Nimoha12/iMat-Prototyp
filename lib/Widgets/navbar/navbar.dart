@@ -11,6 +11,7 @@ import 'package:imat_repo/Widgets/navbar/cart.button.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+
 import 'nav_icon.dart';
 import 'logo.dart';
 
@@ -19,11 +20,15 @@ enum NavbarPage { none, favorites, history, profile }
 class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onLoginTap;
   final NavbarPage activePage;
+  final String? searchQuery;
+  final bool highlightSearchQuery;
 
   const IMatNavbar({
     super.key,
     this.onLoginTap,
     this.activePage = NavbarPage.none,
+    this.searchQuery,
+    this.highlightSearchQuery = false,
   });
 
   @override
@@ -36,39 +41,89 @@ class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
 class _IMatNavbarState extends State<IMatNavbar>
     with SingleTickerProviderStateMixin {
   final SpeechToText _speech = SpeechToText();
-  final TextEditingController _controller = TextEditingController();
 
-  bool _isListening = false; // röd mic + stopp
-  late AnimationController _pulseController; // puls
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
+  bool _isListening = false;
+  bool _isSearchFlashActive = false;
+
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
 
-    _pulseController =
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 900),
-          lowerBound: 0.8,
-          upperBound: 1.2,
-        )..addStatusListener((status) {
-          if (status == AnimationStatus.completed) {
-            _pulseController.reverse();
-          } else if (status == AnimationStatus.dismissed) {
-            _pulseController.forward();
-          }
-        });
+    _controller.text = widget.searchQuery ?? '';
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+      lowerBound: 0.85,
+      upperBound: 1.15,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _pulseController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _pulseController.forward();
+        }
+      });
+
+    if (widget.highlightSearchQuery &&
+        _controller.text.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _flashSearchField();
+      });
+    }
   }
 
   @override
   void dispose() {
+    _controller.dispose();
+    _searchFocusNode.dispose();
     _pulseController.dispose();
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant IMatNavbar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.searchQuery != oldWidget.searchQuery) {
+      _controller.text = widget.searchQuery ?? '';
+    }
+
+    if (widget.highlightSearchQuery !=
+            oldWidget.highlightSearchQuery ||
+        widget.searchQuery != oldWidget.searchQuery) {
+      if (widget.highlightSearchQuery &&
+          _controller.text.trim().isNotEmpty) {
+        _flashSearchField();
+      }
+    }
+  }
+
+  void _flashSearchField() {
+    if (!mounted) return;
+
+    setState(() {
+      _isSearchFlashActive = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 180), () {
+      if (!mounted) return;
+
+      setState(() {
+        _isSearchFlashActive = false;
+      });
+    });
+  }
+
   Future<void> _startListening() async {
     bool available = await _speech.initialize();
+
     if (!available) return;
+    if (!mounted) return;
 
     setState(() {
       _isListening = true;
@@ -76,19 +131,26 @@ class _IMatNavbarState extends State<IMatNavbar>
 
     _pulseController.forward();
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Lyssnar…")));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Lyssnar…"),
+      ),
+    );
 
     _speech.listen(
       onResult: (result) {
+        if (!mounted) return;
+
         setState(() {
           _controller.text = result.recognizedWords;
         });
 
         if (result.finalResult) {
           _stopListening();
-          _onSearchSubmitted(context, result.recognizedWords);
+          _onSearchSubmitted(
+            context,
+            result.recognizedWords,
+          );
         }
       },
     );
@@ -96,9 +158,11 @@ class _IMatNavbarState extends State<IMatNavbar>
 
   void _stopListening() {
     _speech.stop();
+
     setState(() {
       _isListening = false;
     });
+
     _pulseController.stop();
     _pulseController.value = 1.0;
   }
@@ -106,43 +170,69 @@ class _IMatNavbarState extends State<IMatNavbar>
   void _onFavoritesTapLoggedIn(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const FavoritesPage()),
+      MaterialPageRoute(
+        builder: (_) => const FavoritesPage(),
+      ),
     );
   }
 
   void _onHistoryTapLoggedIn(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const HistoryPage()),
+      MaterialPageRoute(
+        builder: (_) => const HistoryPage(),
+      ),
     );
   }
 
   void _onUserTapLoggedIn(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const ProfilePage()),
+      MaterialPageRoute(
+        builder: (_) => const ProfilePage(),
+      ),
     );
   }
 
-  void _onSearchSubmitted(BuildContext context, String query) {
+  void _onSearchSubmitted(
+    BuildContext context,
+    String query,
+  ) {
     final trimmedQuery = query.trim();
+
     if (trimmedQuery.isEmpty) return;
+
+    setState(() {
+      _controller.text = trimmedQuery;
+    });
+
+    _flashSearchField();
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => SearchPage(query: trimmedQuery)),
+      MaterialPageRoute(
+        builder: (_) => SearchPage(
+          query: trimmedQuery,
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final loginOverlay = LoginOverlayScope.maybeOf(context);
-    final bool isLoggedIn = context.watch<AuthState>().isLoggedIn;
+    final loginOverlay =
+        LoginOverlayScope.maybeOf(context);
+
+    final bool isLoggedIn =
+        context.watch<AuthState>().isLoggedIn;
+
     final ShowLoginOverlay showLogin =
         loginOverlay?.showLoginOverlay ??
-        ({LoginSuccessAction? onLoginSuccess}) {
-          widget.onLoginTap?.call();
-        };
+            ({
+              LoginSuccessAction? onLoginSuccess,
+            }) {
+              widget.onLoginTap?.call();
+            };
 
     return AppBar(
       backgroundColor: IMatColors.green,
@@ -152,13 +242,13 @@ class _IMatNavbarState extends State<IMatNavbar>
       titleSpacing: 0,
       title: LayoutBuilder(
         builder: (context, constraints) {
-          final bool isSmallScreen = constraints.maxWidth < 900;
+          final bool isSmallScreen =
+              constraints.maxWidth < 900;
 
           return Row(
             children: [
               const SizedBox(width: 12),
 
-              // Klickbar logga som leder till startsidan
               IMatLogo(
                 onTap: () {
                   Navigator.pushNamedAndRemoveUntil(
@@ -171,38 +261,66 @@ class _IMatNavbarState extends State<IMatNavbar>
 
               const SizedBox(width: 24),
 
-              // Kortare sökfält (mer luftigt)
               Expanded(
                 flex: isSmallScreen ? 2 : 3,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                  ),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 620),
-                      child: SizedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 620,
+                      ),
+                      child: AnimatedContainer(
+                        duration: const Duration(
+                          milliseconds: 700,
+                        ),
+                        curve: Curves.easeOutCubic,
                         height: 46,
+                        decoration: BoxDecoration(
+                          color: _isSearchFlashActive
+                              ? const Color.fromARGB(255, 32, 32, 32)
+                              : Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(10),
+                        ),
                         child: TextField(
                           controller: _controller,
-                          style: IMatText.bodyM,
-                          textInputAction: TextInputAction.search,
+                          focusNode: _searchFocusNode,
+                          cursorColor: IMatColors.black,
+                          textInputAction:
+                              TextInputAction.search,
+
+                          style: IMatText.bodyM.copyWith(
+                            color: IMatColors.black,
+                            fontSize: 25,
+                            decoration:
+                                TextDecoration.none,
+                          ),
+
                           onSubmitted: (query) {
-                            _onSearchSubmitted(context, query);
+                            _onSearchSubmitted(
+                              context,
+                              query,
+                            );
                           },
+
                           decoration: InputDecoration(
                             hintText: "Sök varor...",
-                            hintStyle: IMatText.bodyM.copyWith(
-                              color: Colors.grey[600],
+
+                            hintStyle:
+                                IMatText.bodyM.copyWith(
+                              color: const Color.fromARGB(255, 53, 53, 53),
                             ),
-                            filled: true,
-                            fillColor: IMatColors.white,
+
                             prefixIcon: const Icon(
                               Icons.search,
-                              color: Colors.grey,
+                              color: IMatColors.black,
                               size: 28,
                             ),
 
-                            // ⭐ RÖSTKNAPP MED PULS + RÖD FÄRG + STOPP
                             suffixIcon: GestureDetector(
                               onTap: () {
                                 _isListening
@@ -210,17 +328,23 @@ class _IMatNavbarState extends State<IMatNavbar>
                                     : _startListening();
                               },
                               child: AnimatedBuilder(
-                                animation: _pulseController,
-                                builder: (context, child) {
+                                animation:
+                                    _pulseController,
+                                builder:
+                                    (context, child) {
                                   return Transform.scale(
                                     scale: _isListening
-                                        ? _pulseController.value
+                                        ? _pulseController
+                                            .value
                                         : 1.0,
                                     child: Icon(
-                                      _isListening ? Icons.mic : Icons.mic_none,
+                                      _isListening
+                                          ? Icons.mic
+                                          : Icons.mic_none,
                                       color: _isListening
                                           ? Colors.red
-                                          : Colors.grey,
+                                          : IMatColors
+                                              .black,
                                       size: 28,
                                     ),
                                   );
@@ -228,14 +352,13 @@ class _IMatNavbarState extends State<IMatNavbar>
                               ),
                             ),
 
-                            contentPadding: const EdgeInsets.symmetric(
+                            contentPadding:
+                                const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 10,
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
+
+                            border: InputBorder.none,
                           ),
                         ),
                       ),
@@ -244,52 +367,82 @@ class _IMatNavbarState extends State<IMatNavbar>
                 ),
               ),
 
-              // Ikoner
               CartButton(
                 onTap: () {
                   Navigator.push(
                     context,
                     PageRouteBuilder(
                       opaque: false,
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const Cart(),
+                      pageBuilder:
+                          (
+                            context,
+                            animation,
+                            secondaryAnimation,
+                          ) => const Cart(),
                     ),
                   );
                 },
               ),
 
               NavIcon(
-                selected: widget.activePage == NavbarPage.favorites,
-                icon: widget.activePage == NavbarPage.favorites
-                    ? Icons.favorite
-                    : Icons.favorite_border,
+                selected:
+                    widget.activePage ==
+                    NavbarPage.favorites,
+                icon:
+                    widget.activePage ==
+                            NavbarPage.favorites
+                        ? Icons.favorite
+                        : Icons.favorite_border,
                 label: "Favoriter",
                 onTap: isLoggedIn
-                    ? () => _onFavoritesTapLoggedIn(context)
+                    ? () => _onFavoritesTapLoggedIn(
+                          context,
+                        )
                     : () => showLogin(
-                        onLoginSuccess: () => _onFavoritesTapLoggedIn(context),
-                      ),
+                          onLoginSuccess: () =>
+                              _onFavoritesTapLoggedIn(
+                            context,
+                          ),
+                        ),
               ),
 
               NavIcon(
-                selected: widget.activePage == NavbarPage.history,
+                selected:
+                    widget.activePage ==
+                    NavbarPage.history,
                 icon: Icons.history,
                 label: "Historik",
                 onTap: isLoggedIn
-                    ? () => _onHistoryTapLoggedIn(context)
+                    ? () =>
+                        _onHistoryTapLoggedIn(context)
                     : () => showLogin(
-                        onLoginSuccess: () => _onHistoryTapLoggedIn(context),
-                      ),
+                          onLoginSuccess: () =>
+                              _onHistoryTapLoggedIn(
+                            context,
+                          ),
+                        ),
               ),
 
-              NavIcon(icon: Icons.help_outline, label: "Hjälp", onTap: () {}),
+              NavIcon(
+                icon: Icons.help_outline,
+                label: "Hjälp",
+                onTap: () {},
+              ),
 
               NavIcon(
-                selected: widget.activePage == NavbarPage.profile,
-                icon: isLoggedIn ? Icons.account_circle : Icons.person_outline,
-                label: isLoggedIn ? "Användare" : "Logga in",
+                selected:
+                    widget.activePage ==
+                    NavbarPage.profile,
+                icon: isLoggedIn
+                    ? Icons.account_circle
+                    : Icons.person_outline,
+                label: isLoggedIn
+                    ? "Användare"
+                    : "Logga in",
                 onTap: isLoggedIn
-                    ? () => _onUserTapLoggedIn(context)
+                    ? () => _onUserTapLoggedIn(
+                          context,
+                        )
                     : () => showLogin(),
               ),
 

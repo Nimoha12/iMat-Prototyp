@@ -6,7 +6,7 @@ import 'package:imat_repo/Pages/all_products/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
-import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/navbar/navbar.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
@@ -49,6 +49,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
 
     return IMatScaffold(
+      activePage: NavbarPage.favorites,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: SingleChildScrollView(
@@ -83,10 +84,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
               else
                 CategorizedProductSections(
                   productsByCategory: favoriteProductsByCategory,
-                  onCategoryHeaderTap: (uiCat){
+                  onCategoryHeaderTap: (uiCat) {
                     Navigator.push(
-                      context, MaterialPageRoute(
-                        builder: (_) => CategoryPage(uiCategory: uiCat))
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryPage(uiCategory: uiCat),
+                      ),
                     );
                   },
                 ),

@@ -761,7 +761,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return ElevatedButton.styleFrom(
       backgroundColor: IMatColors.green,
       disabledBackgroundColor: IMatColors.border,
-      foregroundColor: IMatColors.white,
+      foregroundColor: IMatColors.onGreen,
       disabledForegroundColor: IMatColors.textSecondary,
       elevation: 0,
       textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
@@ -809,7 +809,7 @@ class _CheckoutSidebar extends StatelessWidget {
                     label: const Text('Tillbaka till handla'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: IMatColors.green,
-                      foregroundColor: IMatColors.white,
+                      foregroundColor: IMatColors.onGreen,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -867,11 +867,15 @@ class _StepIndicator extends StatelessWidget {
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               child: Center(
                 child: isDone
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
+                    ? const Icon(
+                        Icons.check,
+                        color: IMatColors.onGreen,
+                        size: 20,
+                      )
                     : Text(
                         '$number',
                         style: IMatText.bodyS.copyWith(
-                          color: Colors.white,
+                          color: IMatColors.onGreen,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

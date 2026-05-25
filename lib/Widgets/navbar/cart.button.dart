@@ -15,7 +15,6 @@ class CartButton extends StatefulWidget {
 
 class _CartButtonState extends State<CartButton>
     with SingleTickerProviderStateMixin {
-
   late AnimationController _popController;
 
   @override
@@ -63,15 +62,12 @@ class _CartButtonState extends State<CartButton>
           color: IMatColors.green,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: IMatColors.white.withOpacity(0.25),
+            color: IMatColors.white.withValues(alpha: 0.25),
             width: 1.5,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -79,14 +75,15 @@ class _CartButtonState extends State<CartButton>
                 clipBehavior: Clip.none,
                 children: [
                   ScaleTransition(
-                    scale: Tween<double>(begin: 1.0, end: 1.20)
-                        .animate(CurvedAnimation(
-                      parent: _popController,
-                      curve: Curves.easeOut,
-                    )),
+                    scale: Tween<double>(begin: 1.0, end: 1.20).animate(
+                      CurvedAnimation(
+                        parent: _popController,
+                        curve: Curves.easeOut,
+                      ),
+                    ),
                     child: const Icon(
                       Icons.shopping_cart_outlined,
-                      color: IMatColors.white,
+                      color: IMatColors.onGreen,
                       size: 30, // större ikon
                     ),
                   ),
@@ -119,7 +116,7 @@ class _CartButtonState extends State<CartButton>
               Text(
                 "Varukorg",
                 style: IMatText.bodyM.copyWith(
-                  color: IMatColors.white,
+                  color: IMatColors.onGreen,
                   fontWeight: FontWeight.w700,
                 ),
               ),
