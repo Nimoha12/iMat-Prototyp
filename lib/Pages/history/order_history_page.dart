@@ -44,7 +44,13 @@ class _HistoryPageState extends State<HistoryPage> {
               children: [
                 const CloseProfileButton(),
                 const SizedBox(width: 20),
-                Text('Historik', style: IMatText.h2),
+                const Text(
+                  'Historik',
+                  style: TextStyle(
+                    fontSize: 44,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),

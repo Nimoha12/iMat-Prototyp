@@ -62,7 +62,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 children: [
                   const CloseProfileButton(),
                   const SizedBox(width: 20),
-                  Text('Favoriter', style: IMatText.h2),
+                  const Text(
+                    'Favoriter',
+                    style: TextStyle(
+                      fontSize: 44,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
