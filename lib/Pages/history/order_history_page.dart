@@ -53,61 +53,66 @@ class _HistoryPageState extends State<HistoryPage> {
             child: orders.isEmpty
                 ? const _EmptyHistory()
                 : LayoutBuilder(
-              builder: (context, constraints) {
-                final isNarrow = constraints.maxWidth < 780;
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 780;
 
-                if (isNarrow) {
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: 190,
-                        child: _OrderList(
-                          orders: orders,
-                          selectedIndex: _selectedIndex,
-                          horizontal: true,
-                          onSelect: _selectOrder,
-                        ),
-                      ),
-                      Expanded(
-                        child: _OrderDetails(
-                          order: selectedOrder!,
-                          isReordered: _reorderedOrders.contains(
-                            selectedOrder.orderNumber,
+                      if (isNarrow) {
+                        return Column(
+                          children: [
+                            SizedBox(
+                              height: 190,
+                              child: _OrderList(
+                                orders: orders,
+                                selectedIndex: _selectedIndex,
+                                horizontal: true,
+                                onSelect: _selectOrder,
+                              ),
+                            ),
+                            Expanded(
+                              child: _OrderDetails(
+                                order: selectedOrder!,
+                                isReordered: _reorderedOrders.contains(
+                                  selectedOrder.orderNumber,
+                                ),
+                                onToggleReorder: () =>
+                                    _toggleReorder(selectedOrder),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          SizedBox(
+                            width: 330,
+                            child: _OrderList(
+                              orders: orders,
+                              selectedIndex: _selectedIndex,
+                              onSelect: _selectOrder,
+                            ),
                           ),
-                          onToggleReorder: () => _toggleReorder(selectedOrder),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return Row(
-                  children: [
-                    SizedBox(
-                      width: 330,
-                      child: _OrderList(
-                        orders: orders,
-                        selectedIndex: _selectedIndex,
-                        onSelect: _selectOrder,
-                      ),
-                    ),
-                    const VerticalDivider(width: 1, color: IMatColors.border),
-                    Expanded(
-                      child: _OrderDetails(
-                        order: selectedOrder!,
-                        isReordered: _reorderedOrders.contains(
-                          selectedOrder.orderNumber,
-                        ),
-                        onToggleReorder: () => _toggleReorder(selectedOrder),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          )
-        ]
-          )
+                          const VerticalDivider(
+                            width: 1,
+                            color: IMatColors.border,
+                          ),
+                          Expanded(
+                            child: _OrderDetails(
+                              order: selectedOrder!,
+                              isReordered: _reorderedOrders.contains(
+                                selectedOrder.orderNumber,
+                              ),
+                              onToggleReorder: () =>
+                                  _toggleReorder(selectedOrder),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -316,7 +321,7 @@ class _ReorderButton extends StatelessWidget {
         label: Text(isReordered ? 'Ångra' : 'Beställ igen'),
         style: ElevatedButton.styleFrom(
           backgroundColor: isReordered ? IMatColors.black : IMatColors.green,
-          foregroundColor: IMatColors.white,
+          foregroundColor: isReordered ? IMatColors.white : IMatColors.onGreen,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),

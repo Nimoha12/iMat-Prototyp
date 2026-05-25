@@ -7,6 +7,10 @@ class IMatColors {
 
   static const greenHover = Color(0xFF3F8571);
 
+  static const greenDark = Color(0xFF2F6E5D);
+
+  static const onGreen = white;
+
   static const beige = Color(0xFFF7F4EE);
 
   static const white = Color(0xFFFFFFFF);

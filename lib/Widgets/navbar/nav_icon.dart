@@ -17,9 +17,7 @@ class NavIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = selected
-        ? IMatColors.green
-        : Colors.white;
+    final iconColor = selected ? IMatColors.greenDark : IMatColors.onGreen;
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
@@ -37,11 +35,7 @@ class NavIcon extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: iconColor,
-              size: 32,
-            ),
+            Icon(icon, color: iconColor, size: 32),
             const SizedBox(height: 8),
             Text(
               label,

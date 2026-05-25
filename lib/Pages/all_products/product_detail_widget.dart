@@ -194,7 +194,7 @@ class ProductDetailWidget extends StatelessWidget {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: IMatColors.green,
-            foregroundColor: IMatColors.white,
+            foregroundColor: IMatColors.onGreen,
             elevation: 0,
             textStyle: IMatText.bodyL.copyWith(fontWeight: FontWeight.w800),
             shape: RoundedRectangleBorder(
@@ -252,7 +252,7 @@ class ProductDetailWidget extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: IMatColors.green,
-          foregroundColor: IMatColors.white,
+          foregroundColor: IMatColors.onGreen,
           elevation: 0,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

@@ -28,16 +28,17 @@ class SubCategoryPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: IMatColors.green,
-        title: Text(title, style: IMatText.h3.copyWith(color: Colors.white)),
+        foregroundColor: IMatColors.onGreen,
+        title: Text(
+          title,
+          style: IMatText.h3.copyWith(color: IMatColors.onGreen),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: filtered.isEmpty
             ? Center(
-                child: Text(
-                  "Inga produkter hittades",
-                  style: IMatText.bodyL,
-                ),
+                child: Text("Inga produkter hittades", style: IMatText.bodyL),
               )
             : Wrap(
                 spacing: 24,
