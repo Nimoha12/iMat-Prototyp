@@ -66,7 +66,7 @@ class _ProductCardState extends State<ProductCard>
           PageRouteBuilder(
             opaque: false,
             barrierColor: Colors.black.withOpacity(0.5),
-            pageBuilder: (_, __, ___) {
+            pageBuilder: (_, _, _) {
               return ProductDetailOverlay(product: widget.product);
             },
           ),

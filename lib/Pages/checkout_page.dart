@@ -533,13 +533,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (_orderPlaced) {
       return _Panel(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Icon(Icons.check_circle, color: IMatColors.green, size: 64),
             const SizedBox(height: 12),
-            Text('Tack för din beställning!', style: IMatText.h2),
+            Text(
+              'Tack för din beställning!',
+              style: IMatText.h2,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 8),
             Text(
               'Din order är skickad.',
+              textAlign: TextAlign.center,
               style: IMatText.bodyM.copyWith(color: IMatColors.textSecondary),
             ),
           ],
@@ -691,6 +699,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
       await iMat.placeOrder();
       if (!mounted) return;
       setState(() => _orderPlaced = true);
+      final customer = iMat.getCustomer();
+
+      customer.firstName = _firstNameController.text;
+      customer.lastName = _lastNameController.text;
+      customer.mobilePhoneNumber = _phoneController.text;
+      customer.email = _invoiceEmailController.text;
+
+      customer.address = _addressController.text;
+      customer.postCode = _postCodeController.text;
+      customer.postAddress = _cityController.text;
+
+      iMat.setCustomer(customer);
       return;
     }
 

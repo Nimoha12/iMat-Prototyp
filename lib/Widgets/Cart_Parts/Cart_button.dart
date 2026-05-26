@@ -26,7 +26,7 @@ class CartButton extends StatelessWidget {
           PageRouteBuilder(
             opaque: false,
 
-            pageBuilder: (_, __, ___) => const Cart(),
+            pageBuilder: (_, _, _) => const Cart(),
           ),
         );
       },

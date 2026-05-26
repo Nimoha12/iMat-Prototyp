@@ -87,85 +87,87 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     return IMatScaffold(
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ✅ Breadcrumbs med korrekt hierarki
-                  BreadcrumbBar(
-                    items: [
-                      BreadcrumbItem(
-                        label: "Alla varor",
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AllCategoriesPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      BreadcrumbItem(
-                        label: widget.parentCategory.label,
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CategoryPage(
-                                uiCategory: widget.parentCategory,
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ✅ Breadcrumbs med korrekt hierarki
+                    BreadcrumbBar(
+                      items: [
+                        BreadcrumbItem(
+                          label: "Alla varor",
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AllCategoriesPage(),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                      BreadcrumbItem(label: widget.title),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Rubrik + filterknapp i samma rad
-                  SizedBox(
-                    width: 1396,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(widget.title, style: IMatText.h2),
-                        FilterButton(
-                          onPressed: () => setState(() => filterOpen = true),
+                            );
+                          },
                         ),
+                        BreadcrumbItem(
+                          label: widget.parentCategory.label,
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CategoryPage(
+                                  uiCategory: widget.parentCategory,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        BreadcrumbItem(label: widget.title),
                       ],
                     ),
-                  ),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                  // Produktgrid
-                  filtered.isEmpty
-                      ? Center(
-                          child: Text(
-                            "Inga produkter hittades",
-                            style: IMatText.bodyL,
+                    // Rubrik + filterknapp
+                    SizedBox(
+                      width: 1396,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(widget.title, style: IMatText.h2),
+                          FilterButton(
+                            onPressed: () => setState(() => filterOpen = true),
                           ),
-                        )
-                      : Wrap(
-                          spacing: 24,
-                          runSpacing: 24,
-                          children: filtered.map((product) {
-                            return SizedBox(
-                              width: 260,
-                              child: ProductCard(product: product),
-                            );
-                          }).toList(),
-                        ),
-                ],
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Produktgrid
+                    filtered.isEmpty
+                        ? Center(
+                            child: Text(
+                              "Inga produkter hittades",
+                              style: IMatText.bodyL,
+                            ),
+                          )
+                        : Wrap(
+                            spacing: 24,
+                            runSpacing: 24,
+                            children: filtered.map((product) {
+                              return SizedBox(
+                                width: 260,
+                                child: ProductCard(product: product),
+                              );
+                            }).toList(),
+                          ),
+                  ],
+                ),
               ),
             ),
           ),
-
+          
           // Overlay
           if (filterOpen)
             Positioned.fill(
@@ -174,9 +176,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                 child: AnimatedOpacity(
                   opacity: filterOpen ? 1 : 0,
                   duration: const Duration(milliseconds: 250),
-                  child: Container(
-                    color: Colors.black.withOpacity(0.45),
-                  ),
+                  child: Container(color: Colors.black.withOpacity(0.45)),
                 ),
               ),
             ),

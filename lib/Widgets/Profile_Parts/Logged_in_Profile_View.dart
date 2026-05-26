@@ -1,35 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/model/Profile/profile_page_content.dart';
-import 'package:imat_repo/model/Profile/profile_section.dart';
+import 'package:imat_repo/Pages/Profile_page.dart';
 
-
-
-
-class LoggedInProfileView
-    extends StatelessWidget {
-
-  final ProfileSection selectedSection;
-
-  final Function(ProfileSection)
-      onTabSelected;
-
+class LoggedInProfileView extends StatelessWidget {
   const LoggedInProfileView({
     super.key,
-    required this.selectedSection,
-    required this.onTabSelected,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ProfilePageContent(
-            selectedSection:
-                selectedSection,
-          ),
-        ),
-      ],
-    );
+    return const ProfilePage();
   }
 }

@@ -223,7 +223,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
             ),
           ),
 
-          // 🔥 SCROLL-TO-TOP KNAPP
+          // SCROLL-TO-TOP KNAPP
           if (showScrollButton)
             Positioned(
               right: 24,

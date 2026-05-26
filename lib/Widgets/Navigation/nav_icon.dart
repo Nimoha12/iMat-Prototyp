@@ -22,6 +22,7 @@ class NavIcon extends StatelessWidget {
     final textColor = selected ? IMatColors.greenHover : IMatColors.white;
 
     return InkWell(
+      borderRadius: BorderRadius.circular(18),
       onTap: onTap,
       child: Container(
         width: 120, // något bredare för luft

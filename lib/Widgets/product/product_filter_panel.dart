@@ -20,7 +20,8 @@ class ProductFilterPanel extends StatelessWidget {
 
   final VoidCallback onClose;
 
-  final bool fullHeight; // <-- NYTT
+  final bool fullHeight;
+  final bool showCategoryFilter;
 
   const ProductFilterPanel({
     super.key,
@@ -33,14 +34,15 @@ class ProductFilterPanel extends StatelessWidget {
     required this.selectedCategory,
     required this.onCategoryChange,
     required this.onClose,
-    this.fullHeight = false, // <-- DEFAULT = false
+    this.fullHeight = false,
+    this.showCategoryFilter = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 350,
-      height: fullHeight ? double.infinity : null, // <-- FIX
+      height: fullHeight ? double.infinity : null,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: IMatColors.white,
@@ -58,6 +60,7 @@ class ProductFilterPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // HEADER
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -71,28 +74,19 @@ class ProductFilterPanel extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            Text("Kategori", style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
+            // =========================
+            // PRIS
+            // =========================
 
-            Column(
-              children: UiCategory.values.map((uiCat) {
-                final isSelected = selectedCategory == uiCat;
-                return ListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(uiCat.label, style: IMatText.bodyM),
-                  trailing: isSelected
-                      ? Icon(Icons.check, color: IMatColors.green)
-                      : null,
-                  onTap: () => onCategoryChange(isSelected ? null : uiCat),
-                );
-              }).toList(),
+            Text(
+              "Maxpris: ${maxPrice.toInt()} kr",
+              style: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 8),
 
-            Text("Maxpris: ${maxPrice.toInt()} kr",
-                style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w600)),
             Slider(
               value: maxPrice,
               min: 0,
@@ -102,37 +96,138 @@ class ProductFilterPanel extends StatelessWidget {
               onChanged: onPriceChange,
             ),
 
-            const SizedBox(height: 24),
+            const Divider(height: 40),
 
-            Text("Ekologiskt",
-                style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
+            // =========================
+            // EKOLOGISKT
+            // =========================
+
+            Text(
+              "Ekologiskt",
+              style: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 12),
 
             SegmentedButton<EcoFilter>(
               segments: const [
-                ButtonSegment(value: EcoFilter.alla, label: Text("Alla")),
-                ButtonSegment(value: EcoFilter.eco, label: Text("Ekologiskt")),
-                ButtonSegment(value: EcoFilter.inteEco, label: Text("Ej ekologiskt")),
+                ButtonSegment(
+                  value: EcoFilter.alla,
+                  label: Text("Alla"),
+                ),
+                ButtonSegment(
+                  value: EcoFilter.eco,
+                  label: Text("Ekologiskt"),
+                ),
+                ButtonSegment(
+                  value: EcoFilter.inteEco,
+                  label: Text("Ej ekologiskt"),
+                ),
               ],
               selected: {ecoFilter},
               onSelectionChanged: (v) => onEcoChange(v.first),
             ),
 
-            const SizedBox(height: 24),
+            const Divider(height: 40),
 
-            Text("Sortera",
-                style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
+            // =========================
+            // SORTERA
+            // =========================
+
+            Text(
+              "Sortera",
+              style: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 12),
 
             DropdownButtonFormField<String>(
-              value: sortBy,
+              initialValue: sortBy,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
+              ),
               items: const [
-                DropdownMenuItem(value: "none", child: Text("Ingen sortering")),
-                DropdownMenuItem(value: "priceAsc", child: Text("Pris: Lågt till högt")),
-                DropdownMenuItem(value: "priceDesc", child: Text("Pris: Högt till lågt")),
+                DropdownMenuItem(
+                  value: "none",
+                  child: Text("Ingen sortering"),
+                ),
+                DropdownMenuItem(
+                  value: "priceAsc",
+                  child: Text("Pris: Lågt till högt"),
+                ),
+                DropdownMenuItem(
+                  value: "priceDesc",
+                  child: Text("Pris: Högt till lågt"),
+                ),
               ],
               onChanged: (v) => onSortChange(v!),
             ),
+
+            // =========================
+            // KATEGORI
+            // =========================
+
+            if (showCategoryFilter) ...[
+              const Divider(height: 40),
+
+              Text(
+                "Kategori",
+                style: IMatText.bodyM.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Column(
+                children: UiCategory.values.map((uiCat) {
+                  final isSelected = selectedCategory == uiCat;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: isSelected
+                          ? IMatColors.green.withOpacity(0.08)
+                          : Colors.transparent,
+                    ),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                      ),
+                      title: Text(
+                        uiCat.label,
+                        style: IMatText.bodyM,
+                      ),
+                      trailing: isSelected
+                          ? Icon(
+                              Icons.check_circle,
+                              color: IMatColors.green,
+                            )
+                          : null,
+                      onTap: () =>
+                          onCategoryChange(isSelected ? null : uiCat),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+
+            const SizedBox(height: 24),
           ],
         ),
       ),

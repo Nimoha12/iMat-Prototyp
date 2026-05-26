@@ -15,7 +15,7 @@ import '../../Widgets/Category/categorized_product_sections.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import '../../Widgets/Category/product_ui_category_extension.dart';
 import '../../Widgets/Navigation/filter_button.dart';
-import '../../Widgets/Navigation/breadcrumb_bar.dart'; // ✅ gemensam breadcrumb-komponent
+import '../../Widgets/Navigation/breadcrumb_bar.dart'; // 
 
 class AllCategoriesPage extends StatefulWidget {
   const AllCategoriesPage({super.key});

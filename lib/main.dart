@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
           showLoginOverlay: showLoginOverlay,
           child: Stack(
             children: [
-              if (child != null) child,
+              ?child,
               if (showLoginWidget)
                 LoginOverlay(
                   onClose: hideLoginOverlay,
