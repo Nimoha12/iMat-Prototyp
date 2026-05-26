@@ -16,13 +16,13 @@ import 'category_page.dart';
 class SubCategoryPage extends StatefulWidget {
   final String title;
   final List<ProductCategory> categories;
-  final UiCategory parentCategory; // ✅ Ny parameter för huvudkategori
+  final UiCategory parentCategory; // ny parameter för huvudkategori
 
   const SubCategoryPage({
     super.key,
     required this.title,
     required this.categories,
-    required this.parentCategory, // ✅ krävs nu vid anrop
+    required this.parentCategory, //  krävs nu vid anrop
   });
 
   @override

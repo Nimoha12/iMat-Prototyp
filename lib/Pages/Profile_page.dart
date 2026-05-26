@@ -108,11 +108,21 @@ class _ProfilePageState extends State<ProfilePage> {
                             CrossAxisAlignment.stretch,
 
                         children: [
+
+                          const SizedBox(height: 24),
+
+                          Expanded(
+                            child: PaymentCard(
+                              key: _paymentKey,
+                              isEditing: _editing,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
                           Align(
   alignment: Alignment.center,
   child: SizedBox(
-    width: 400, // adjust as needed
-    height: 72,
+    width: 460, // adjust as needed
+    height: 84,
     child: ElevatedButton.icon(
       onPressed: _toggleEditing,
       icon: Icon(
@@ -128,22 +138,13 @@ class _ProfilePageState extends State<ProfilePage> {
           borderRadius: BorderRadius.circular(18),
         ),
         textStyle: const TextStyle(
-          fontSize: 20,
+          fontSize: 24,
           fontWeight: FontWeight.w800,
         ),
       ),
     ),
   ),
 ),
-
-                          const SizedBox(height: 24),
-
-                          Expanded(
-                            child: PaymentCard(
-                              key: _paymentKey,
-                              isEditing: _editing,
-                            ),
-                          ),
                         ],
                       ),
                     ),

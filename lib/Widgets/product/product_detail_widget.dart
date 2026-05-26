@@ -255,7 +255,9 @@ class ProductDetailWidget extends StatelessWidget {
           foregroundColor: IMatColors.white,
           elevation: 0,
           padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
         child: Icon(icon),
       ),
@@ -336,7 +338,10 @@ class _DetailTabs extends StatelessWidget {
   final String? contents;
   final String? description;
 
-  const _DetailTabs({required this.contents, required this.description});
+  const _DetailTabs({
+    required this.contents,
+    required this.description,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -381,7 +386,9 @@ class _DetailTabs extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               indicatorPadding: const EdgeInsets.all(6),
-              labelStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w900),
+              labelStyle: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w900,
+              ),
               unselectedLabelStyle: IMatText.bodyM.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -397,19 +404,24 @@ class _DetailTabs extends StatelessWidget {
               ],
             ),
             const Divider(height: 1, color: IMatColors.border),
-            SizedBox(
-              height: 132,
-              child: TabBarView(
-                children: [
-                  for (final tab in tabs)
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Text(
-                        tab.content,
-                        style: IMatText.bodyL.copyWith(height: 1.35),
+
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 260),
+              child: SizedBox(
+                height: 100,
+                child: TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    for (final tab in tabs)
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          tab.content,
+                          style: IMatText.bodyL.copyWith(height: 1.35),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -423,7 +435,10 @@ class _ImagePanel extends StatelessWidget {
   final Widget productImage;
   final bool isNarrow;
 
-  const _ImagePanel({required this.productImage, required this.isNarrow});
+  const _ImagePanel({
+    required this.productImage,
+    required this.isNarrow,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -453,7 +468,8 @@ class _DetailTabData {
   final String title;
   final String content;
 
-  _DetailTabData(this.title, String? content) : content = content?.trim() ?? '';
+  _DetailTabData(this.title, String? content)
+      : content = content?.trim() ?? '';
 }
 
 class _SoftDivider extends StatelessWidget {

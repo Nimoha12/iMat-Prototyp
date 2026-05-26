@@ -867,11 +867,15 @@ class _StepIndicator extends StatelessWidget {
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               child: Center(
                 child: isDone
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
+                    ? const Icon(
+                        Icons.check,
+                        color: IMatColors.white,
+                        size: 20,
+                      )
                     : Text(
                         '$number',
                         style: IMatText.bodyS.copyWith(
-                          color: Colors.white,
+                          color: IMatColors.white,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

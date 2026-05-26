@@ -43,12 +43,12 @@ class AddToCartButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.add, color: Colors.white, size: 26),
+              const Icon(Icons.add, color: IMatColors.white, size: 26),
               const SizedBox(width: 8),
               Text(
                 "Lägg till",
                 style: IMatText.bodyL.copyWith(
-                  color: Colors.white,
+                  color: IMatColors.white,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -73,24 +73,23 @@ class AddToCartButton extends StatelessWidget {
           GestureDetector(
             onTap: () {
               if (quantity > 1) {
-                iMat.shoppingCartUpdate(
-                  ShoppingItem(product),
-                  delta: -1,
-                );
+                iMat.shoppingCartUpdate(ShoppingItem(product), delta: -1);
               } else {
-                iMat.shoppingCartRemove(
-                  ShoppingItem(product),
-                );
+                iMat.shoppingCartRemove(ShoppingItem(product));
               }
             },
             child: Container(
               width: 52,
               height: double.infinity,
               decoration: BoxDecoration(
-                color:IMatColors.green,
+                color: IMatColors.green,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.remove, size: 28, color: IMatColors.white),
+              child: const Icon(
+                Icons.remove,
+                size: 28,
+                color: IMatColors.white,
+              ),
             ),
           ),
 
@@ -106,10 +105,7 @@ class AddToCartButton extends StatelessWidget {
           // PLUS
           GestureDetector(
             onTap: () {
-              iMat.shoppingCartUpdate(
-                ShoppingItem(product),
-                delta: 1,
-              );
+              iMat.shoppingCartUpdate(ShoppingItem(product), delta: 1);
             },
             child: Container(
               width: 52,
@@ -118,7 +114,7 @@ class AddToCartButton extends StatelessWidget {
                 color: IMatColors.green,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.add, size: 28, color: Colors.white),
+              child: const Icon(Icons.add, size: 28, color: IMatColors.white),
             ),
           ),
         ],

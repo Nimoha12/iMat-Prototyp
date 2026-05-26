@@ -39,6 +39,8 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     return IMatScaffold(
+      searchQuery: query,
+      highlightSearchQuery: query.isNotEmpty,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: SingleChildScrollView(
@@ -76,8 +78,6 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ),
               const SizedBox(height: 24),
-              Text('Sökresultat för "$query"', style: IMatText.h2),
-              const SizedBox(height: 24),
               if (products.isEmpty)
                 const Center(child: CircularProgressIndicator())
               else if (query.isEmpty)
@@ -97,11 +97,13 @@ class _SearchPageState extends State<SearchPage> {
               else
                 CategorizedProductSections(
                   productsByCategory: searchResult.productsByCategory,
-                  onCategoryHeaderTap: (uiCat){
+                  onCategoryHeaderTap: (uiCat) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => CategoryPage(uiCategory: uiCat)));
+                        builder: (_) => CategoryPage(uiCategory: uiCat),
+                      ),
+                    );
                   },
                 ),
             ],

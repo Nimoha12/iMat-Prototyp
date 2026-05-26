@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/all_products/category_page.dart';
+import 'package:imat_repo/Widgets/Navigation/navbar.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_repo/Widgets/Category/categorized_product_sections.dart';
 import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
-import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
@@ -49,6 +49,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
 
     return IMatScaffold(
+      activePage: NavbarPage.favorites,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: SingleChildScrollView(
@@ -62,7 +63,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 children: [
                   const CloseProfileButton(),
                   const SizedBox(width: 20),
-                  Text('Favoriter', style: IMatText.h2),
+                  const Text(
+                    'Favoriter',
+                    style: TextStyle(
+                      fontSize: 44,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -77,10 +84,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
               else
                 CategorizedProductSections(
                   productsByCategory: favoriteProductsByCategory,
-                  onCategoryHeaderTap: (uiCat){
+                  onCategoryHeaderTap: (uiCat) {
                     Navigator.push(
-                      context, MaterialPageRoute(
-                        builder: (_) => CategoryPage(uiCategory: uiCat))
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryPage(uiCategory: uiCat),
+                      ),
                     );
                   },
                 ),

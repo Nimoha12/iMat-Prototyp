@@ -145,13 +145,24 @@ class CustomerCardState
           children: [
 
             const Text(
-              "Konto & Leverans",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
+  "Konto & Leverans",
+  style: TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+SizedBox(height: 8),
+
+Text(
+  "Redigera kontaktuppgifter och leveransadress",
+  style: TextStyle(
+    fontSize: 16,
+    color: Colors.black54,
+  ),
+),
+
+SizedBox(height: 24),
 
             const SizedBox(height: 32),
 

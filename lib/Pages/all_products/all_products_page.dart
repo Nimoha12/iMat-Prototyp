@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Widgets/product/product_card.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
@@ -7,7 +8,6 @@ import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
 import '../../Widgets/Category/ui_categories.dart';
-import '../../Widgets/product/product_card.dart';
 import '../../Widgets/product/product_filter_panel.dart';
 
 class AllProductsPage extends StatefulWidget {

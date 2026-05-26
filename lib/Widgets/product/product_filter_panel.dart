@@ -74,9 +74,7 @@ class ProductFilterPanel extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // =========================
-            // PRIS
-            // =========================
+            //pris
 
             Text(
               "Maxpris: ${maxPrice.toInt()} kr",
@@ -98,9 +96,7 @@ class ProductFilterPanel extends StatelessWidget {
 
             const Divider(height: 40),
 
-            // =========================
-            // EKOLOGISKT
-            // =========================
+            //ekologiskt
 
             Text(
               "Ekologiskt",
@@ -132,9 +128,7 @@ class ProductFilterPanel extends StatelessWidget {
 
             const Divider(height: 40),
 
-            // =========================
-            // SORTERA
-            // =========================
+           //Sortera
 
             Text(
               "Sortera",
@@ -172,10 +166,7 @@ class ProductFilterPanel extends StatelessWidget {
               ],
               onChanged: (v) => onSortChange(v!),
             ),
-
-            // =========================
-            // KATEGORI
-            // =========================
+            //kategori
 
             if (showCategoryFilter) ...[
               const Divider(height: 40),
