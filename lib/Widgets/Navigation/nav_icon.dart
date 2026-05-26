@@ -47,7 +47,7 @@ class NavIcon extends StatelessWidget {
               style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.w600,
-                fontSize: 16, // tidigare 12
+                fontSize: 18, //
                 letterSpacing: 0.3, // lite mer luft mellan bokstäver
               ),
             ),
