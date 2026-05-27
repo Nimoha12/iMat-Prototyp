@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Theme/imat_colors.dart';
+import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/model/imat/user.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +23,18 @@ class _LoginOverlayState extends State<LoginOverlay> {
   bool _isSending = false;
   String? _errorMessage;
 
+  bool get _canLogin =>
+      _emailController.text.trim().isNotEmpty &&
+      _passwordController.text.trim().isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    void onFieldsChanged() => setState(() {});
+    _emailController.addListener(onFieldsChanged);
+    _passwordController.addListener(onFieldsChanged);
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -30,126 +44,87 @@ class _LoginOverlayState extends State<LoginOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill(
+    return SizedBox.expand(
       child: GestureDetector(
-        // Klick på mörka bakgrunden
         onTap: _isSending ? null : widget.onClose,
-
         child: Material(
           color: Colors.black.withValues(alpha: 0.5),
-
           child: Center(
             child: GestureDetector(
-              // Hindrar klick i rutan från att bubbla vidare
               onTap: () {},
-
               child: Container(
-                width: 560,
-                padding: const EdgeInsets.all(40),
-
+                width: 430,
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 22,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // TOPPRAD
                     Row(
                       children: [
-                        const SizedBox(width: 48),
-                        const Expanded(
+                        const SizedBox(width: 32),
+                        Expanded(
                           child: Text(
-                            "Logga in",
+                            'Logga in',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 42,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: IMatText.h1,
                           ),
                         ),
-
                         HoverCloseIcon(
                           onClose: _isSending ? () {} : widget.onClose,
                         ),
-                        // För balans så texten hålls centrerad
                       ],
                     ),
-
-                    const SizedBox(height: 24),
-
-                    TextField(
+                    const SizedBox(height: 22),
+                    _LoginLabeledField(
+                      label: 'E-postadress',
+                      hint: 'din.epost@example.com',
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
-                      style: TextStyle(fontSize: 28),
-                      decoration: InputDecoration(
-                        hintText: "E-post",
-                        border: OutlineInputBorder(),
-                      ),
+                      enabled: !_isSending,
                     ),
-
-                    const SizedBox(height: 16),
-
-                    TextField(
+                    const SizedBox(height: 14),
+                    _LoginLabeledField(
+                      label: 'Lösenord',
+                      hint: 'Ange ditt lösenord',
                       controller: _passwordController,
-                      style: TextStyle(fontSize: 28),
                       obscureText: true,
                       textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _sendLogin(),
-                      decoration: InputDecoration(
-                        hintText: "Lösenord",
-                        border: OutlineInputBorder(),
-                      ),
+                      onSubmitted: (_) => _tryLogin(),
+                      enabled: !_isSending,
                     ),
-
-                    const SizedBox(height: 24),
-
-                    ElevatedButton(
-                      onPressed: _isSending ? null : _sendLogin,
-
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4B8A73),
-
-                        foregroundColor: Colors.white,
-
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-
-                        elevation: 0,
-                      ),
-
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
-                        children: [
-                          const SizedBox(width: 10),
-
-                          Text(
-                            _isSending ? "skickar..." : "logga in",
-
-                            style: const TextStyle(fontSize: 38),
-                          ),
-                          const SizedBox(width: 10),
-                          const Icon(Icons.arrow_forward, size: 38),
-                        ],
-                      ),
-                    ),
-
                     if (_errorMessage != null) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
                       Text(
                         _errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                        style: IMatText.bodyS.copyWith(
+                          color: Colors.red.shade700,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
+                    const SizedBox(height: 22),
+                    SizedBox(
+                      height: 58,
+                      child: ElevatedButton(
+                        onPressed:
+                            _isSending || !_canLogin ? null : _tryLogin,
+                        style: _primaryButtonStyle(),
+                        child: Text(_isSending ? 'Loggar in…' : 'Logga in'),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -160,13 +135,25 @@ class _LoginOverlayState extends State<LoginOverlay> {
     );
   }
 
-  Future<void> _sendLogin() async {
+  ButtonStyle _primaryButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: IMatColors.green,
+      disabledBackgroundColor: IMatColors.border,
+      foregroundColor: IMatColors.white,
+      disabledForegroundColor: IMatColors.textSecondary,
+      elevation: 0,
+      textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
+  Future<void> _tryLogin() async {
     final email = _emailController.text.trim();
-    final password = _passwordController.text;
+    final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = "fel användarnamn eller lösenord";
+        _errorMessage = 'Fyll i e-post och lösenord';
       });
       return;
     }
@@ -189,5 +176,72 @@ class _LoginOverlayState extends State<LoginOverlay> {
 
     widget.onLoginSuccess?.call();
     widget.onClose();
+  }
+}
+
+class _LoginLabeledField extends StatelessWidget {
+  final String label;
+  final String? hint;
+  final TextEditingController controller;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final bool enabled;
+
+  const _LoginLabeledField({
+    required this.label,
+    required this.controller,
+    this.hint,
+    this.keyboardType,
+    this.obscureText = false,
+    this.textInputAction,
+    this.onSubmitted,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 7),
+        SizedBox(
+          height: 54,
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            textInputAction: textInputAction,
+            onSubmitted: onSubmitted,
+            enabled: enabled,
+            style: IMatText.bodyM,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: IMatText.bodyM.copyWith(color: Colors.grey.shade500),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: Color(0xFF9C9C9C)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: Color(0xFF9C9C9C)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: IMatColors.green, width: 2),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

@@ -1,35 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
+import 'package:imat_repo/Theme/imat_colors.dart';
+import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
-import 'package:provider/provider.dart';
-import 'package:imat_repo/layout/imat_scaffold.dart';
-import 'package:imat_repo/model/imat_data_handler.dart';
-import 'package:imat_repo/model/imat/product.dart';
-import 'package:imat_repo/Theme/imat_text.dart';
-import 'package:imat_repo/Theme/imat_colors.dart';
-import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
-import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
-import '../../Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
-import 'category_page.dart';
+import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
+import 'package:imat_repo/layout/imat_scaffold.dart';
+import 'package:imat_repo/model/AuthState.dart';
+import 'package:imat_repo/model/imat/product.dart';
+import 'package:imat_repo/model/imat_data_handler.dart';
+import 'package:imat_repo/model/recommended_products.dart';
+import 'package:provider/provider.dart';
 
-class SubCategoryPage extends StatefulWidget {
-  final String title;
-  final List<ProductCategory> categories;
-  final UiCategory parentCategory; // ny parameter för huvudkategori
-
-  const SubCategoryPage({
-    super.key,
-    required this.title,
-    required this.categories,
-    required this.parentCategory, //  krävs nu vid anrop
-  });
+class RecommendedProductsPage extends StatefulWidget {
+  const RecommendedProductsPage({super.key});
 
   @override
-  State<SubCategoryPage> createState() => _SubCategoryPageState();
+  State<RecommendedProductsPage> createState() => _RecommendedProductsPageState();
 }
 
-class _SubCategoryPageState extends State<SubCategoryPage> {
+class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
   final ScrollController _scrollController = ScrollController();
   bool showScrollButton = false;
 
@@ -57,32 +48,32 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final iMat = context.watch<ImatDataHandler>();
-    final allProducts = iMat.selectProducts;
+  List<Product> _applyFilters(List<Product> products) {
+    var filtered = List<Product>.from(products);
 
-    // Filtrera produkter som tillhör denna underkategori
-    var filtered = allProducts
-        .where((p) => widget.categories.contains(p.category))
-        .toList();
-
-    // Ekologiskt-filter
     if (ecoFilter == EcoFilter.eco) {
       filtered = filtered.where((p) => p.isEcological).toList();
     } else if (ecoFilter == EcoFilter.inteEco) {
       filtered = filtered.where((p) => !p.isEcological).toList();
     }
 
-    // Maxpris
     filtered = filtered.where((p) => p.price <= maxPrice).toList();
 
-    // Sortering
     if (sortBy == "priceAsc") {
       filtered.sort((a, b) => a.price.compareTo(b.price));
     } else if (sortBy == "priceDesc") {
       filtered.sort((a, b) => b.price.compareTo(a.price));
     }
+
+    return filtered;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final iMat = context.watch<ImatDataHandler>();
+    final isLoggedIn = context.watch<AuthState>().isLoggedIn;
+    final recommended = iMat.getRecommendedProducts(isLoggedIn: isLoggedIn);
+    final filtered = _applyFilters(recommended);
 
     return IMatScaffold(
       body: Stack(
@@ -105,26 +96,12 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AllCategoriesPage(),
+                                    builder: (_) => const AllCategoriesPage(),
                                   ),
                                 );
                               },
                             ),
-                            BreadcrumbItem(
-                              label: widget.parentCategory.label,
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => CategoryPage(
-                                      uiCategory: widget.parentCategory,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            BreadcrumbItem(label: widget.title),
+                            BreadcrumbItem(label: recommendedProductsTitle),
                           ],
                         ),
                         const SizedBox(height: 24),
@@ -133,12 +110,24 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(widget.title, style: IMatText.h2),
+                              Text(
+                                recommendedProductsTitle,
+                                style: IMatText.h2,
+                              ),
                               FilterButton(
                                 onPressed: () =>
                                     setState(() => filterOpen = true),
                               ),
                             ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isLoggedIn
+                              ? "Baserat på dina tidigare köp."
+                              : "Populära varor att börja med.",
+                          style: IMatText.bodyM.copyWith(
+                            color: IMatColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -160,8 +149,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
               ),
             ),
           ),
-          
-          // Overlay
           if (filterOpen)
             Positioned.fill(
               child: GestureDetector(
@@ -173,8 +160,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                 ),
               ),
             ),
-
-          // Filterpanel
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -193,8 +178,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
               onClose: () => setState(() => filterOpen = false),
             ),
           ),
-
-          // Scroll-to-top button
           if (showScrollButton)
             Positioned(
               right: 24,

@@ -40,6 +40,12 @@ class ProductDetailWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(28),
               child: Container(
+                constraints: shouldScroll
+                    ? null
+                    : BoxConstraints(
+                        minHeight: (constraints.maxHeight - 120)
+                            .clamp(480.0, 680.0),
+                      ),
                 decoration: BoxDecoration(
                   color: IMatColors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -52,38 +58,15 @@ class ProductDetailWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Flex(
-                  direction: isNarrow ? Axis.vertical : Axis.horizontal,
-                  crossAxisAlignment: shouldScroll
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.stretch,
-                  children: [
-                    _ImagePanel(
-                      productImage: iMat.getImage(product),
-                      isNarrow: isNarrow,
-                    ),
-                    _SoftDivider(isNarrow: isNarrow),
-                    if (isNarrow)
-                      _productInfo(
-                        detail: detail,
-                        unit: unit,
-                        amount: amount,
-                        iMat: iMat,
-                        shoppingItem: shoppingItem,
-                        isNarrow: isNarrow,
-                      )
-                    else
-                      Expanded(
-                        child: _productInfo(
-                          detail: detail,
-                          unit: unit,
-                          amount: amount,
-                          iMat: iMat,
-                          shoppingItem: shoppingItem,
-                          isNarrow: isNarrow,
-                        ),
-                      ),
-                  ],
+                child: _productLayout(
+                  detail: detail,
+                  unit: unit,
+                  amount: amount,
+                  iMat: iMat,
+                  shoppingItem: shoppingItem,
+                  productImage: iMat.getImage(product),
+                  isNarrow: isNarrow,
+                  shouldScroll: shouldScroll,
                 ),
               ),
             ),
@@ -99,69 +82,150 @@ class ProductDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _productInfo({
+  Widget _productLayout({
     required ProductDetail? detail,
+    required String unit,
+    required double amount,
+    required ImatDataHandler iMat,
+    required ShoppingItem shoppingItem,
+    required Widget productImage,
+    required bool isNarrow,
+    required bool shouldScroll,
+  }) {
+    final padding = EdgeInsets.fromLTRB(
+      isNarrow ? 24 : 34,
+      isNarrow ? 24 : 32,
+      isNarrow ? 24 : 34,
+      isNarrow ? 24 : 32,
+    );
+
+    if (isNarrow) {
+      final narrowContent = Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _purchaseBlock(
+              unit: unit,
+              amount: amount,
+              iMat: iMat,
+              shoppingItem: shoppingItem,
+              isNarrow: true,
+            ),
+            const SizedBox(height: 20),
+            _ImagePanel(productImage: productImage, isNarrow: true),
+            const SizedBox(height: 20),
+            _titleBlock(detail: detail, isNarrow: true, centered: true),
+            const SizedBox(height: 20),
+            _DetailTabs(
+              contents: detail?.contents,
+              description: detail?.description,
+            ),
+          ],
+        ),
+      );
+      return narrowContent;
+    }
+
+    final wideContent = Padding(
+      padding: padding,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 320,
+                  child: _purchaseBlock(
+                    unit: unit,
+                    amount: amount,
+                    iMat: iMat,
+                    shoppingItem: shoppingItem,
+                    isNarrow: false,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _ImagePanel(productImage: productImage, isNarrow: false),
+              ],
+            ),
+          ),
+          const SizedBox(width: 28),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _titleBlock(detail: detail, isNarrow: false, centered: true),
+                const SizedBox(height: 20),
+                if (shouldScroll)
+                  _DetailTabs(
+                    contents: detail?.contents,
+                    description: detail?.description,
+                  )
+                else
+                  Expanded(
+                    child: _DetailTabs(
+                      contents: detail?.contents,
+                      description: detail?.description,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return wideContent;
+  }
+
+  Widget _titleBlock({
+    required ProductDetail? detail,
+    required bool isNarrow,
+    bool centered = false,
+  }) {
+    return Column(
+      crossAxisAlignment:
+          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        Text(
+          product.name,
+          textAlign: centered ? TextAlign.center : TextAlign.start,
+          style: IMatText.h1.copyWith(
+            fontSize: isNarrow ? 34 : 40,
+            fontWeight: FontWeight.w900,
+            height: 1.05,
+          ),
+        ),
+        if (product.isEcological) ...[
+          const SizedBox(height: 10),
+          _ecoBadge(),
+        ],
+        _ProductMeta(detail: detail, centered: centered),
+      ],
+    );
+  }
+
+  Widget _purchaseBlock({
     required String unit,
     required double amount,
     required ImatDataHandler iMat,
     required ShoppingItem shoppingItem,
     required bool isNarrow,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            isNarrow ? 24 : 34,
-            isNarrow ? 24 : 32,
-            isNarrow ? 24 : 34,
-            isNarrow ? 26 : 32,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      product.name,
-                      style: IMatText.h1.copyWith(
-                        fontSize: isNarrow ? 34 : 40,
-                        fontWeight: FontWeight.w900,
-                        height: 1.05,
-                      ),
-                    ),
-                  ),
-                  if (product.isEcological) ...[
-                    const SizedBox(width: 12),
-                    _ecoBadge(),
-                  ],
-                ],
-              ),
-              _ProductMeta(detail: detail),
-              const SizedBox(height: 22),
-              _PurchasePanel(
-                price: product.price,
-                unit: unit,
-                isNarrow: isNarrow,
-                cartControl: _cartControl(
-                  amount: amount,
-                  iMat: iMat,
-                  product: product,
-                  shoppingItem: shoppingItem,
-                ),
-              ),
-              const SizedBox(height: 22),
-              _DetailTabs(
-                contents: detail?.contents,
-                description: detail?.description,
-              ),
-            ],
-          ),
-        ),
-      ],
+    return _PurchasePanel(
+      price: product.price,
+      unit: unit,
+      isNarrow: isNarrow,
+      cartControl: _cartControl(
+        amount: amount,
+        iMat: iMat,
+        product: product,
+        shoppingItem: shoppingItem,
+      ),
     );
   }
 
@@ -267,8 +331,9 @@ class ProductDetailWidget extends StatelessWidget {
 
 class _ProductMeta extends StatelessWidget {
   final ProductDetail? detail;
+  final bool centered;
 
-  const _ProductMeta({required this.detail});
+  const _ProductMeta({required this.detail, this.centered = false});
 
   @override
   Widget build(BuildContext context) {
@@ -285,6 +350,7 @@ class _ProductMeta extends StatelessWidget {
       padding: const EdgeInsets.only(top: 12),
       child: Text(
         values.map((value) => value!).join('  /  '),
+        textAlign: centered ? TextAlign.center : TextAlign.start,
         style: IMatText.bodyL.copyWith(
           color: IMatColors.textSecondary,
           fontWeight: FontWeight.w700,
@@ -442,19 +508,18 @@ class _ImagePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: isNarrow ? double.infinity : 430,
-      height: isNarrow ? 280 : null,
-      padding: EdgeInsets.all(isNarrow ? 26 : 36),
-      color: IMatColors.white,
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox(
-              width: isNarrow ? 260 : 330,
-              height: isNarrow ? 260 : 330,
+    final imageSize = isNarrow ? 260.0 : 300.0;
+
+    return SizedBox(
+      width: isNarrow ? double.infinity : 340,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: isNarrow ? 0 : 8),
+        child: Center(
+          child: SizedBox(
+            width: imageSize,
+            height: imageSize,
+            child: FittedBox(
+              fit: BoxFit.contain,
               child: productImage,
             ),
           ),
@@ -470,21 +535,4 @@ class _DetailTabData {
 
   _DetailTabData(this.title, String? content)
       : content = content?.trim() ?? '';
-}
-
-class _SoftDivider extends StatelessWidget {
-  final bool isNarrow;
-
-  const _SoftDivider({required this.isNarrow});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: isNarrow ? double.infinity : 1,
-      height: isNarrow ? 1 : null,
-      child: const DecoratedBox(
-        decoration: BoxDecoration(color: IMatColors.border),
-      ),
-    );
-  }
 }

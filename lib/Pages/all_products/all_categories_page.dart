@@ -10,6 +10,7 @@ import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 
 import 'category_page.dart';
+import 'recommended_products_page.dart';
 import '../../Widgets/Category/category_quick_acess.dart';
 import '../../Widgets/Category/categorized_product_sections.dart';
 import '../../Widgets/Category/ui_categories.dart';
@@ -96,62 +97,69 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: SingleChildScrollView(
+              child: CustomScrollView(
                 controller: _scrollController,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ✅ Gemensam breadcrumb-komponent (ersätter hårdkodad rad)
-                    BreadcrumbBar(
-                      items: [
-                        BreadcrumbItem(label: "Alla varor"),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BreadcrumbBar(
+                          items: [
+                            BreadcrumbItem(label: "Alla varor"),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: 1396,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Alla varor", style: IMatText.h2),
+                              FilterButton(
+                                onPressed: () =>
+                                    setState(() => filterOpen = true),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        CategoryQuickAccessGrid(
+                          onRecommendedTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const RecommendedProductsPage(),
+                              ),
+                            );
+                          },
+                          onCategoryTap: (uiCat) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    CategoryPage(uiCategory: uiCat),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 32),
                       ],
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // ⭐ Rubrik + filterknapp i samma rad (samma som CategoryPage)
-                    SizedBox(
-                      width: 1396,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Alla varor", style: IMatText.h2),
-                          FilterButton(
-                            onPressed: () => setState(() => filterOpen = true),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    CategoryQuickAccessGrid(
-                      onCategoryTap: (uiCat) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryPage(uiCategory: uiCat),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    CategorizedProductSections(
-                      productsByCategory: grouped,
-                      onCategoryHeaderTap: (uiCat) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryPage(uiCategory: uiCat),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                  ...CategorizedProductSections(
+                    productsByCategory: grouped,
+                    onCategoryHeaderTap: (uiCat) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CategoryPage(uiCategory: uiCat),
+                        ),
+                      );
+                    },
+                  ).buildSlivers(),
+                ],
               ),
             ),
           ),

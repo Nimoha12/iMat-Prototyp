@@ -9,6 +9,7 @@ import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import '../../Widgets/product/product_filter_panel.dart';
+import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 
 class AllProductsPage extends StatefulWidget {
   final UiCategory uiCategory;
@@ -174,15 +175,12 @@ class _AllProductsPageState extends State<AllProductsPage> {
                   child: GridView.builder(
                     controller: _scrollController, // ← SCROLLCONTROLLER
                     itemCount: products.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 0.65,
-                    ),
+                    gridDelegate: productGridDelegate,
                     itemBuilder: (context, index) {
-                      return ProductCard(product: products[index]);
+                      return Align(
+                        alignment: Alignment.topCenter,
+                        child: ProductCard(product: products[index]),
+                      );
                     },
                   ),
                 ),

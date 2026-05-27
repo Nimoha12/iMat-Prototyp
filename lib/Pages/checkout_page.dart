@@ -555,62 +555,78 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
     }
 
-    return _Panel(
-      padding: const EdgeInsets.all(22),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Granska din beställning',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: IMatText.h2,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return _Panel(
+          padding: const EdgeInsets.all(22),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: constraints.maxHeight.isFinite
+                  ? constraints.maxHeight
+                  : _stepContentHeight,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Granska din beställning',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: IMatText.h2,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _SummaryBox(
+                          title: 'Leveranstid',
+                          lines: [
+                            _dates[_selectedDate].fullLabel,
+                            _times[_selectedTime],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _SummaryBox(
+                          title: 'Leveransadress',
+                          lines: [_addressController.text, _addressLine],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _SummaryBox(
+                          title: 'Kontaktinformation',
+                          lines: [
+                            _fullName,
+                            _phoneController.text,
+                            _invoiceEmailController.text,
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _SummaryBox(
+                          title: 'Betalning',
+                          lines: [_payment],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _OrderSummary(items: items, total: total),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _SummaryBox(
-                  title: 'Leveranstid',
-                  lines: [
-                    _dates[_selectedDate].fullLabel,
-                    _times[_selectedTime],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _SummaryBox(
-                  title: 'Leveransadress',
-                  lines: [_addressController.text, _addressLine],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: _SummaryBox(
-                  title: 'Kontaktinformation',
-                  lines: [
-                    _fullName,
-                    _phoneController.text,
-                    _invoiceEmailController.text,
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _SummaryBox(title: 'Betalning', lines: [_payment]),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          _OrderSummary(items: items, total: total),
-        ],
-      ),
+        );
+      },
     );
   }
 
