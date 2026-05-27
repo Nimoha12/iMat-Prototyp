@@ -17,6 +17,7 @@ import 'package:imat_repo/model/imat/shopping_cart.dart';
 import 'package:imat_repo/model/imat/shopping_item.dart';
 import 'package:imat_repo/model/imat/user.dart';
 import 'package:imat_repo/model/internet_handler.dart';
+import 'package:imat_repo/model/recommended_products.dart';
 
 
 
@@ -87,6 +88,56 @@ class ImatDataHandler extends ChangeNotifier {
       final name = product.name.toLowerCase();
       return name.contains(lowerSearch);
     }).toList();
+  }
+
+  /// Eight curated staples (mjölk, bröd, frukt, etc.) for guests and empty history.
+  List<Product> getDefaultPopularProducts() {
+    final result = <Product>[];
+    for (final id in defaultPopularProductIds) {
+      final product = getProduct(id);
+      if (product != null) {
+        result.add(product);
+      }
+    }
+    return result;
+  }
+
+  /// Up to [limit] products ranked by total quantity bought across all orders.
+  List<Product> getMostPurchasedProducts({int limit = recommendedProductCount}) {
+    final counts = <int, int>{};
+    for (final order in _orders) {
+      for (final item in order.items) {
+        final id = item.product.productId;
+        counts[id] = (counts[id] ?? 0) + item.amount.round();
+      }
+    }
+
+    final ranked = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final result = <Product>[];
+    for (final entry in ranked) {
+      final product = getProduct(entry.key);
+      if (product != null) {
+        result.add(product);
+      }
+      if (result.length >= limit) {
+        break;
+      }
+    }
+    return result;
+  }
+
+  /// Logged-out users and empty purchase history see [getDefaultPopularProducts].
+  List<Product> getRecommendedProducts({required bool isLoggedIn}) {
+    if (!isLoggedIn) {
+      return getDefaultPopularProducts();
+    }
+    final fromHistory = getMostPurchasedProducts();
+    if (fromHistory.isEmpty) {
+      return getDefaultPopularProducts();
+    }
+    return fromHistory;
   }
 
   // Returnerar produkten med productId idNbr eller null

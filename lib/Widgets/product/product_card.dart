@@ -7,8 +7,8 @@ import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 
-
-import 'product_detail_overlay.dart'; // overlay-versionen
+import 'product_card_image.dart';
+import 'product_detail_overlay.dart';
 
 class ProductCard extends StatefulWidget {
   final Product product;
@@ -89,13 +89,16 @@ class _ProductCardState extends State<ProductCard>
         padding: const EdgeInsets.all(18),
 
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
               height: 140,
               child: Stack(
                 children: [
-                  Positioned.fill(child: iMat.getImage(widget.product)),
+                  Positioned.fill(
+                    child: ProductCardImage(product: widget.product),
+                  ),
 
                   // Favorite button with login check + pop animation
                   Positioned(

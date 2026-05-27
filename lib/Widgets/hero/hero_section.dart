@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/all_products/recommended_products_page.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
+import 'package:imat_repo/model/recommended_products.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
@@ -55,10 +57,15 @@ class HeroSection extends StatelessWidget {
                       backgroundColor:
                           WidgetStatePropertyAll(IMatColors.white),
                     ),
-                    onPressed: () {},
-                    child: const Text(
-                      "Handla populära varor",
-                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RecommendedProductsPage(),
+                        ),
+                      );
+                    },
+                    child: Text(recommendedProductsTitle),
                   ),
                 ],
               ),

@@ -40,12 +40,8 @@ class ProductFilterPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 350,
-      height: fullHeight ? double.infinity : null,
-      padding: const EdgeInsets.all(20),
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: IMatColors.white,
         boxShadow: fullHeight
             ? [
                 BoxShadow(
@@ -56,10 +52,16 @@ class ProductFilterPanel extends StatelessWidget {
               ]
             : null,
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Material(
+        color: IMatColors.white,
+        child: Container(
+          width: 350,
+          height: fullHeight ? double.infinity : null,
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // HEADER
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -184,15 +186,15 @@ class ProductFilterPanel extends StatelessWidget {
                 children: UiCategory.values.map((uiCat) {
                   final isSelected = selectedCategory == uiCat;
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Material(
                       color: isSelected
                           ? IMatColors.green.withOpacity(0.08)
                           : Colors.transparent,
-                    ),
-                    child: ListTile(
+                      borderRadius: BorderRadius.circular(12),
+                      clipBehavior: Clip.antiAlias,
+                      child: ListTile(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -212,6 +214,7 @@ class ProductFilterPanel extends StatelessWidget {
                           : null,
                       onTap: () =>
                           onCategoryChange(isSelected ? null : uiCat),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -220,6 +223,8 @@ class ProductFilterPanel extends StatelessWidget {
 
             const SizedBox(height: 24),
           ],
+        ),
+          ),
         ),
       ),
     );
