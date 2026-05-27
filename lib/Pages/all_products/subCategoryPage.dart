@@ -17,12 +17,14 @@ class SubCategoryPage extends StatefulWidget {
   final String title;
   final List<ProductCategory> categories;
   final UiCategory parentCategory; // ny parameter för huvudkategori
+  final bool showParentBreadcrumb;
 
   const SubCategoryPage({
     super.key,
     required this.title,
     required this.categories,
     required this.parentCategory, //  krävs nu vid anrop
+    this.showParentBreadcrumb = true,
   });
 
   @override
@@ -111,19 +113,20 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                                 );
                               },
                             ),
-                            BreadcrumbItem(
-                              label: widget.parentCategory.label,
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => CategoryPage(
-                                      uiCategory: widget.parentCategory,
+                            if (widget.showParentBreadcrumb)
+                              BreadcrumbItem(
+                                label: widget.parentCategory.label,
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CategoryPage(
+                                        uiCategory: widget.parentCategory,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                },
+                              ),
                             BreadcrumbItem(label: widget.title),
                           ],
                         ),

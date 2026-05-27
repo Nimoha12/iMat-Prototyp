@@ -57,6 +57,19 @@ class _CategoryPageState extends State<CategoryPage> {
     final allProducts = iMat.selectProducts;
     final groups = subCategoryGroups[widget.uiCategory] ?? [];
 
+    // UX: If this category only has a single subcategory, skip the
+    // intermediate node and show the products for the subcategory directly.
+    // This prevents the user from having to tap "extra" levels in the tree.
+    if (groups.length == 1) {
+      final group = groups.first;
+      return SubCategoryPage(
+        title: group.title,
+        categories: group.categories,
+        parentCategory: widget.uiCategory,
+        showParentBreadcrumb: false,
+      );
+    }
+
     // Filtreringsfunktion
     List<Product> applyFilters(List<Product> products) {
       var list = products;
