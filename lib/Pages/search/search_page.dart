@@ -43,12 +43,11 @@ class _SearchPageState extends State<SearchPage> {
       highlightSearchQuery: query.isNotEmpty,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           controller: scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Row(
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -73,41 +72,50 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   Text(
                     "Sök",
-                    style: IMatText.bodyL.copyWith(fontWeight: FontWeight.w700),
+                    style: IMatText.bodyL.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              if (products.isEmpty)
-                const Center(child: CircularProgressIndicator())
-              else if (query.isEmpty)
-                Text(
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            if (products.isEmpty)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (query.isEmpty)
+              SliverToBoxAdapter(
+                child: Text(
                   "Skriv något i sökrutan för att hitta varor.",
                   style: IMatText.bodyM.copyWith(
                     color: IMatColors.textSecondary,
                   ),
-                )
-              else if (searchResult.productsByCategory.isEmpty)
-                Text(
+                ),
+              )
+            else if (searchResult.productsByCategory.isEmpty)
+              SliverToBoxAdapter(
+                child: Text(
                   "Inga produkter matchar sökningen.",
                   style: IMatText.bodyM.copyWith(
                     color: IMatColors.textSecondary,
                   ),
-                )
-              else
-                CategorizedProductSections(
-                  productsByCategory: searchResult.productsByCategory,
-                  onCategoryHeaderTap: (uiCat) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryPage(uiCategory: uiCat),
-                      ),
-                    );
-                  },
                 ),
-            ],
-          ),
+              )
+            else
+              ...CategorizedProductSections(
+                productsByCategory: searchResult.productsByCategory,
+                onCategoryHeaderTap: (uiCat) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CategoryPage(uiCategory: uiCat),
+                    ),
+                  );
+                },
+              ).buildSlivers(),
+          ],
         ),
       ),
     );

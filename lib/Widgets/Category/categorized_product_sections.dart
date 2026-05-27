@@ -5,12 +5,13 @@ import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/model/imat/product.dart';
 
-class CategorizedProductSections extends StatelessWidget {
+/// Builds category headers and lazy product grids as slivers for a parent
+/// [CustomScrollView]. Do not nest inside another scrollable.
+class CategorizedProductSections {
   final Map<UiCategory, List<Product>> productsByCategory;
   final void Function(UiCategory) onCategoryHeaderTap;
 
   const CategorizedProductSections({
-    super.key,
     required this.productsByCategory,
     required this.onCategoryHeaderTap,
   });
@@ -43,10 +44,5 @@ class CategorizedProductSections extends StatelessWidget {
     }
 
     return slivers;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(slivers: buildSlivers());
   }
 }

@@ -52,49 +52,54 @@ class _FavoritesPageState extends State<FavoritesPage> {
       activePage: NavbarPage.favorites,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           controller: scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CloseProfileButton(),
-                  const SizedBox(width: 20),
-                  const Text(
-                    'Favoriter',
-                    style: TextStyle(
-                      fontSize: 44,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  const SizedBox(height: 24),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const CloseProfileButton(),
+                      const SizedBox(width: 20),
+                      const Text(
+                        'Favoriter',
+                        style: TextStyle(
+                          fontSize: 44,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              if (favorites.isEmpty)
-                Text(
+            ),
+            if (favorites.isEmpty)
+              SliverToBoxAdapter(
+                child: Text(
                   "Du har inga favoritvaror än.",
                   style: IMatText.bodyM.copyWith(
                     color: IMatColors.textSecondary,
                   ),
-                )
-              else
-                CategorizedProductSections(
-                  productsByCategory: favoriteProductsByCategory,
-                  onCategoryHeaderTap: (uiCat) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryPage(uiCategory: uiCat),
-                      ),
-                    );
-                  },
                 ),
-            ],
-          ),
+              )
+            else
+              ...CategorizedProductSections(
+                productsByCategory: favoriteProductsByCategory,
+                onCategoryHeaderTap: (uiCat) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CategoryPage(uiCategory: uiCat),
+                    ),
+                  );
+                },
+              ).buildSlivers(),
+          ],
         ),
       ),
     );
