@@ -87,7 +87,23 @@ class _CategoryPageState extends State<CategoryPage> {
       return list;
     }
 
+    final breadcrumbItems = [
+      BreadcrumbItem(
+        label: "Alla varor",
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AllCategoriesPage(),
+            ),
+          );
+        },
+      ),
+      BreadcrumbItem(label: widget.uiCategory.label),
+    ];
+
     return IMatScaffold(
+      breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
           // Huvudinnehåll
@@ -101,23 +117,7 @@ class _CategoryPageState extends State<CategoryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(
-                          items: [
-                            BreadcrumbItem(
-                              label: "Alla varor",
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AllCategoriesPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                            BreadcrumbItem(label: widget.uiCategory.label),
-                          ],
-                        ),
+                        BreadcrumbBar(items: breadcrumbItems),
                         const SizedBox(height: 24),
                         SizedBox(
                           width: 1396,

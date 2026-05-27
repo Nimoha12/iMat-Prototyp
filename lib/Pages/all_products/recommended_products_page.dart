@@ -75,7 +75,23 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
     final recommended = iMat.getRecommendedProducts(isLoggedIn: isLoggedIn);
     final filtered = _applyFilters(recommended);
 
+    final breadcrumbItems = [
+      BreadcrumbItem(
+        label: "Alla varor",
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AllCategoriesPage(),
+            ),
+          );
+        },
+      ),
+      BreadcrumbItem(label: recommendedProductsTitle),
+    ];
+
     return IMatScaffold(
+      breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
           Positioned.fill(
@@ -88,22 +104,7 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(
-                          items: [
-                            BreadcrumbItem(
-                              label: "Alla varor",
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const AllCategoriesPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                            BreadcrumbItem(label: recommendedProductsTitle),
-                          ],
-                        ),
+                        BreadcrumbBar(items: breadcrumbItems),
                         const SizedBox(height: 24),
                         SizedBox(
                           width: 1396,

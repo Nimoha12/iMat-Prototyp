@@ -5,14 +5,22 @@ import 'package:imat_repo/Widgets/Category/categorized_product_sections.dart';
 import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 
 class SearchPage extends StatefulWidget {
-  final String query;
+  static const routeName = '/search';
 
-  const SearchPage({super.key, required this.query});
+  final String query;
+  final List<BreadcrumbItem> breadcrumbContext;
+
+  const SearchPage({
+    super.key,
+    required this.query,
+    this.breadcrumbContext = const [],
+  });
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -41,42 +49,18 @@ class _SearchPageState extends State<SearchPage> {
     return IMatScaffold(
       searchQuery: query,
       highlightSearchQuery: query.isNotEmpty,
+      breadcrumbContext: widget.breadcrumbContext,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: CustomScrollView(
           controller: scrollController,
           slivers: [
             SliverToBoxAdapter(
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      );
-                    },
-                    child: Text(
-                      "Hem",
-                      style: IMatText.bodyL.copyWith(
-                        color: IMatColors.green,
-                        fontWeight: FontWeight.w700,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: Icon(Icons.chevron_right, size: 24),
-                  ),
-                  Text(
-                    "Sök",
-                    style: IMatText.bodyL.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
+              child: BreadcrumbBar(
+                items: buildSearchBreadcrumbs(
+                  context,
+                  widget.breadcrumbContext,
+                ),
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 24)),

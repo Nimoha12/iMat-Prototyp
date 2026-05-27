@@ -86,7 +86,37 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
       filtered.sort((a, b) => b.price.compareTo(a.price));
     }
 
+    final breadcrumbItems = [
+      BreadcrumbItem(
+        label: "Alla varor",
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AllCategoriesPage(),
+            ),
+          );
+        },
+      ),
+      if (widget.showParentBreadcrumb)
+        BreadcrumbItem(
+          label: widget.parentCategory.label,
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CategoryPage(
+                  uiCategory: widget.parentCategory,
+                ),
+              ),
+            );
+          },
+        ),
+      BreadcrumbItem(label: widget.title),
+    ];
+
     return IMatScaffold(
+      breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
           Positioned.fill(
@@ -99,37 +129,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(
-                          items: [
-                            BreadcrumbItem(
-                              label: "Alla varor",
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AllCategoriesPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                            if (widget.showParentBreadcrumb)
-                              BreadcrumbItem(
-                                label: widget.parentCategory.label,
-                                onTap: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => CategoryPage(
-                                        uiCategory: widget.parentCategory,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            BreadcrumbItem(label: widget.title),
-                          ],
-                        ),
+                        BreadcrumbBar(items: breadcrumbItems),
                         const SizedBox(height: 24),
                         SizedBox(
                           width: 1396,

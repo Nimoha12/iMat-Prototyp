@@ -6,6 +6,7 @@ import 'package:imat_repo/Pages/favorites/favorites_page.dart';
 import 'package:imat_repo/Pages/history/history_page.dart';
 import 'package:imat_repo/Pages/search/search_page.dart';
 import 'package:imat_repo/Widgets/Cart_Parts/Cart.dart';
+import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/cart.button.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/model/AuthState.dart';
@@ -22,6 +23,7 @@ class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
   final NavbarPage activePage;
   final String? searchQuery;
   final bool highlightSearchQuery;
+  final List<BreadcrumbItem> breadcrumbContext;
 
   const IMatNavbar({
     super.key,
@@ -29,6 +31,7 @@ class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
     this.activePage = NavbarPage.none,
     this.searchQuery,
     this.highlightSearchQuery = false,
+    this.breadcrumbContext = const [],
   });
 
   @override
@@ -209,14 +212,22 @@ class _IMatNavbarState extends State<IMatNavbar>
 
     _flashSearchField();
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SearchPage(
-          query: trimmedQuery,
-        ),
+    final route = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: SearchPage.routeName),
+      builder: (_) => SearchPage(
+        query: trimmedQuery,
+        breadcrumbContext: widget.breadcrumbContext,
       ),
     );
+
+    final alreadyOnSearch =
+        ModalRoute.of(context)?.settings.name == SearchPage.routeName;
+
+    if (alreadyOnSearch) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
   }
 
   @override
