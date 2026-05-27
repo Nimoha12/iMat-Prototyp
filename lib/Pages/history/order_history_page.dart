@@ -9,6 +9,8 @@ import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 
 class HistoryPage extends StatefulWidget {
+  static const routeName = '/history';
+
   const HistoryPage({super.key});
 
   @override
@@ -273,9 +275,19 @@ class _OrderDetails extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Order #${order.orderNumber}',
-                      style: IMatText.headingL,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Order #${order.orderNumber}',
+                          style: IMatText.headingL,
+                        ),
+                        const SizedBox(width: 18),
+                        _ReorderButton(
+                          isReordered: isReordered,
+                          onPressed: onToggleReorder,
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -288,18 +300,7 @@ class _OrderDetails extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 18),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _ReorderButton(
-                    isReordered: isReordered,
-                    onPressed: onToggleReorder,
-                  ),
-                  const SizedBox(width: 8),
-                  const CloseProfileButton(),
-                ],
-              ),
+              const CloseProfileButton(),
             ],
           ),
         const SizedBox(height: 24),

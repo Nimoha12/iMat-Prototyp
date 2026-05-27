@@ -171,30 +171,79 @@ class _IMatNavbarState extends State<IMatNavbar>
     _pulseController.value = 1.0;
   }
 
+  NavbarPage _resolvedActivePage(BuildContext context) {
+    if (widget.activePage != NavbarPage.none) {
+      return widget.activePage;
+    }
+
+    final routeName = ModalRoute.of(context)?.settings.name;
+    if (routeName == FavoritesPage.routeName) {
+      return NavbarPage.favorites;
+    }
+    if (routeName == HistoryPage.routeName) {
+      return NavbarPage.history;
+    }
+    if (routeName == ProfilePage.routeName) {
+      return NavbarPage.profile;
+    }
+
+    return NavbarPage.none;
+  }
+
+  bool _isOnNavbarPage(BuildContext context) {
+    return _resolvedActivePage(context) != NavbarPage.none;
+  }
+
+  void _navigateToNavbarPage(
+    BuildContext context,
+    Widget page,
+    String routeName,
+  ) {
+    final route = MaterialPageRoute(
+      settings: RouteSettings(name: routeName),
+      builder: (_) => page,
+    );
+
+    if (_isOnNavbarPage(context)) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
+  }
+
   void _onFavoritesTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.favorites) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const FavoritesPage(),
-      ),
+      const FavoritesPage(),
+      FavoritesPage.routeName,
     );
   }
 
   void _onHistoryTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.history) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const HistoryPage(),
-      ),
+      const HistoryPage(),
+      HistoryPage.routeName,
     );
   }
 
   void _onUserTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.profile) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const ProfilePage(),
-      ),
+      const ProfilePage(),
+      ProfilePage.routeName,
     );
   }
 
@@ -246,6 +295,8 @@ class _IMatNavbarState extends State<IMatNavbar>
               widget.onLoginTap?.call();
             };
 
+    final activePage = _resolvedActivePage(context);
+
     return AppBar(
       backgroundColor: IMatColors.green,
       elevation: 0,
@@ -259,209 +310,203 @@ class _IMatNavbarState extends State<IMatNavbar>
 
           return Row(
             children: [
-              const SizedBox(width: 12),
-
-              IMatLogo(
-                onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/',
-                    (route) => false,
-                  );
-                },
-              ),
-
-              const SizedBox(width: 24),
-
-              Expanded(
-                flex: isSmallScreen ? 2 : 3,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(width: 50),
+                  IMatLogo(
+                    onTap: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/',
+                        (route) => false,
+                      );
+                    },
                   ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 620,
-                      ),
-                      child: AnimatedContainer(
-                        duration: const Duration(
-                          milliseconds: 700,
-                        ),
-                        curve: Curves.easeOutCubic,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: _isSearchFlashActive
-                              ? const Color.fromARGB(255, 32, 32, 32)
-                              : Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(10),
-                        ),
-                        child: TextField(
-                          controller: _controller,
-                          focusNode: _searchFocusNode,
-                          cursorColor: IMatColors.black,
-                          textInputAction:
-                              TextInputAction.search,
+                  
+                ],
+              ),
+              const Spacer(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
 
-                          style: IMatText.bodyM.copyWith(
-                            color: IMatColors.black,
-                            fontSize: 25,
-                            decoration:
-                                TextDecoration.none,
-                          ),
-
-                          onSubmitted: (query) {
-                            _onSearchSubmitted(
-                              context,
-                              query,
-                            );
-                          },
-
-                          decoration: InputDecoration(
-                            hintText: "Sök varor...",
-
-                            hintStyle:
-                                IMatText.bodyM.copyWith(
-                              color: const Color.fromARGB(255, 53, 53, 53),
-                            ),
-
-                            prefixIcon: const Icon(
-                              Icons.search,
-                              color: IMatColors.black,
-                              size: 28,
-                            ),
-
-                            suffixIcon: GestureDetector(
-                              onTap: () {
-                                _isListening
-                                    ? _stopListening()
-                                    : _startListening();
-                              },
-                              child: AnimatedBuilder(
-                                animation:
-                                    _pulseController,
-                                builder:
-                                    (context, child) {
-                                  return Transform.scale(
-                                    scale: _isListening
-                                        ? _pulseController
-                                            .value
-                                        : 1.0,
-                                    child: Icon(
-                                      _isListening
-                                          ? Icons.mic
-                                          : Icons.mic_none,
-                                      color: _isListening
-                                          ? Colors.red
-                                          : IMatColors
-                                              .black,
-                                      size: 28,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-
-                            contentPadding:
-                                const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
+                  _SearchBarExpanded(
+                    isSmallScreen: isSmallScreen,
+                    controller: _controller,
+                    searchFocusNode: _searchFocusNode,
+                    pulseController: _pulseController,
+                    isSearchFlashActive: _isSearchFlashActive,
+                    isListening: _isListening,
+                    onSubmitted: (query) =>
+                        _onSearchSubmitted(context, query),
+                    onMicTap: () {
+                      _isListening
+                          ? _stopListening()
+                          : _startListening();
+                    },
                   ),
-                ),
-              ),
-
-              CartButton(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      opaque: false,
-                      pageBuilder:
-                          (
-                            context,
-                            animation,
-                            secondaryAnimation,
-                          ) => const Cart(),
-                    ),
-                  );
-                },
-              ),
-
-              NavIcon(
-                selected:
-                    widget.activePage ==
-                    NavbarPage.favorites,
-                icon:
-                    widget.activePage ==
-                            NavbarPage.favorites
+                  const SizedBox(width: 30),
+                  CartButton(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          opaque: false,
+                          pageBuilder:
+                              (
+                                context,
+                                animation,
+                                secondaryAnimation,
+                              ) => const Cart(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 30),
+                  NavIcon(
+                    selected: activePage == NavbarPage.favorites,
+                    icon: activePage == NavbarPage.favorites
                         ? Icons.favorite
                         : Icons.favorite_border,
-                label: "Favoriter",
-                onTap: isLoggedIn
-                    ? () => _onFavoritesTapLoggedIn(
-                          context,
-                        )
-                    : () => showLogin(
-                          onLoginSuccess: () =>
-                              _onFavoritesTapLoggedIn(
-                            context,
-                          ),
-                        ),
+                    label: "Favoriter",
+                    onTap: isLoggedIn
+                        ? () => _onFavoritesTapLoggedIn(
+                              context,
+                            )
+                        : () => showLogin(
+                              onLoginSuccess: () =>
+                                  _onFavoritesTapLoggedIn(
+                                context,
+                              ),
+                            ),
+                  ),
+                  const SizedBox(width: 30),
+                  NavIcon(
+                    selected: activePage == NavbarPage.history,
+                    icon: Icons.history,
+                    label: "Historik",
+                    onTap: isLoggedIn
+                        ? () =>
+                            _onHistoryTapLoggedIn(context)
+                        : () => showLogin(
+                              onLoginSuccess: () =>
+                                  _onHistoryTapLoggedIn(
+                                context,
+                              ),
+                            ),
+                  ),
+                  const SizedBox(width: 30),
+                  NavIcon(
+                    icon: Icons.help_outline,
+                    label: "Hjälp",
+                    onTap: () {},
+                  ),
+                  const SizedBox(width: 30),
+                  NavIcon(
+                    selected: activePage == NavbarPage.profile,
+                    icon: isLoggedIn
+                        ? Icons.account_circle
+                        : Icons.person_outline,
+                    label: isLoggedIn
+                        ? "Profil"
+                        : "Logga in",
+                    onTap: isLoggedIn
+                        ? () => _onUserTapLoggedIn(
+                              context,
+                            )
+                        : () => showLogin(),
+                  ),
+                  const SizedBox(width: 12),
+                ],
               ),
-
-              NavIcon(
-                selected:
-                    widget.activePage ==
-                    NavbarPage.history,
-                icon: Icons.history,
-                label: "Historik",
-                onTap: isLoggedIn
-                    ? () =>
-                        _onHistoryTapLoggedIn(context)
-                    : () => showLogin(
-                          onLoginSuccess: () =>
-                              _onHistoryTapLoggedIn(
-                            context,
-                          ),
-                        ),
-              ),
-
-              NavIcon(
-                icon: Icons.help_outline,
-                label: "Hjälp",
-                onTap: () {},
-              ),
-
-              NavIcon(
-                selected:
-                    widget.activePage ==
-                    NavbarPage.profile,
-                icon: isLoggedIn
-                    ? Icons.account_circle
-                    : Icons.person_outline,
-                label: isLoggedIn
-                    ? "Användare"
-                    : "Logga in",
-                onTap: isLoggedIn
-                    ? () => _onUserTapLoggedIn(
-                          context,
-                        )
-                    : () => showLogin(),
-              ),
-
-              const SizedBox(width: 12),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _SearchBarExpanded extends StatelessWidget {
+  final bool isSmallScreen;
+  final TextEditingController controller;
+  final FocusNode searchFocusNode;
+  final AnimationController pulseController;
+  final bool isSearchFlashActive;
+  final bool isListening;
+  final ValueChanged<String> onSubmitted;
+  final VoidCallback onMicTap;
+
+  const _SearchBarExpanded({
+    required this.isSmallScreen,
+    required this.controller,
+    required this.searchFocusNode,
+    required this.pulseController,
+    required this.isSearchFlashActive,
+    required this.isListening,
+    required this.onSubmitted,
+    required this.onMicTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: isSmallScreen ? 200 : 300,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeOutCubic,
+        height: 46,
+        decoration: BoxDecoration(
+          color: isSearchFlashActive
+              ? const Color.fromARGB(255, 32, 32, 32)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: TextField(
+          controller: controller,
+          focusNode: searchFocusNode,
+          cursorColor: IMatColors.black,
+          textInputAction: TextInputAction.search,
+          style: IMatText.bodyM.copyWith(
+            color: IMatColors.black,
+            fontSize: 25,
+            decoration: TextDecoration.none,
+          ),
+          onSubmitted: onSubmitted,
+          decoration: InputDecoration(
+            hintText: "Sök varor...",
+            hintStyle: IMatText.bodyM.copyWith(
+              color: const Color.fromARGB(255, 53, 53, 53),
+            ),
+            prefixIcon: const Icon(
+              Icons.search,
+              color: IMatColors.black,
+              size: 28,
+            ),
+            suffixIcon: GestureDetector(
+              onTap: onMicTap,
+              child: AnimatedBuilder(
+                animation: pulseController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: isListening ? pulseController.value : 1.0,
+                    child: Icon(
+                      isListening ? Icons.mic : Icons.mic_none,
+                      color: isListening ? Colors.red : IMatColors.black,
+                      size: 28,
+                    ),
+                  );
+                },
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 10,
+            ),
+            border: InputBorder.none,
+          ),
+        ),
       ),
     );
   }

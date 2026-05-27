@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/home_page.dart';
+import 'package:imat_repo/Theme/imat_buttons.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
@@ -22,6 +24,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   static const double _buttonGap = 14;
 
   int _step = 0;
+  bool _hasAutoSkippedLoginStep = false;
   int _selectedDate = 0;
   int _selectedTime = 0;
   String _payment = 'Faktura';
@@ -138,6 +141,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthState>().isLoggedIn;
+    _ensureCheckoutStartsAfterLogin(isLoggedIn);
 
     return IMatScaffold(
       body: Container(
@@ -294,6 +298,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  void _ensureCheckoutStartsAfterLogin(bool isLoggedIn) {
+    if (!isLoggedIn) {
+      _hasAutoSkippedLoginStep = false;
+      return;
+    }
+
+    if (_step != 0 || _hasAutoSkippedLoginStep) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _step != 0) {
+        return;
+      }
+      setState(() {
+        _step = 1;
+        _hasAutoSkippedLoginStep = true;
+      });
+    });
   }
 
   Widget _buildDeliveryCard() {
@@ -560,9 +585,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Din order är skickad.',
+              'Din order är skickad. Se den i Historik.',
               textAlign: TextAlign.center,
               style: IMatText.bodyM.copyWith(color: IMatColors.textSecondary),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: 320,
+              height: 62,
+              child: ElevatedButton(
+                onPressed: _goToHome,
+                style: _primaryStyle(),
+                child: const Text('Tillbaka till startsidan'),
+              ),
             ),
           ],
         ),
@@ -651,14 +686,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           height: 62,
           child: OutlinedButton(
             onPressed: () => setState(() => _step--),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: IMatColors.green,
-              side: const BorderSide(color: IMatColors.green, width: 2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
-            ),
+            style: IMatButton.outlinedGreen,
             child: const Text('← Tillbaka'),
           ),
         ),
@@ -699,7 +727,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     context.read<ImatDataHandler>().setUser(User(email, password));
     context.read<AuthState>().login();
 
-    setState(() {});
+    setState(() {
+      _step = 1;
+      _hasAutoSkippedLoginStep = true;
+    });
   }
 
   Future<void> _next() async {
@@ -780,16 +811,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
       '${_postCodeController.text.trim()} ${_cityController.text.trim()}'
           .trim();
 
-  ButtonStyle _primaryStyle() {
-    return ElevatedButton.styleFrom(
-      backgroundColor: IMatColors.green,
-      disabledBackgroundColor: IMatColors.border,
-      foregroundColor: IMatColors.white,
-      disabledForegroundColor: IMatColors.textSecondary,
-      elevation: 0,
-      textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  void _goToHome() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const HomePage()),
+      (route) => false,
     );
+  }
+
+  ButtonStyle _primaryStyle() {
+    return IMatButton.primaryGreen;
   }
 }
 
@@ -811,10 +842,11 @@ class _CheckoutSidebar extends StatelessWidget {
 
     return Container(
       width: 300,
-      color: const Color(0xFFF1EDE4),
+      color: IMatColors.white,
       padding: const EdgeInsets.fromLTRB(28, 34, 22, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+       
         children: [
           SizedBox(
             width: double.infinity,
@@ -823,14 +855,7 @@ class _CheckoutSidebar extends StatelessWidget {
               onPressed: onBackToShop,
               icon: const Icon(Icons.arrow_back),
               label: const Text('Tillbaka till handla'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: IMatColors.green,
-                foregroundColor: IMatColors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              style: IMatButton.primaryGreen,
             ),
           ),
           const SizedBox(height: 28),

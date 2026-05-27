@@ -25,30 +25,32 @@ class NavIcon extends StatelessWidget {
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
       child: Container(
-        width: 120, // något bredare för luft
-        height: 88, // högre för större ikon + text
-        color: selected
-            ? IMatColors.greenLight // ljus bakgrund vid val
-            : Colors.transparent,
+        width: 95,
+        decoration: BoxDecoration(
+          color: selected
+              ? IMatColors.navSelectedBackground
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Större ikon för bättre synlighet
             Icon(
               icon,
               color: iconColor,
-              size: 38, // tidigare 32
+              size: 38,
             ),
             const SizedBox(height: 10),
-            // Större text med bättre kontrast
             Text(
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.w600,
-                fontSize: 18, //
-                letterSpacing: 0.3, // lite mer luft mellan bokstäver
+                fontSize: 18,
+                letterSpacing: 0.3,
               ),
             ),
           ],
