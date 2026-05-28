@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/checkout_page.dart';
+import 'package:imat_repo/Theme/imat_buttons.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -44,12 +45,9 @@ class CartFooter extends StatelessWidget {
           // Checkout-knapp
           SizedBox(
             width: double.infinity,
-            height: 64,
+            height: 62,
             child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade700,
-                foregroundColor: Colors.white,
-              ),
+              style: IMatButton.primaryGreen,
               onPressed: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
@@ -58,10 +56,7 @@ class CartFooter extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text(
-                "Gå till checkout",
-                style: TextStyle(fontSize: 24),
-              ),
+              child: const Text('Gå till checkout'),
             ),
           ),
 
@@ -70,15 +65,13 @@ class CartFooter extends StatelessWidget {
           // Töm varukorg-knapp
           SizedBox(
             width: double.infinity,
-            height: 58,
+            height: 62,
             child: OutlinedButton(
               onPressed: () {
                 iMatHandler.shoppingCartClear();
               },
-              child: const Text(
-                "Töm varukorg",
-                style: TextStyle(fontSize: 22),
-              ),
+              style: IMatButton.outlinedGreen,
+              child: const Text('Töm varukorg'),
             ),
           ),
         ],

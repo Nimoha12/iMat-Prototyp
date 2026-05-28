@@ -9,6 +9,8 @@ import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 
 class HistoryPage extends StatefulWidget {
+  static const routeName = '/history';
+
   const HistoryPage({super.key});
 
   @override
@@ -33,92 +35,66 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       appBar: const IMatNavbar(activePage: NavbarPage.history),
       backgroundColor: IMatColors.beige,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const CloseProfileButton(),
-                const SizedBox(width: 20),
-                const Text(
-                  'Historik',
-                  style: TextStyle(
-                    fontSize: 44,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+      body: orders.isEmpty
+          ? const _EmptyHistory()
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 780;
+
+                if (isNarrow) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        height: 190,
+                        child: _OrderList(
+                          orders: orders,
+                          selectedIndex: _selectedIndex,
+                          horizontal: true,
+                          onSelect: _selectOrder,
+                        ),
+                      ),
+                      Expanded(
+                        child: _OrderDetails(
+                          order: selectedOrder!,
+                          isReordered: _reorderedOrders.contains(
+                            selectedOrder.orderNumber,
+                          ),
+                          onToggleReorder: () => _toggleReorder(selectedOrder),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: 330,
+                      child: _OrderList(
+                        orders: orders,
+                        selectedIndex: _selectedIndex,
+                        onSelect: _selectOrder,
+                      ),
+                    ),
+                    const VerticalDivider(
+                      width: 1,
+                      color: IMatColors.border,
+                    ),
+                    Expanded(
+                      child: _OrderDetails(
+                        order: selectedOrder!,
+                        isReordered: _reorderedOrders.contains(
+                          selectedOrder.orderNumber,
+                        ),
+                        onToggleReorder: () => _toggleReorder(selectedOrder),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: orders.isEmpty
-                ? const _EmptyHistory()
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isNarrow = constraints.maxWidth < 780;
-
-                      if (isNarrow) {
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: 190,
-                              child: _OrderList(
-                                orders: orders,
-                                selectedIndex: _selectedIndex,
-                                horizontal: true,
-                                onSelect: _selectOrder,
-                              ),
-                            ),
-                            Expanded(
-                              child: _OrderDetails(
-                                order: selectedOrder!,
-                                isReordered: _reorderedOrders.contains(
-                                  selectedOrder.orderNumber,
-                                ),
-                                onToggleReorder: () =>
-                                    _toggleReorder(selectedOrder),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-
-                      return Row(
-                        children: [
-                          SizedBox(
-                            width: 330,
-                            child: _OrderList(
-                              orders: orders,
-                              selectedIndex: _selectedIndex,
-                              onSelect: _selectOrder,
-                            ),
-                          ),
-                          const VerticalDivider(
-                            width: 1,
-                            color: IMatColors.border,
-                          ),
-                          Expanded(
-                            child: _OrderDetails(
-                              order: selectedOrder!,
-                              isReordered: _reorderedOrders.contains(
-                                selectedOrder.orderNumber,
-                              ),
-                              onToggleReorder: () =>
-                                  _toggleReorder(selectedOrder),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -147,7 +123,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
-class _OrderList extends StatelessWidget {
+class _OrderList extends StatefulWidget {
   final List<Order> orders;
   final int selectedIndex;
   final bool horizontal;
@@ -161,25 +137,55 @@ class _OrderList extends StatelessWidget {
   });
 
   @override
+  State<_OrderList> createState() => _OrderListState();
+}
+
+class _OrderListState extends State<_OrderList> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    final listView = ListView.separated(
+      controller: _scrollController,
+      scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
+      padding: const EdgeInsets.all(18),
+      itemCount: widget.orders.length,
+      separatorBuilder: (context, index) => SizedBox(
+        width: widget.horizontal ? 12 : 0,
+        height: widget.horizontal ? 0 : 12,
+      ),
+      itemBuilder: (context, index) {
+        return SizedBox(
+          width: widget.horizontal ? 260 : double.infinity,
+          child: _OrderCard(
+            order: widget.orders[index],
+            selected: widget.selectedIndex == index,
+            onTap: () => widget.onSelect(index),
+          ),
+        );
+      },
+    );
+
+    return ColoredBox(
       color: IMatColors.white,
-      child: ListView.separated(
-        scrollDirection: horizontal ? Axis.horizontal : Axis.vertical,
-        padding: const EdgeInsets.all(18),
-        itemCount: orders.length,
-        separatorBuilder: (context, index) =>
-            SizedBox(width: horizontal ? 12 : 0, height: horizontal ? 0 : 12),
-        itemBuilder: (context, index) {
-          return SizedBox(
-            width: horizontal ? 260 : double.infinity,
-            child: _OrderCard(
-              order: orders[index],
-              selected: selectedIndex == index,
-              onTap: () => onSelect(index),
-            ),
-          );
-        },
+      child: Scrollbar(
+        controller: _scrollController,
+        thumbVisibility: true,
+        trackVisibility: true,
+        interactive: true,
+        child: listView,
       ),
     );
   }
@@ -257,34 +263,46 @@ class _OrderDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(28, 24, 28, 34),
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Order #${order.orderNumber}', style: IMatText.headingL),
-                  const SizedBox(height: 6),
-                  Text(
-                    _formatDate(order.date),
-                    style: IMatText.bodyM.copyWith(
-                      color: IMatColors.textSecondary,
+    return ColoredBox(
+      color: IMatColors.beige,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(28, 24, 28, 34),
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Order #${order.orderNumber}',
+                          style: IMatText.headingL,
+                        ),
+                        const SizedBox(width: 18),
+                        _ReorderButton(
+                          isReordered: isReordered,
+                          onPressed: onToggleReorder,
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    Text(
+                      _formatDate(order.date),
+                      style: IMatText.bodyM.copyWith(
+                        color: IMatColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 18),
-            _ReorderButton(
-              isReordered: isReordered,
-              onPressed: onToggleReorder,
-            ),
-          ],
-        ),
+              const SizedBox(width: 18),
+              const CloseProfileButton(),
+            ],
+          ),
         const SizedBox(height: 24),
         _TotalPanel(order: order),
         const SizedBox(height: 18),
@@ -306,7 +324,8 @@ class _OrderDetails extends StatelessWidget {
             ],
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -444,30 +463,45 @@ class _EmptyHistory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 420,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: IMatColors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: IMatColors.border),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.receipt_long, size: 48, color: IMatColors.green),
-            const SizedBox(height: 14),
-            Text('Ingen orderhistorik än', style: IMatText.headingM),
-            const SizedBox(height: 8),
-            Text(
-              'När du slutför ett köp visas det här.',
-              textAlign: TextAlign.center,
-              style: IMatText.bodyS.copyWith(color: IMatColors.textSecondary),
+    return Stack(
+      children: [
+        Center(
+          child: Container(
+            width: 420,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: IMatColors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: IMatColors.border),
             ),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.receipt_long,
+                  size: 48,
+                  color: IMatColors.green,
+                ),
+                const SizedBox(height: 14),
+                Text('Ingen orderhistorik än', style: IMatText.headingM),
+                const SizedBox(height: 8),
+                Text(
+                  'När du slutför ett köp visas det här.',
+                  textAlign: TextAlign.center,
+                  style: IMatText.bodyS.copyWith(
+                    color: IMatColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+        const Positioned(
+          top: 12,
+          right: 16,
+          child: CloseProfileButton(),
+        ),
+      ],
     );
   }
 }

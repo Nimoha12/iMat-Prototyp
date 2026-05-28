@@ -5,6 +5,8 @@ import 'package:imat_repo/Widgets/Profile_Parts/Header/LogoutButton%20.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Payment_Card.dart';
 
 class ProfilePage extends StatefulWidget {
+  static const routeName = '/profile';
+
   const ProfilePage({super.key});
 
   @override

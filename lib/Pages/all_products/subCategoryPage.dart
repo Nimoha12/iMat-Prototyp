@@ -18,12 +18,14 @@ class SubCategoryPage extends StatefulWidget {
   final String title;
   final List<ProductCategory> categories;
   final UiCategory parentCategory; // ny parameter för huvudkategori
+  final bool showParentBreadcrumb;
 
   const SubCategoryPage({
     super.key,
     required this.title,
     required this.categories,
     required this.parentCategory, //  krävs nu vid anrop
+    this.showParentBreadcrumb = true,
   });
 
   @override
@@ -89,7 +91,37 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
       filtered.sort((a, b) => b.price.compareTo(a.price));
     }
 
+    final breadcrumbItems = [
+      BreadcrumbItem(
+        label: "Alla varor",
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AllCategoriesPage(),
+            ),
+          );
+        },
+      ),
+      if (widget.showParentBreadcrumb)
+        BreadcrumbItem(
+          label: widget.parentCategory.label,
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CategoryPage(
+                  uiCategory: widget.parentCategory,
+                ),
+              ),
+            );
+          },
+        ),
+      BreadcrumbItem(label: widget.title),
+    ];
+
     return IMatScaffold(
+      breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
           Positioned.fill(

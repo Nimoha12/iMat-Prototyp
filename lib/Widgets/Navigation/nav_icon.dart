@@ -33,19 +33,21 @@ class NavIcon extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 2,
+        horizontal: 4,
       ),
       child: Material(
         color: selected
             ? IMatColors.greenLight
             : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
+      
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
+          splashColor: IMatColors.green.withOpacity(0.2),
           onTap: onTap,
           child: SizedBox(
-            width: 120,
-            height: 88,
+            width: 108,
+            height: 84,
             child: Column(
               mainAxisAlignment:
                   MainAxisAlignment.center,
@@ -53,7 +55,7 @@ class NavIcon extends StatelessWidget {
                 Icon(
                   icon,
                   color: iconColor,
-                  size: 38,
+                  size: 34,
                 ),
 
                 const SizedBox(height: 10),
@@ -64,7 +66,7 @@ class NavIcon extends StatelessWidget {
                   style: TextStyle(
                     color: textColor,
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 15.5,
                     letterSpacing: 0.3,
                   ),
                 ),

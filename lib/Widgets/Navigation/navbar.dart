@@ -1,7 +1,3 @@
-// ==========================
-// IMAT_NAVBAR.DART
-// ==========================
-
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/Profile_page.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
@@ -10,6 +6,7 @@ import 'package:imat_repo/Pages/favorites/favorites_page.dart';
 import 'package:imat_repo/Pages/history/history_page.dart';
 import 'package:imat_repo/Pages/search/search_page.dart';
 import 'package:imat_repo/Widgets/Cart_Parts/Cart.dart';
+import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/cart.button.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/model/AuthState.dart';
@@ -27,6 +24,7 @@ class IMatNavbar extends StatefulWidget
   final NavbarPage activePage;
   final String? searchQuery;
   final bool highlightSearchQuery;
+  final List<BreadcrumbItem> breadcrumbContext;
 
   const IMatNavbar({
     super.key,
@@ -34,6 +32,7 @@ class IMatNavbar extends StatefulWidget
     this.activePage = NavbarPage.none,
     this.searchQuery,
     this.highlightSearchQuery = false,
+    this.breadcrumbContext = const [],
   });
 
   @override
@@ -176,30 +175,79 @@ class _IMatNavbarState extends State<IMatNavbar>
     _pulseController.value = 1.0;
   }
 
+  NavbarPage _resolvedActivePage(BuildContext context) {
+    if (widget.activePage != NavbarPage.none) {
+      return widget.activePage;
+    }
+
+    final routeName = ModalRoute.of(context)?.settings.name;
+    if (routeName == FavoritesPage.routeName) {
+      return NavbarPage.favorites;
+    }
+    if (routeName == HistoryPage.routeName) {
+      return NavbarPage.history;
+    }
+    if (routeName == ProfilePage.routeName) {
+      return NavbarPage.profile;
+    }
+
+    return NavbarPage.none;
+  }
+
+  bool _isOnNavbarPage(BuildContext context) {
+    return _resolvedActivePage(context) != NavbarPage.none;
+  }
+
+  void _navigateToNavbarPage(
+    BuildContext context,
+    Widget page,
+    String routeName,
+  ) {
+    final route = MaterialPageRoute(
+      settings: RouteSettings(name: routeName),
+      builder: (_) => page,
+    );
+
+    if (_isOnNavbarPage(context)) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
+  }
+
   void _onFavoritesTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.favorites) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const FavoritesPage(),
-      ),
+      const FavoritesPage(),
+      FavoritesPage.routeName,
     );
   }
 
   void _onHistoryTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.history) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const HistoryPage(),
-      ),
+      const HistoryPage(),
+      HistoryPage.routeName,
     );
   }
 
   void _onUserTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.profile) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const ProfilePage(),
-      ),
+      const ProfilePage(),
+      ProfilePage.routeName,
     );
   }
 
@@ -217,14 +265,22 @@ class _IMatNavbarState extends State<IMatNavbar>
 
     _flashSearchField();
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SearchPage(
-          query: trimmedQuery,
-        ),
+    final route = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: SearchPage.routeName),
+      builder: (_) => SearchPage(
+        query: trimmedQuery,
+        breadcrumbContext: widget.breadcrumbContext,
       ),
     );
+
+    final alreadyOnSearch =
+        ModalRoute.of(context)?.settings.name == SearchPage.routeName;
+
+    if (alreadyOnSearch) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
   }
 
   @override
