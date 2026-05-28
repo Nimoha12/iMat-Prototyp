@@ -16,7 +16,8 @@ import '../../Widgets/Category/categorized_product_sections.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import '../../Widgets/Category/product_ui_category_extension.dart';
 import '../../Widgets/Navigation/filter_button.dart';
-import '../../Widgets/Navigation/breadcrumb_bar.dart'; // 
+import '../../Widgets/Navigation/breadcrumb_bar.dart'; //
+import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
 class AllCategoriesPage extends StatefulWidget {
   const AllCategoriesPage({super.key});
@@ -29,7 +30,8 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
-  UiCategory? selectedCategory;
+
+  FilterSelection selection = const FilterSelection();
 
   bool filterOpen = false;
 
@@ -63,8 +65,13 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
     List<Product> applyFilters(List<Product> products) {
       List<Product> list = List<Product>.from(products);
 
-      if (selectedCategory != null) {
-        list = list.where((p) => p.uiCategory == selectedCategory).toList();
+      // Multi-select huvudkategorier
+      if (selection.selectedMainCategories.isNotEmpty) {
+        list = list
+            .where(
+              (p) => selection.selectedMainCategories.contains(p.uiCategory),
+            )
+            .toList();
       }
 
       if (ecoFilter == EcoFilter.eco) {
@@ -105,9 +112,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         BreadcrumbBar(
-                          items: [
-                            BreadcrumbItem(label: "Alla varor"),
-                          ],
+                          items: [BreadcrumbItem(label: "Alla varor")],
                         ),
                         const SizedBox(height: 24),
                         SizedBox(
@@ -129,8 +134,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const RecommendedProductsPage(),
+                                builder: (_) => const RecommendedProductsPage(),
                               ),
                             );
                           },
@@ -138,8 +142,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    CategoryPage(uiCategory: uiCat),
+                                builder: (_) => CategoryPage(uiCategory: uiCat),
                               ),
                             );
                           },
@@ -189,9 +192,15 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
-              selectedCategory: selectedCategory,
-              onCategoryChange: (v) => setState(() => selectedCategory = v),
+              selection: selection,
+              onSelectionChanged: (s) => setState(() => selection = s),
+              contextCategory: null,
               onClose: () => setState(() => filterOpen = false),
+              onApplyFilters: () {
+                setState(() {
+                  filterOpen = false;
+                });
+              },
             ),
           ),
 

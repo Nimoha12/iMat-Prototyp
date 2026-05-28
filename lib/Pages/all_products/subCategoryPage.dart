@@ -12,6 +12,7 @@ import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'category_page.dart';
+import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
 class SubCategoryPage extends StatefulWidget {
   final String title;
@@ -37,6 +38,10 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
   bool filterOpen = false;
+
+  // används bara för att matcha ProductFilterPanel-signaturen,
+  // men ingen kategori-filtering på denna sida
+  FilterSelection selection = const FilterSelection();
 
   @override
   void initState() {
@@ -105,8 +110,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AllCategoriesPage(),
+                                    builder: (_) => const AllCategoriesPage(),
                                   ),
                                 );
                               },
@@ -160,7 +164,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
               ),
             ),
           ),
-          
+
           // Overlay
           if (filterOpen)
             Positioned.fill(
@@ -174,7 +178,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
               ),
             ),
 
-          // Filterpanel
+          // Filterpanel (utan kategoridel)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -188,9 +192,16 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
-              selectedCategory: null,
-              onCategoryChange: (_) {},
+              selection: selection,
+              onSelectionChanged: (s) => setState(() => selection = s),
+              contextCategory: null,
+              showCategoryFilter: false,
               onClose: () => setState(() => filterOpen = false),
+              onApplyFilters: () {
+                setState(() {
+                  filterOpen = false;
+                });
+              },
             ),
           ),
 

@@ -89,6 +89,7 @@ class _MyAppState extends State<MyApp> {
     final authState = context.watch<AuthState>();
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: _navigatorKey,
       title: 'iMat',
       theme: ThemeData(

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/Category/product_ui_category_extension.dart';
 import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
+import 'package:imat_repo/Widgets/product/filter_selection.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:imat_repo/model/imat/product.dart';
@@ -17,7 +19,8 @@ class RecommendedProductsPage extends StatefulWidget {
   const RecommendedProductsPage({super.key});
 
   @override
-  State<RecommendedProductsPage> createState() => _RecommendedProductsPageState();
+  State<RecommendedProductsPage> createState() =>
+      _RecommendedProductsPageState();
 }
 
 class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
@@ -28,6 +31,9 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
   bool filterOpen = false;
+
+  // Multi-select kategori
+  FilterSelection selection = const FilterSelection();
 
   @override
   void initState() {
@@ -51,14 +57,24 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
   List<Product> _applyFilters(List<Product> products) {
     var filtered = List<Product>.from(products);
 
+    // Huvudkategori-filter (multi-select)
+    if (selection.selectedMainCategories.isNotEmpty) {
+      filtered = filtered
+          .where((p) => selection.selectedMainCategories.contains(p.uiCategory))
+          .toList();
+    }
+
+    // Ekologiskt
     if (ecoFilter == EcoFilter.eco) {
       filtered = filtered.where((p) => p.isEcological).toList();
     } else if (ecoFilter == EcoFilter.inteEco) {
       filtered = filtered.where((p) => !p.isEcological).toList();
     }
 
+    // Maxpris
     filtered = filtered.where((p) => p.price <= maxPrice).toList();
 
+    // Sortering
     if (sortBy == "priceAsc") {
       filtered.sort((a, b) => a.price.compareTo(b.price));
     } else if (sortBy == "priceDesc") {
@@ -149,6 +165,8 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
               ),
             ),
           ),
+
+          // Overlay
           if (filterOpen)
             Positioned.fill(
               child: GestureDetector(
@@ -160,6 +178,8 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
                 ),
               ),
             ),
+
+          // Filterpanel (samma som Alla varor)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -173,11 +193,22 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
-              selectedCategory: null,
-              onCategoryChange: (_) {},
+
+              selection: selection,
+              onSelectionChanged: (s) => setState(() => selection = s),
+
+              contextCategory: null, // viktigt
+              showCategoryFilter: true, // viktigt
+
               onClose: () => setState(() => filterOpen = false),
+              onApplyFilters: () {
+                setState(() {
+                  filterOpen = false;
+                });
+              },
             ),
           ),
+
           if (showScrollButton)
             Positioned(
               right: 24,

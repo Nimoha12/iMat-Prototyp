@@ -600,4 +600,24 @@ import 'package:http/http.dart' as http;
 
     notifyListeners();
   }
+
+  void shoppingCartSet(ShoppingItem item) {
+  bool found = false;
+  int pId = item.product.productId;
+
+  for (final cartItem in _shoppingCart.items) {
+    if (cartItem.product.productId == pId) {
+      cartItem.amount = item.amount;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    _shoppingCart.addItem(item, merge: false);
+  }
+
+  setShoppingCart(); // sparar + notifyListeners()
+}
+
 }

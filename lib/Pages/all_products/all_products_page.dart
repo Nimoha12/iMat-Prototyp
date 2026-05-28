@@ -10,6 +10,7 @@ import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import '../../Widgets/product/product_filter_panel.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
+import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
 class AllProductsPage extends StatefulWidget {
   final UiCategory uiCategory;
@@ -33,7 +34,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
   String sortBy = "none";
   bool filterOpen = false;
 
-  // 🔥 Scrollcontroller + state för knappen
+  // Nytt: krävs av ProductFilterPanel
+  FilterSelection selection = const FilterSelection();
+
   final ScrollController _scrollController = ScrollController();
   bool showScrollButton = false;
 
@@ -61,19 +64,24 @@ class _AllProductsPageState extends State<AllProductsPage> {
     final iMat = context.watch<ImatDataHandler>();
     var products = iMat.selectProducts;
 
+    // Vilka kategorier ska visas?
     final List<ProductCategory> cats =
         widget.subCategories ?? categoryMap[widget.uiCategory]!;
 
+    // Filtrera på kategori
     products = products.where((p) => cats.contains(p.category)).toList();
 
+    // Ekologiskt
     if (ecoFilter == EcoFilter.eco) {
       products = products.where((p) => p.isEcological).toList();
     } else if (ecoFilter == EcoFilter.inteEco) {
       products = products.where((p) => !p.isEcological).toList();
     }
 
+    // Maxpris
     products = products.where((p) => p.price <= maxPrice).toList();
 
+    // Sortering
     if (sortBy == "priceAsc") {
       products.sort((a, b) => a.price.compareTo(b.price));
     } else if (sortBy == "priceDesc") {
@@ -90,6 +98,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Breadcrumbs
                 Row(
                   children: [
                     GestureDetector(
@@ -156,6 +165,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
                 const SizedBox(height: 24),
 
+                // Titel + filterknapp
                 SizedBox(
                   width: 1396,
                   child: Row(
@@ -171,9 +181,10 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
                 const SizedBox(height: 24),
 
+                // Produktgrid
                 Expanded(
                   child: GridView.builder(
-                    controller: _scrollController, // ← SCROLLCONTROLLER
+                    controller: _scrollController,
                     itemCount: products.length,
                     gridDelegate: productGridDelegate,
                     itemBuilder: (context, index) {
@@ -188,6 +199,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
             ),
           ),
 
+          // Overlay
           if (filterOpen)
             Positioned.fill(
               child: GestureDetector(
@@ -195,13 +207,12 @@ class _AllProductsPageState extends State<AllProductsPage> {
                 child: AnimatedOpacity(
                   opacity: filterOpen ? 1 : 0,
                   duration: const Duration(milliseconds: 250),
-                  child: Container(
-                    color: Colors.black.withOpacity(0.45),
-                  ),
+                  child: Container(color: Colors.black.withOpacity(0.45)),
                 ),
               ),
             ),
 
+          // Filterpanel (utan kategoridel)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -215,13 +226,25 @@ class _AllProductsPageState extends State<AllProductsPage> {
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
-              selectedCategory: null,
-              onCategoryChange: (_) {},
+
+              // Nya obligatoriska parametrar
+              selection: selection,
+              onSelectionChanged: (s) => setState(() => selection = s),
+
+              // Ingen kategori här
+              contextCategory: null,
+              showCategoryFilter: false,
+
               onClose: () => setState(() => filterOpen = false),
+              onApplyFilters: () {
+                setState(() {
+                  filterOpen = false;
+                });
+              },
             ),
           ),
 
-          // SCROLL-TO-TOP KNAPP
+          // Scroll-to-top
           if (showScrollButton)
             Positioned(
               right: 24,
@@ -229,7 +252,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
               child: FloatingActionButton(
                 backgroundColor: IMatColors.green,
                 onPressed: () {
-                  _scrollController.jumpTo(0); // ← INGEN ANIMATION
+                  _scrollController.jumpTo(0);
                 },
                 child: const Icon(Icons.arrow_upward, color: Colors.white),
               ),

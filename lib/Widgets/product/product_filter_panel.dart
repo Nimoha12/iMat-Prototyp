@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import '../Category/ui_categories.dart';
+import '../Category/subcategories.dart';
+import 'filter_selection.dart';
 
 enum EcoFilter { alla, eco, inteEco }
 
@@ -15,10 +17,13 @@ class ProductFilterPanel extends StatelessWidget {
   final String sortBy;
   final Function(String) onSortChange;
 
-  final UiCategory? selectedCategory;
-  final Function(UiCategory?) onCategoryChange;
+  final FilterSelection selection;
+  final ValueChanged<FilterSelection> onSelectionChanged;
+
+  final UiCategory? contextCategory;
 
   final VoidCallback onClose;
+  final VoidCallback onApplyFilters;
 
   final bool fullHeight;
   final bool showCategoryFilter;
@@ -31,9 +36,11 @@ class ProductFilterPanel extends StatelessWidget {
     required this.onEcoChange,
     required this.sortBy,
     required this.onSortChange,
-    required this.selectedCategory,
-    required this.onCategoryChange,
+    required this.selection,
+    required this.onSelectionChanged,
     required this.onClose,
+    required this.onApplyFilters,
+    this.contextCategory,
     this.fullHeight = false,
     this.showCategoryFilter = true,
   });
@@ -55,175 +62,325 @@ class ProductFilterPanel extends StatelessWidget {
       child: Material(
         color: IMatColors.white,
         child: Container(
-          width: 350,
+          width: 360,
           height: fullHeight ? double.infinity : null,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            // HEADER
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Filter", style: IMatText.h3),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: onClose,
+                // HEADER
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Filter",
+                      style: IMatText.h3.copyWith(fontSize: 24),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      iconSize: 26,
+                      onPressed: onClose,
+                    ),
+                  ],
                 ),
-              ],
-            ),
 
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            //pris
-
-            Text(
-              "Maxpris: ${maxPrice.toInt()} kr",
-              style: IMatText.bodyM.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Slider(
-              value: maxPrice,
-              min: 0,
-              max: 200,
-              divisions: 8,
-              activeColor: IMatColors.green,
-              onChanged: onPriceChange,
-            ),
-
-            const Divider(height: 40),
-
-            //ekologiskt
-
-            Text(
-              "Ekologiskt",
-              style: IMatText.bodyM.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            SegmentedButton<EcoFilter>(
-              segments: const [
-                ButtonSegment(
-                  value: EcoFilter.alla,
-                  label: Text("Alla"),
+                // PRIS
+                Text(
+                  "Maxpris: ${maxPrice.toInt()} kr",
+                  style: IMatText.bodyM.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                  ),
                 ),
-                ButtonSegment(
-                  value: EcoFilter.eco,
-                  label: Text("Ekologiskt"),
+
+                const SizedBox(height: 8),
+
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    overlayShape: SliderComponentShape.noOverlay,
+                  ),
+                  child: Transform.translate(
+                    offset: const Offset(-8, 0),
+                    child: Slider(
+                      value: maxPrice,
+                      min: 0,
+                      max: 200,
+                      divisions: 8,
+                      activeColor: IMatColors.green,
+                      onChanged: onPriceChange,
+                    ),
+                  ),
                 ),
-                ButtonSegment(
-                  value: EcoFilter.inteEco,
-                  label: Text("Ej ekologiskt"),
+
+                const Divider(height: 40),
+
+                // EKOLOGISKT
+                Text(
+                  "Ekologiskt",
+                  style: IMatText.bodyM.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                  ),
                 ),
-              ],
-              selected: {ecoFilter},
-              onSelectionChanged: (v) => onEcoChange(v.first),
-            ),
 
-            const Divider(height: 40),
+                const SizedBox(height: 14),
 
-           //Sortera
+                Row(
+                  children: [
+                    _ecoChip(
+                      label: "Alla",
+                      selected: ecoFilter == EcoFilter.alla,
+                      onTap: () => onEcoChange(EcoFilter.alla),
+                    ),
 
-            Text(
-              "Sortera",
-              style: IMatText.bodyM.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+                    const SizedBox(width: 8),
 
-            const SizedBox(height: 12),
+                    _ecoChip(
+                      label: "Ekologiskt",
+                      selected: ecoFilter == EcoFilter.eco,
+                      onTap: () => onEcoChange(EcoFilter.eco),
+                    ),
 
-            DropdownButtonFormField<String>(
-              initialValue: sortBy,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                    const SizedBox(width: 8),
+
+                    _ecoChip(
+                      label: "Ej ekologiskt",
+                      selected: ecoFilter == EcoFilter.inteEco,
+                      onTap: () => onEcoChange(EcoFilter.inteEco),
+                    ),
+                  ],
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
-                ),
-              ),
-              items: const [
-                DropdownMenuItem(
-                  value: "none",
-                  child: Text("Ingen sortering"),
-                ),
-                DropdownMenuItem(
-                  value: "priceAsc",
-                  child: Text("Pris: Lågt till högt"),
-                ),
-                DropdownMenuItem(
-                  value: "priceDesc",
-                  child: Text("Pris: Högt till lågt"),
-                ),
-              ],
-              onChanged: (v) => onSortChange(v!),
-            ),
-            //kategori
 
-            if (showCategoryFilter) ...[
-              const Divider(height: 40),
+                const Divider(height: 40),
 
-              Text(
-                "Kategori",
-                style: IMatText.bodyM.copyWith(
-                  fontWeight: FontWeight.w600,
+                // SORTERA
+                Text(
+                  "Sortera",
+                  style: IMatText.bodyM.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-              Column(
-                children: UiCategory.values.map((uiCat) {
-                  final isSelected = selectedCategory == uiCat;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Material(
-                      color: isSelected
-                          ? IMatColors.green.withOpacity(0.08)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                      clipBehavior: Clip.antiAlias,
-                      child: ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      dense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                      ),
-                      title: Text(
-                        uiCat.label,
-                        style: IMatText.bodyM,
-                      ),
-                      trailing: isSelected
-                          ? Icon(
-                              Icons.check_circle,
-                              color: IMatColors.green,
-                            )
-                          : null,
-                      onTap: () =>
-                          onCategoryChange(isSelected ? null : uiCat),
+                DropdownButtonFormField<String>(
+                  value: sortBy,
+                  iconSize: 26,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                        color: IMatColors.border,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-            ],
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                        color: IMatColors.border,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(
+                        color: IMatColors.green,
+                        width: 2,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                  ),
+                  style: IMatText.bodyM.copyWith(
+                    fontSize: 16,
+                    color: IMatColors.black,
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: "none",
+                      child: Text(
+                        "Ingen sortering",
+                        style: IMatText.bodyM.copyWith(fontSize: 16),
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: "priceAsc",
+                      child: Text(
+                        "Pris: Lågt till högt",
+                        style: IMatText.bodyM.copyWith(fontSize: 16),
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: "priceDesc",
+                      child: Text(
+                        "Pris: Högt till lågt",
+                        style: IMatText.bodyM.copyWith(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) onSortChange(v);
+                  },
+                ),
 
-            const SizedBox(height: 24),
-          ],
+                // KATEGORI
+                if (showCategoryFilter) ...[
+                  const Divider(height: 40),
+
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      dividerColor: Colors.transparent,
+                    ),
+                    child: ExpansionTile(
+                      tilePadding: EdgeInsets.zero,
+                      childrenPadding: EdgeInsets.zero,
+                      title: Text(
+                        "Välj kategori",
+                        style: IMatText.bodyM.copyWith(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                        ),
+                      ),
+                      children: [
+                        const SizedBox(height: 4),
+
+                        if (contextCategory == null)
+                          Column(
+                            children: UiCategory.values.map((uiCat) {
+                              final isSelected = selection
+                                  .selectedMainCategories
+                                  .contains(uiCat);
+
+                              return CheckboxListTile(
+                                value: isSelected,
+                                dense: true,
+                                visualDensity: const VisualDensity(
+                                  vertical: -2,
+                                ),
+                                contentPadding: EdgeInsets.zero,
+                                activeColor: IMatColors.green,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                title: Text(
+                                  uiCat.label,
+                                  style: IMatText.bodyM.copyWith(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                onChanged: (_) {
+                                  onSelectionChanged(
+                                    selection.toggleMain(uiCat),
+                                  );
+                                },
+                              );
+                            }).toList(),
+                          )
+                        else
+                          Column(
+                            children:
+                                (subCategoryGroups[contextCategory] ?? [])
+                                    .map((g) {
+                              final isSelected = selection
+                                  .selectedSubCategories
+                                  .contains(g.title);
+
+                              return CheckboxListTile(
+                                value: isSelected,
+                                dense: true,
+                                visualDensity: const VisualDensity(
+                                  vertical: -2,
+                                ),
+                                contentPadding: EdgeInsets.zero,
+                                activeColor: IMatColors.green,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                title: Text(
+                                  g.title,
+                                  style: IMatText.bodyM.copyWith(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                onChanged: (_) {
+                                  onSelectionChanged(
+                                    selection.toggleSub(g.title),
+                                  );
+                                },
+                              );
+                            }).toList(),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 36),
+
+                // APPLY BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: onApplyFilters,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: IMatColors.green,
+                      foregroundColor: IMatColors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      "Visa resultat",
+                      style: IMatText.bodyM.copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: IMatColors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _ecoChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? IMatColors.green : IMatColors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? IMatColors.green : IMatColors.border,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: IMatText.bodyS.copyWith(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: selected ? IMatColors.white : IMatColors.black,
+            height: 1,
           ),
         ),
       ),

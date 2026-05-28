@@ -324,7 +324,7 @@ class _ReorderButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onPressed,
         icon: Icon(isReordered ? Icons.undo : Icons.shopping_cart_checkout),
-        label: Text(isReordered ? 'Ångra' : 'Beställ igen'),
+        label: Text(isReordered ? 'Ångra' : 'lägg i kundvagnen'),
         style: ElevatedButton.styleFrom(
           backgroundColor: isReordered ? IMatColors.black : IMatColors.green,
           foregroundColor: isReordered ? IMatColors.white : IMatColors.white,

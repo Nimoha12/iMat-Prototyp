@@ -13,6 +13,7 @@ import 'package:imat_repo/Pages/all_products/subCategoryPage.dart';
 import 'package:imat_repo/Widgets/Category/subcategories.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
+import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
 class CategoryPage extends StatefulWidget {
   final UiCategory uiCategory;
@@ -31,6 +32,8 @@ class _CategoryPageState extends State<CategoryPage> {
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
   bool filterOpen = false;
+
+  FilterSelection selection = const FilterSelection();
 
   @override
   void initState() {
@@ -60,17 +63,21 @@ class _CategoryPageState extends State<CategoryPage> {
     // Filtreringsfunktion
     List<Product> applyFilters(List<Product> products) {
       var list = products;
+
       if (ecoFilter == EcoFilter.eco) {
         list = list.where((p) => p.isEcological).toList();
       } else if (ecoFilter == EcoFilter.inteEco) {
         list = list.where((p) => !p.isEcological).toList();
       }
+
       list = list.where((p) => p.price <= maxPrice).toList();
+
       if (sortBy == "priceAsc") {
         list.sort((a, b) => a.price.compareTo(b.price));
       } else if (sortBy == "priceDesc") {
         list.sort((a, b) => b.price.compareTo(a.price));
       }
+
       return list;
     }
 
@@ -96,8 +103,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        const AllCategoriesPage(),
+                                    builder: (_) => const AllCategoriesPage(),
                                   ),
                                 );
                               },
@@ -111,10 +117,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                widget.uiCategory.label,
-                                style: IMatText.h2,
-                              ),
+                              Text(widget.uiCategory.label, style: IMatText.h2),
                               FilterButton(
                                 onPressed: () =>
                                     setState(() => filterOpen = true),
@@ -146,8 +149,9 @@ class _CategoryPageState extends State<CategoryPage> {
                                   decoration: BoxDecoration(
                                     color: IMatColors.green,
                                     borderRadius: BorderRadius.circular(16),
-                                    border:
-                                        Border.all(color: IMatColors.border),
+                                    border: Border.all(
+                                      color: IMatColors.border,
+                                    ),
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -172,11 +176,17 @@ class _CategoryPageState extends State<CategoryPage> {
                   ),
                   for (final group in groups)
                     ...() {
+                      // Multi-select underkategorier: om något är valt, visa bara de valda
+                      if (selection.selectedSubCategories.isNotEmpty &&
+                          !selection.selectedSubCategories.contains(
+                            group.title,
+                          )) {
+                        return <Widget>[];
+                      }
+
                       final filtered = applyFilters(
                         allProducts
-                            .where(
-                              (p) => group.categories.contains(p.category),
-                            )
+                            .where((p) => group.categories.contains(p.category))
                             .toList(),
                       );
                       if (filtered.isEmpty) return <Widget>[];
@@ -247,9 +257,15 @@ class _CategoryPageState extends State<CategoryPage> {
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
-              selectedCategory: null,
-              onCategoryChange: (_) {},
+              selection: selection,
+              onSelectionChanged: (s) => setState(() => selection = s),
+              contextCategory: widget.uiCategory,
               onClose: () => setState(() => filterOpen = false),
+              onApplyFilters: () {
+                setState(() {
+                  filterOpen = false;
+                });
+              },
             ),
           ),
 
