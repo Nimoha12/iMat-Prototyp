@@ -10,6 +10,7 @@ import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 
+
 class FavoritesPage extends StatefulWidget {
   static const routeName = '/favorites';
 

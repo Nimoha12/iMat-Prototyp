@@ -9,6 +9,7 @@ import 'package:imat_repo/Pages/search/search_page.dart';
 import 'package:imat_repo/Widgets/Cart_Parts/Cart.dart';
 import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/cart.button.dart';
+import 'package:imat_repo/Widgets/Navigation/module_navigation.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:provider/provider.dart';
@@ -194,21 +195,29 @@ class _IMatNavbarState extends State<IMatNavbar>
   }
 
   void _navigateToNavbarPage(
-    BuildContext context,
-    Widget page,
-    String routeName,
-  ) {
-    final route = MaterialPageRoute(
-      settings: RouteSettings(name: routeName),
-      builder: (_) => page,
-    );
+  BuildContext context,
+  Widget page,
+  String routeName,
+) {
+  final route = MaterialPageRoute(
+    settings: RouteSettings(name: routeName),
+    builder: (_) => page,
+  );
 
-    if (_isOnNavbarPage(context)) {
-      Navigator.pushReplacement(context, route);
-    } else {
-      Navigator.push(context, route);
-    }
+  if (!ModuleNavigation.insideModuleArea) {
+    ModuleNavigation.enter();
+
+    Navigator.push(
+      context,
+      route,
+    );
+  } else {
+    Navigator.pushReplacement(
+      context,
+      route,
+    );
   }
+}
 
   void _onFavoritesTapLoggedIn(BuildContext context) {
     if (_resolvedActivePage(context) == NavbarPage.favorites) {

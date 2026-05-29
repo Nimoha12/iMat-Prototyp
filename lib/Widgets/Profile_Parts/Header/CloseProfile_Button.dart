@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Widgets/Navigation/module_navigation.dart';
 
 class CloseProfileButton
     extends StatelessWidget {
@@ -15,7 +16,7 @@ class CloseProfileButton
       offset: const Offset(0, -2),
       child: IconButton(
         onPressed: () {
-          Navigator.pop(context);
+          ModuleNavigation.exit(context);
         },
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(
