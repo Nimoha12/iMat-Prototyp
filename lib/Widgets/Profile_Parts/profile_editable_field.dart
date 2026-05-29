@@ -12,11 +12,13 @@ class ProfileEditableField extends StatefulWidget {
   final ValueChanged<String> onSave;
   final TextInputType? keyboardType;
   final int? maxLength;
+  final String? helperText;
 
   const ProfileEditableField({
     super.key,
     required this.label,
     required this.controller,
+    this.helperText,
     required this.onSave,
     this.keyboardType,
     this.maxLength,
@@ -146,47 +148,75 @@ class _ProfileEditableFieldState extends State<ProfileEditableField> {
                     },
                   ),
                 },
-                child: TextField(
-                  controller: widget.controller,
-                  focusNode: _focusNode,
-                  readOnly: !_editing,
-                  keyboardType: widget.keyboardType,
-                  maxLength: widget.maxLength,
-                  textInputAction: TextInputAction.done,
-                  onTap: _startEditing,
-                  onSubmitted: (_) => _save(),
-                  style: profileFieldTextStyle,
-                  decoration: InputDecoration(
-                    counterText: '',
-                    filled: true,
-                    fillColor: _editing
-                        ? profileSurfaceColor
-                        : profilePrimaryLightColor.withValues(alpha: 0.55),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 15,
-                    ),
-                    suffixIcon: IconButton(
-                      tooltip: _editing ? profileSaveTooltip : profileEditHint,
-                      onPressed: _editing ? _save : _startEditing,
-                      icon: Icon(_editing ? Icons.check : Icons.edit),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(profileCardRadius),
-                      borderSide: const BorderSide(
-                        color: profileBorderColor,
-                        width: 1.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(profileCardRadius),
-                      borderSide: const BorderSide(
-                        color: profilePrimaryColor,
-                        width: 3,
-                      ),
-                    ),
-                  ),
-                ),
+                child: Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    TextField(
+      controller: widget.controller,
+      focusNode: _focusNode,
+      readOnly: !_editing,
+      keyboardType: widget.keyboardType,
+      maxLength: widget.maxLength,
+      textInputAction: TextInputAction.done,
+      onTap: _startEditing,
+      onSubmitted: (_) => _save(),
+      style: profileFieldTextStyle,
+      decoration: InputDecoration(
+        counterText: '',
+        filled: true,
+        fillColor: _editing
+            ? profileSurfaceColor
+            : profilePrimaryLightColor.withValues(alpha: 0.55),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 15,
+        ),
+        suffixIcon: IconButton(
+          tooltip: _editing
+              ? profileSaveTooltip
+              : profileEditHint,
+          onPressed: _editing ? _save : _startEditing,
+          icon: Icon(
+            _editing
+                ? Icons.check
+                : Icons.edit,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(
+            profileCardRadius,
+          ),
+          borderSide: const BorderSide(
+            color: profileBorderColor,
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(
+            profileCardRadius,
+          ),
+          borderSide: const BorderSide(
+            color: profilePrimaryColor,
+            width: 3,
+          ),
+        ),
+      ),
+    ),
+
+    if (widget.helperText != null) ...[
+      const SizedBox(height: 6),
+
+      Text(
+        widget.helperText!,
+        style: profileHelperTextStyle.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ],
+  ],
+),
+              
               ),
             ),
           ],

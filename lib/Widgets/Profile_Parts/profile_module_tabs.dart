@@ -38,7 +38,7 @@ class _ProfileModuleTabsState extends State<ProfileModuleTabs> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Semantics(
           label: profileTabsSemanticsLabel,
@@ -56,7 +56,7 @@ class _ProfileModuleTabsState extends State<ProfileModuleTabs> {
 
               if (isNarrow) {
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     for (var index = 0; index < tabButtons.length; index++) ...[
                       tabButtons[index],
@@ -186,10 +186,12 @@ class _ProfileFieldGroupView extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth >= 720;
-            final columnWidth = isWide
-                ? (constraints.maxWidth - 26) / 2
-                : constraints.maxWidth;
+            final columnCount = isWide ? 3 : 1;
 
+            final totalSpacing = 26 * (columnCount - 1);
+
+            final columnWidth =
+                (constraints.maxWidth - totalSpacing) / columnCount;
             return Wrap(
               spacing: 26,
               runSpacing: 18,

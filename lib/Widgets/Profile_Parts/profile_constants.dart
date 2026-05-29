@@ -10,7 +10,7 @@ const Color profileTextColor = IMatColors.black;
 const Color profileMutedTextColor = IMatColors.textSecondary;
 
 const double profileMaxWidth = 1120;
-const double profileFieldWidth = 285;
+const double profileFieldWidth = 240;
 const double profileFieldHeight = 58;
 const double profileTouchTarget = 56;
 const double profileCardRadius = 8;
