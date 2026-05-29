@@ -15,7 +15,6 @@ extension CategoryToUi on Category {
   }
 }
 
-// Visar 6 kategorier på startsidan 
 class CategoryGridHome extends StatelessWidget {
   const CategoryGridHome({super.key});
 
@@ -80,7 +79,7 @@ class CategoryGridHome extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final category = homeCategories[index];
-              return _CategoryCard(category: category);
+              return _HoverCategoryCard(category: category);
             },
           ),
         ),
@@ -89,102 +88,118 @@ class CategoryGridHome extends StatelessWidget {
   }
 }
 
-//Enskilt kategori-kort (förbättrad tillgänglighet)
-class _CategoryCard extends StatelessWidget {
+class _HoverCategoryCard extends StatefulWidget {
   final Category category;
 
-  const _CategoryCard({required this.category});
+  const _HoverCategoryCard({required this.category});
+
+  @override
+  State<_HoverCategoryCard> createState() => _HoverCategoryCardState();
+}
+
+class _HoverCategoryCardState extends State<_HoverCategoryCard> {
+  bool _hovered = false;
+
+  void _onTap(BuildContext context) {
+    final uiCat = widget.category.uiCategory;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CategoryPage(uiCategory: uiCat),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final category = widget.category;
     final hasImage = category.bgImagePath != null;
 
-    return InkWell(
-      onTap: () {
-        final uiCat = category.uiCategory;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CategoryPage(uiCategory: uiCat),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: () => _onTap(context),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          transformAlignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..scale(_hovered ? 1.04 : 1.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: _hovered ? 0.14 : 0.08),
+                blurRadius: _hovered ? 10 : 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        );
-      },
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            if (hasImage)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  category.bgImagePath!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ),
-
-            // Lättare overlay för bättre kontrast
-            if (hasImage)
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.black.withValues(alpha: 0.35),
-                ),
-              ),
-
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Större ikon för bättre synlighet
-                  if (category.iconPath != null)
-                    Image.asset(
-                      category.iconPath!,
-                      width: 60,
-                      height: 60,
-                      color: Colors.white,
-                    )
-                  else if (category.icon != null)
-                    Icon(
-                      category.icon!,
-                      size: 60,
-                      color: Colors.white,
-                    ),
-
-                  const SizedBox(height: 14),
-
-                  // Större och tydligare text
-                  Text(
-                    category.label,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(0, 1),
-                          blurRadius: 2,
-                          color: Colors.black54,
-                        ),
-                      ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Stack(
+              children: [
+                if (hasImage)
+                  Positioned.fill(
+                    child: Image.asset(
+                      category.bgImagePath!,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ],
-              ),
+
+                if (hasImage)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black.withValues(
+                        alpha: _hovered ? 0.25 : 0.35,
+                      ),
+                    ),
+                  ),
+
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (category.iconPath != null)
+                        Image.asset(
+                          category.iconPath!,
+                          width: 60,
+                          height: 60,
+                          color: Colors.white,
+                        )
+                      else if (category.icon != null)
+                        Icon(
+                          category.icon!,
+                          size: 60,
+                          color: Colors.white,
+                        ),
+
+                      const SizedBox(height: 14),
+
+                      Text(
+                        category.label,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              offset: Offset(0, 1),
+                              blurRadius: 2,
+                              color: Colors.black54,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
