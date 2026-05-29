@@ -21,42 +21,33 @@ class NavIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor =
-        selected
-            ? IMatColors.green
-            : IMatColors.white;
+    final iconColor = selected ? IMatColors.green : IMatColors.white;
 
-    final textColor =
-        selected
-            ? IMatColors.green
-            : IMatColors.white;
+    final textColor = selected ? IMatColors.green : IMatColors.white;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Material(
-        color: selected
-            ? IMatColors.greenLight
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-      
+        color: selected ? IMatColors.greenLight : Colors.transparent,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(14),
+            topRight: Radius.circular(14),
+          ),
           splashColor: IMatColors.green.withOpacity(0.2),
           onTap: onTap,
           child: SizedBox(
             width: 108,
             height: 84,
             child: Column(
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  icon,
-                  color: iconColor,
-                  size: 34,
-                ),
+                Icon(icon, color: iconColor, size: 34),
 
                 const SizedBox(height: 10),
 
