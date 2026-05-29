@@ -1,0 +1,6 @@
+kategori: Varukorg
+titel: Ändra antal i varukorgen
+
+I varukorgen ser du alla varor du har lagt till. Använd plus och minus vid en vara för att öka eller minska antalet. Om antalet blir noll tas varan bort från varukorgen.
+
+Du kan också ta bort en vara direkt med borttagningsknappen på raden. Totalbeloppet uppdateras automatiskt när varukorgen ändras.

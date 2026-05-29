@@ -1,0 +1,6 @@
+kategori: Checka ut
+titel: Så fungerar checkout
+
+När varukorgen innehåller varor kan du gå vidare med Gå till checkout. Där kontrollerar du dina varor, fyller i kontaktuppgifter och väljer betalningssätt.
+
+Kontrollera gärna leverans- och kontaktuppgifter innan du slutför beställningen. När ordern är lagd töms varukorgen och beställningen hamnar i historiken.

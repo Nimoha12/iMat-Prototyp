@@ -98,9 +98,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
       grouped[cat] = filtered.where((p) => p.uiCategory == cat).toList();
     }
 
-    final breadcrumbItems = [
-      BreadcrumbItem(label: "Alla varor"),
-    ];
+    final breadcrumbItems = [BreadcrumbItem(label: "Alla varor")];
 
     return IMatScaffold(
       breadcrumbContext: breadcrumbItems,

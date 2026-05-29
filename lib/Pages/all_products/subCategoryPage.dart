@@ -97,9 +97,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AllCategoriesPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const AllCategoriesPage()),
           );
         },
       ),
@@ -110,9 +108,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => CategoryPage(
-                  uiCategory: widget.parentCategory,
-                ),
+                builder: (_) => CategoryPage(uiCategory: widget.parentCategory),
               ),
             );
           },

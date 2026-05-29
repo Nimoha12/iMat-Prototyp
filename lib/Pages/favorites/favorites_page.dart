@@ -21,7 +21,7 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPageState extends State<FavoritesPage> {
   final ScrollController scrollController = ScrollController();
-  
+
   @override
   void dispose() {
     scrollController.dispose();
@@ -62,7 +62,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
             if (visibleSections.isNotEmpty)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 24, right: 16, bottom: 16),
+                  padding: const EdgeInsets.only(
+                    top: 24,
+                    right: 16,
+                    bottom: 16,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -94,13 +98,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 ),
               ),
             if (favorites.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 24, right: 16),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: const CloseProfileButton(),
+                  padding: const EdgeInsets.only(
+                    top: 24,
+                    right: 16,
+                    bottom: 80,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [CloseProfileButton()],
                   ),
                 ),
               )

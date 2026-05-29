@@ -28,8 +28,10 @@ class HomePage extends StatelessWidget {
                 const spacing = 16.0;
 
                 // Säker beräkning av kortbredd
-                final availableWidth =
-                    math.max(constraints.maxWidth - (spacing * 2), 0);
+                final availableWidth = math.max(
+                  constraints.maxWidth - (spacing * 2),
+                  0,
+                );
                 final cardWidth = availableWidth / 3;
 
                 return SizedBox(
@@ -46,10 +48,7 @@ class HomePage extends StatelessWidget {
                       const SizedBox(width: spacing),
 
                       // Höger: Alla varor
-                      SizedBox(
-                        width: cardWidth,
-                        child: const AllItemsCard(),
-                      ),
+                      SizedBox(width: cardWidth, child: const AllItemsCard()),
                     ],
                   ),
                 );

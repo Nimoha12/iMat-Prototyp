@@ -78,10 +78,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         onSelect: _selectOrder,
                       ),
                     ),
-                    const VerticalDivider(
-                      width: 1,
-                      color: IMatColors.border,
-                    ),
+                    const VerticalDivider(width: 1, color: IMatColors.border),
                     Expanded(
                       child: _OrderDetails(
                         order: selectedOrder!,
@@ -303,27 +300,27 @@ class _OrderDetails extends StatelessWidget {
               const CloseProfileButton(),
             ],
           ),
-        const SizedBox(height: 24),
-        _TotalPanel(order: order),
-        const SizedBox(height: 18),
-        Text('Varor', style: IMatText.headingM),
-        const SizedBox(height: 10),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: IMatColors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: IMatColors.border),
+          const SizedBox(height: 24),
+          _TotalPanel(order: order),
+          const SizedBox(height: 18),
+          Text('Varor', style: IMatText.headingM),
+          const SizedBox(height: 10),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: IMatColors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: IMatColors.border),
+            ),
+            child: Column(
+              children: [
+                for (int index = 0; index < order.items.length; index++)
+                  _OrderItemRow(
+                    item: order.items[index],
+                    showDivider: index < order.items.length - 1,
+                  ),
+              ],
+            ),
           ),
-          child: Column(
-            children: [
-              for (int index = 0; index < order.items.length; index++)
-                _OrderItemRow(
-                  item: order.items[index],
-                  showDivider: index < order.items.length - 1,
-                ),
-            ],
-          ),
-        ),
         ],
       ),
     );
@@ -496,11 +493,7 @@ class _EmptyHistory extends StatelessWidget {
             ),
           ),
         ),
-        const Positioned(
-          top: 12,
-          right: 16,
-          child: CloseProfileButton(),
-        ),
+        const Positioned(top: 12, right: 16, child: CloseProfileButton()),
       ],
     );
   }

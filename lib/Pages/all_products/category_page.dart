@@ -100,9 +100,7 @@ class _CategoryPageState extends State<CategoryPage> {
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AllCategoriesPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const AllCategoriesPage()),
           );
         },
       ),
