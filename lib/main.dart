@@ -29,35 +29,58 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool showLoginWidget = false;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  OverlayEntry? _loginOverlayEntry;
   VoidCallback? onLoginSuccessAction;
 
+  void _removeLoginOverlayEntry() {
+    _loginOverlayEntry?.remove();
+    _loginOverlayEntry = null;
+  }
+
   void showLoginOverlay({VoidCallback? onLoginSuccess}) {
-    setState(() {
-      onLoginSuccessAction = onLoginSuccess;
-      showLoginWidget = true;
-    });
+    onLoginSuccessAction = onLoginSuccess;
+    _removeLoginOverlayEntry();
+
+    void insertLoginOverlay() {
+      if (!mounted) {
+        return;
+      }
+      final overlay = _navigatorKey.currentState?.overlay;
+      if (overlay == null) {
+        return;
+      }
+
+      _loginOverlayEntry = OverlayEntry(
+        builder: (context) => LoginOverlay(
+          onClose: hideLoginOverlay,
+          onLoginSuccess: markLoggedIn,
+        ),
+      );
+      overlay.insert(_loginOverlayEntry!);
+    }
+
+    final overlay = _navigatorKey.currentState?.overlay;
+    if (overlay != null) {
+      insertLoginOverlay();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => insertLoginOverlay());
+    }
   }
 
   void hideLoginOverlay() {
-    setState(() {
-      showLoginWidget = false;
-      onLoginSuccessAction = null;
-    });
+    _removeLoginOverlayEntry();
+    onLoginSuccessAction = null;
   }
 
   void markLoggedIn() {
     final afterLogin = onLoginSuccessAction;
 
-    setState(() {
-      showLoginWidget = false;
-      onLoginSuccessAction = null;
-    });
+    hideLoginOverlay();
 
     context.read<AuthState>().login();
 
     afterLogin?.call();
-
   }
 
   // This widget is the root of your application.
@@ -66,6 +89,8 @@ class _MyAppState extends State<MyApp> {
     final authState = context.watch<AuthState>();
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      navigatorKey: _navigatorKey,
       title: 'iMat',
       theme: ThemeData(
         useMaterial3: false,
@@ -80,16 +105,7 @@ class _MyAppState extends State<MyApp> {
         return LoginOverlayScope(
           isLoggedIn: authState.isLoggedIn,
           showLoginOverlay: showLoginOverlay,
-          child: Stack(
-            children: [
-              ?child,
-              if (showLoginWidget)
-                LoginOverlay(
-                  onClose: hideLoginOverlay,
-                  onLoginSuccess: markLoggedIn,
-                ),
-            ],
-          ),
+          child: child ?? const SizedBox.shrink(),
         );
       },
     );

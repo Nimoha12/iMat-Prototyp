@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/all_products/category_page.dart';
 import 'package:imat_repo/Widgets/Navigation/navbar.dart';
 import 'package:provider/provider.dart';
-import 'package:imat_repo/Widgets/Category/categorized_product_sections.dart';
 import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
-import 'package:imat_repo/layout/imat_scaffold.dart';
+import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 
 class FavoritesPage extends StatefulWidget {
+  static const routeName = '/favorites';
+
   const FavoritesPage({super.key});
 
   @override
@@ -20,8 +21,7 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPageState extends State<FavoritesPage> {
   final ScrollController scrollController = ScrollController();
-  final Map<UiCategory, GlobalKey> sectionKeys = {};
-
+  
   @override
   void dispose() {
     scrollController.dispose();
@@ -36,8 +36,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final favoriteProductsByCategory = <UiCategory, List<Product>>{};
 
     for (final uiCategory in UiCategory.values) {
-      sectionKeys.putIfAbsent(uiCategory, GlobalKey.new);
-
       final categories = categoryMap[uiCategory] ?? [];
       final categoryFavorites = favorites
           .where((p) => categories.contains(p.category))
@@ -48,53 +46,95 @@ class _FavoritesPageState extends State<FavoritesPage> {
       }
     }
 
-    return IMatScaffold(
-      activePage: NavbarPage.favorites,
+    final visibleSections = favoriteProductsByCategory.entries
+        .where((entry) => entry.value.isNotEmpty)
+        .toList();
+
+    return Scaffold(
+      appBar: const IMatNavbar(activePage: NavbarPage.favorites),
+      backgroundColor: IMatColors.beige,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: SingleChildScrollView(
+        // Keep scrollbar at far right while preserving left breathing room.
+        padding: const EdgeInsets.only(left: 24),
+        child: CustomScrollView(
           controller: scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const CloseProfileButton(),
-                  const SizedBox(width: 20),
-                  const Text(
-                    'Favoriter',
-                    style: TextStyle(
-                      fontSize: 44,
-                      fontWeight: FontWeight.bold,
+          slivers: [
+            if (visibleSections.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 24, right: 16, bottom: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CategoryPage(
+                                  uiCategory: visibleSections.first.key,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            visibleSections.first.key.label,
+                            style: IMatText.h3.copyWith(
+                              color: IMatColors.green,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const CloseProfileButton(),
+                    ],
+                  ),
+                ),
+              ),
+            if (favorites.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 24, right: 16),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: const CloseProfileButton(),
+                  ),
+                ),
+              )
+            else ...[
+              lazyProductGridSliver(visibleSections.first.value),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
+              for (final entry in visibleSections.skip(1)) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16, right: 16),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CategoryPage(uiCategory: entry.key),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        entry.key.label,
+                        style: IMatText.h3.copyWith(
+                          color: IMatColors.green,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              if (favorites.isEmpty)
-                Text(
-                  "Du har inga favoritvaror än.",
-                  style: IMatText.bodyM.copyWith(
-                    color: IMatColors.textSecondary,
-                  ),
-                )
-              else
-                CategorizedProductSections(
-                  productsByCategory: favoriteProductsByCategory,
-                  onCategoryHeaderTap: (uiCat) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryPage(uiCategory: uiCat),
-                      ),
-                    );
-                  },
                 ),
+                lazyProductGridSliver(entry.value),
+                const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
+              ],
             ],
-          ),
+          ],
         ),
       ),
     );

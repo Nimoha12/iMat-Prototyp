@@ -87,7 +87,9 @@ class InternetHandler {
   }
 
   static Future<String> getExtras() async {
-    return getEndpoint("extras", id: kGroupId);
+    final body = await getEndpoint("extras", id: kGroupId);
+    // API may return 200 with an empty body when no extras exist yet.
+    return body.trim().isEmpty ? '{}' : body;
   }
 
   static Future<String> getEndpoint(String endPoint, {int id = 0}) async {
@@ -307,4 +309,6 @@ class InternetHandler {
     dbugPrint('getCachedImage $url');
     return _imageCache[url];
   }
+
+  
 }

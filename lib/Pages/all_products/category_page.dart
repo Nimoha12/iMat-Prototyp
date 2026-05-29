@@ -12,7 +12,8 @@ import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
 import 'package:imat_repo/Pages/all_products/subCategoryPage.dart';
 import 'package:imat_repo/Widgets/Category/subcategories.dart';
 import '../../Widgets/Category/ui_categories.dart';
-import '../../Widgets/product/product_card.dart';
+import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
+import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
 class CategoryPage extends StatefulWidget {
   final UiCategory uiCategory;
@@ -31,6 +32,8 @@ class _CategoryPageState extends State<CategoryPage> {
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
   bool filterOpen = false;
+
+  FilterSelection selection = const FilterSelection();
 
   @override
   void initState() {
@@ -57,129 +60,171 @@ class _CategoryPageState extends State<CategoryPage> {
     final allProducts = iMat.selectProducts;
     final groups = subCategoryGroups[widget.uiCategory] ?? [];
 
+    // UX: If this category only has a single subcategory, skip the
+    // intermediate node and show the products for the subcategory directly.
+    // This prevents the user from having to tap "extra" levels in the tree.
+    if (groups.length == 1) {
+      final group = groups.first;
+      return SubCategoryPage(
+        title: group.title,
+        categories: group.categories,
+        parentCategory: widget.uiCategory,
+        showParentBreadcrumb: false,
+      );
+    }
+
     // Filtreringsfunktion
     List<Product> applyFilters(List<Product> products) {
       var list = products;
+
       if (ecoFilter == EcoFilter.eco) {
         list = list.where((p) => p.isEcological).toList();
       } else if (ecoFilter == EcoFilter.inteEco) {
         list = list.where((p) => !p.isEcological).toList();
       }
+
       list = list.where((p) => p.price <= maxPrice).toList();
+
       if (sortBy == "priceAsc") {
         list.sort((a, b) => a.price.compareTo(b.price));
       } else if (sortBy == "priceDesc") {
         list.sort((a, b) => b.price.compareTo(a.price));
       }
+
       return list;
     }
 
+    final breadcrumbItems = [
+      BreadcrumbItem(
+        label: "Alla varor",
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AllCategoriesPage(),
+            ),
+          );
+        },
+      ),
+      BreadcrumbItem(label: widget.uiCategory.label),
+    ];
+
     return IMatScaffold(
+      breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
           // Huvudinnehåll
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: SingleChildScrollView(
+              child: CustomScrollView(
                 controller: _scrollController,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ✅ Breadcrumbs
-                    BreadcrumbBar(
-                      items: [
-                        BreadcrumbItem(
-                          label: "Alla varor",
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const AllCategoriesPage(),
-                              ),
-                            );
-                          },
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BreadcrumbBar(
+                          items: [
+                            BreadcrumbItem(
+                              label: "Alla varor",
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AllCategoriesPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            BreadcrumbItem(label: widget.uiCategory.label),
+                          ],
                         ),
-                        BreadcrumbItem(label: widget.uiCategory.label),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Rubrik + filterknapp
-                    SizedBox(
-                      width: 1396,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(widget.uiCategory.label, style: IMatText.h2),
-                          FilterButton(
-                            onPressed: () => setState(() => filterOpen = true),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: 1396,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(widget.uiCategory.label, style: IMatText.h2),
+                              FilterButton(
+                                onPressed: () =>
+                                    setState(() => filterOpen = true),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Underkategorier
-                    if (groups.isNotEmpty)
-                      Wrap(
-                        spacing: 16,
-                        runSpacing: 16,
-                        children: groups.map((g) {
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => SubCategoryPage(
-                                    title: g.title,
-                                    categories: g.categories,
-                                    parentCategory: widget.uiCategory, // ✅ fix
+                        ),
+                        const SizedBox(height: 24),
+                        if (groups.isNotEmpty)
+                          Wrap(
+                            spacing: 16,
+                            runSpacing: 16,
+                            children: groups.map((g) {
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => SubCategoryPage(
+                                        title: g.title,
+                                        categories: g.categories,
+                                        parentCategory: widget.uiCategory,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    color: IMatColors.green,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: IMatColors.border,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 22,
+                                      vertical: 16,
+                                    ),
+                                    child: Text(
+                                      g.title,
+                                      style: IMatText.bodyM.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: IMatColors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               );
-                            },
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                color: IMatColors.green,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: IMatColors.border),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 22, vertical: 16),
-                                child: Text(
-                                  g.title,
-                                  style: IMatText.bodyM.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: IMatColors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                            }).toList(),
+                          ),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                  for (final group in groups)
+                    ...() {
+                      // Multi-select underkategorier: om något är valt, visa bara de valda
+                      if (selection.selectedSubCategories.isNotEmpty &&
+                          !selection.selectedSubCategories.contains(
+                            group.title,
+                          )) {
+                        return <Widget>[];
+                      }
 
-                    const SizedBox(height: 32),
+                      final filtered = applyFilters(
+                        allProducts
+                            .where((p) => group.categories.contains(p.category))
+                            .toList(),
+                      );
+                      if (filtered.isEmpty) return <Widget>[];
 
-                    // Produktsektioner
-                    ...groups.map((group) {
-                      final subProducts = allProducts
-                          .where((p) => group.categories.contains(p.category))
-                          .toList();
-                      final filtered = applyFilters(subProducts);
-                      if (filtered.isEmpty) return const SizedBox.shrink();
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 48),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
+                      return [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -187,7 +232,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                     builder: (_) => SubCategoryPage(
                                       title: group.title,
                                       categories: group.categories,
-                                      parentCategory: widget.uiCategory, // ✅ fix
+                                      parentCategory: widget.uiCategory,
                                     ),
                                   ),
                                 );
@@ -200,23 +245,15 @@ class _CategoryPageState extends State<CategoryPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            Wrap(
-                              spacing: 24,
-                              runSpacing: 24,
-                              children: filtered.map((product) {
-                                return SizedBox(
-                                  width: 260,
-                                  child: ProductCard(product: product),
-                                );
-                              }).toList(),
-                            ),
-                          ],
+                          ),
                         ),
-                      );
-                    }),
-                  ],
-                ),
+                        lazyProductGridSliver(filtered),
+                        const SliverPadding(
+                          padding: EdgeInsets.only(bottom: 32),
+                        ),
+                      ];
+                    }(),
+                ],
               ),
             ),
           ),
@@ -249,9 +286,15 @@ class _CategoryPageState extends State<CategoryPage> {
               onEcoChange: (v) => setState(() => ecoFilter = v),
               sortBy: sortBy,
               onSortChange: (v) => setState(() => sortBy = v),
-              selectedCategory: null,
-              onCategoryChange: (_) {},
+              selection: selection,
+              onSelectionChanged: (s) => setState(() => selection = s),
+              contextCategory: widget.uiCategory,
               onClose: () => setState(() => filterOpen = false),
+              onApplyFilters: () {
+                setState(() {
+                  filterOpen = false;
+                });
+              },
             ),
           ),
 

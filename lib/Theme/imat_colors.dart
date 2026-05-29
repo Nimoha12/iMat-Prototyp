@@ -7,6 +7,8 @@ class IMatColors {
 
   // Lättare bakgrundsgrön för hover och sekundära ytor (#E4F0EC → #E8F3EF)
   static const greenLight = Color(0xFFE8F3EF);
+  // Gråare grön för markerad navbar-ikon
+  static const navSelectedBackground = Color.fromRGBO(255, 255, 255, 0.80);
 
   // Hover-färg något ljusare för bättre synlighet (#3F8571 → #4A947E)
   static const greenHover = Color(0xFF4A947E);

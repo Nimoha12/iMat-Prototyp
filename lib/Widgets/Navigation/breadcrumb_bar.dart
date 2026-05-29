@@ -87,3 +87,25 @@ class BreadcrumbItem {
     this.onTap,
   });
 }
+
+/// Breadcrumbs for [SearchPage]: [prefix…, Sök]. Tapping a prefix segment pops
+/// back through routes that were open before search was opened.
+List<BreadcrumbItem> buildSearchBreadcrumbs(
+  BuildContext context,
+  List<BreadcrumbItem> prefix,
+) {
+  return [
+    for (var i = 0; i < prefix.length; i++)
+      BreadcrumbItem(
+        label: prefix[i].label,
+        onTap: () {
+          final pops = prefix.length - i;
+          final navigator = Navigator.of(context);
+          for (var p = 0; p < pops && navigator.canPop(); p++) {
+            navigator.pop();
+          }
+        },
+      ),
+    BreadcrumbItem(label: 'Sök'),
+  ];
+}

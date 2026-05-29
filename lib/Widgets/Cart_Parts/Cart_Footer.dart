@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/checkout_page.dart';
+import 'package:imat_repo/Theme/imat_buttons.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -49,151 +50,39 @@ class _CartFooterState extends State<CartFooter> {
 
           const SizedBox(height: 22),
 
-          if (canUndoClear)
-            SizedBox(
-              width: double.infinity,
-              height: 58,
-              child: OutlinedButton(
-                onPressed: iMatHandler.shoppingCartUndoClear,
-                child: const Text("Ångra", style: TextStyle(fontSize: 22)),
-              ),
-            )
-          else if (!cartIsEmpty)
-            _ClearCartButton(
-              isExpanded: _showClearConfirmation,
-              onToggle: () {
-                setState(() {
-                  _showClearConfirmation = true;
-                });
+          // Checkout-knapp
+          SizedBox(
+            width: double.infinity,
+            height: 62,
+            child: ElevatedButton(
+              style: IMatButton.primaryGreen,
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    settings: const RouteSettings(name: '/checkout'),
+                    builder: (_) => const CheckoutPage(),
+                  ),
+                );
               },
-              onCancel: () {
-                setState(() {
-                  _showClearConfirmation = false;
-                });
-              },
-              onClear: () {
-                iMatHandler.shoppingCartClear();
-                setState(() {
-                  _showClearConfirmation = false;
-                });
-              },
-            ),
-
-          if (!cartIsEmpty && !_showClearConfirmation) ...[
-            const SizedBox(height: 18),
-            // Checkout-knapp
-            SizedBox(
-              width: double.infinity,
-              height: 64,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      settings: const RouteSettings(name: '/checkout'),
-                      builder: (_) => const CheckoutPage(),
-                    ),
-                  );
-                },
-                child: const Text(
-                  "Gå till checkout",
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ClearCartButton extends StatelessWidget {
-  final bool isExpanded;
-  final VoidCallback onToggle;
-  final VoidCallback onCancel;
-  final VoidCallback onClear;
-
-  const _ClearCartButton({
-    required this.isExpanded,
-    required this.onToggle,
-    required this.onCancel,
-    required this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final borderColor = Theme.of(context).colorScheme.outline;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      width: double.infinity,
-      height: isExpanded ? 134 : 58,
-      decoration: BoxDecoration(
-        border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isExpanded ? null : onToggle,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Töm varukorg", style: TextStyle(fontSize: 22)),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 160),
-                  child: isExpanded
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 14),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: SizedBox(
-                                  height: 48,
-                                  child: ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red.shade700,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    onPressed: onClear,
-                                    icon: const Icon(Icons.delete_outline),
-                                    label: const Text(
-                                      "Töm",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: SizedBox(
-                                  height: 48,
-                                  child: OutlinedButton(
-                                    onPressed: onCancel,
-                                    child: const Text(
-                                      "Avbryt",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ],
+              child: const Text('Gå till checkout'),
             ),
           ),
-        ),
+
+          const SizedBox(height: 18),
+
+          // Töm varukorg-knapp
+          SizedBox(
+            width: double.infinity,
+            height: 62,
+            child: OutlinedButton(
+              onPressed: () {
+                iMatHandler.shoppingCartClear();
+              },
+              style: IMatButton.outlinedGreen,
+              child: const Text('Töm varukorg'),
+            ),
+          ),
+        ],
       ),
     );
   }

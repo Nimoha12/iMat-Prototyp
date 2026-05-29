@@ -1,3 +1,7 @@
+// ==========================
+// NAV_ICON.DART
+// ==========================
+
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 
@@ -17,41 +21,49 @@ class NavIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Förbättrad kontrast och tydlighet för äldre användare
     final iconColor = selected ? IMatColors.green : IMatColors.white;
-    final textColor = selected ? IMatColors.greenHover : IMatColors.white;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        width: 120, // något bredare för luft
-        height: 88, // högre för större ikon + text
-        color: selected
-            ? IMatColors.greenLight // ljus bakgrund vid val
-            : Colors.transparent,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Större ikon för bättre synlighet
-            Icon(
-              icon,
-              color: iconColor,
-              size: 38, // tidigare 32
+    final textColor = selected ? IMatColors.green : IMatColors.white;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Material(
+        color: selected ? IMatColors.greenLight : Colors.transparent,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+
+        child: InkWell(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(14),
+            topRight: Radius.circular(14),
+          ),
+          splashColor: IMatColors.green.withOpacity(0.2),
+          onTap: onTap,
+          child: SizedBox(
+            width: 108,
+            height: 84,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: iconColor, size: 34),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15.5,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            // Större text med bättre kontrast
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 16, // tidigare 12
-                letterSpacing: 0.3, // lite mer luft mellan bokstäver
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

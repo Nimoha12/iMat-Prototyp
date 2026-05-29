@@ -1,57 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Widgets/product/product_card.dart';
 import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/model/imat/product.dart';
 
-class CategorizedProductSections extends StatelessWidget {
+/// Builds category headers and lazy product grids as slivers for a parent
+/// [CustomScrollView]. Do not nest inside another scrollable.
+class CategorizedProductSections {
   final Map<UiCategory, List<Product>> productsByCategory;
   final void Function(UiCategory) onCategoryHeaderTap;
 
   const CategorizedProductSections({
-    super.key,
     required this.productsByCategory,
     required this.onCategoryHeaderTap,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: productsByCategory.entries.map((entry) {
-        if (entry.value.isEmpty) return SizedBox.shrink();
+  List<Widget> buildSlivers() {
+    final slivers = <Widget>[];
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 48),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => onCategoryHeaderTap(entry.key),
-                child: Text(
-                  entry.key.label,
-                  style: IMatText.h3.copyWith(
-                    color: IMatColors.green,
-                    decoration: TextDecoration.underline,
-                  ),
+    for (final entry in productsByCategory.entries) {
+      if (entry.value.isEmpty) continue;
+
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: GestureDetector(
+              onTap: () => onCategoryHeaderTap(entry.key),
+              child: Text(
+                entry.key.label,
+                style: IMatText.h3.copyWith(
+                  color: IMatColors.green,
+                  decoration: TextDecoration.underline,
                 ),
               ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                children: entry.value.map((product) {
-                  return SizedBox(
-                    width: 260,
-                    child: ProductCard(product: product),
-                  );
-                }).toList(),
-              ),
-            ],
+            ),
           ),
-        );
-      }).toList(),
-    );
+        ),
+      );
+      slivers.add(lazyProductGridSliver(entry.value));
+      slivers.add(const SliverPadding(padding: EdgeInsets.only(bottom: 32)));
+    }
+
+    return slivers;
   }
 }

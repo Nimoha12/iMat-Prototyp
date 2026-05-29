@@ -21,30 +21,139 @@ class AddToCartButton extends StatelessWidget {
     return 0;
   }
 
+  Future<void> _showEditAmountDialog(
+    BuildContext context,
+    int currentAmount,
+    ImatDataHandler iMat,
+  ) async {
+    final controller = TextEditingController(text: currentAmount.toString());
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: IMatColors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 32,
+            vertical: 24,
+          ), // större dialog
+          titlePadding: const EdgeInsets.fromLTRB(32, 32, 32, 12),
+          contentPadding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 14),
+
+          title: Text(
+            "Ange antal",
+            style: IMatText.headingL.copyWith(
+              color: IMatColors.green,
+            )
+              // större text
+          ),
+
+          content: SizedBox(
+            width: 360, // gör dialogen bredare
+            child: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              style: IMatText.bodyL, // större text
+              decoration: InputDecoration(
+                hintText: "Skriv antal...",
+                hintStyle: IMatText.bodyM.copyWith(
+                  color: IMatColors.textSecondary,
+                ),
+                filled: true,
+                fillColor: IMatColors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 22, // större klickyta
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: const BorderSide(
+                    color: IMatColors.border,
+                    width: 1.4,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          actions: [
+            SizedBox(
+              height: 58, // större knappar
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Avbryt", style: IMatText.bodyL.copyWith(
+                  fontWeight: FontWeight.w600
+                ),),
+              ),
+            ),
+            SizedBox(
+              height: 58,
+              child: TextButton(
+                onPressed: () {
+                  final value = int.tryParse(controller.text);
+
+                  if (value == null || value < 0) {
+                    Navigator.pop(context);
+                    return;
+                  }
+
+                  if (value == 0) {
+                    iMat.shoppingCartRemove(ShoppingItem(product));
+                  } else {
+                    iMat.shoppingCartSet(
+                      ShoppingItem(product, amount: value.toDouble()),
+                    );
+                  }
+
+                  Navigator.pop(context);
+                },
+                child: Text("OK", style: IMatText.bodyL.copyWith(
+                   fontWeight: FontWeight.w600
+
+                )),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final iMat = context.watch<ImatDataHandler>();
     final cart = iMat.getShoppingCart();
-
     final int quantity = getAmount(cart, product);
 
-    // --- 1. INTE I KUNDVAGNEN ---
+    // INTE I KUNDVAGNEN
     if (quantity == 0) {
       return GestureDetector(
         onTap: () {
           iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
         },
         child: Container(
-          height: 52,
+          height: 68, // större, mer premium
           decoration: BoxDecoration(
             color: IMatColors.green,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.add, color: IMatColors.white, size: 26),
-              const SizedBox(width: 8),
+              const Icon(Icons.add, color: IMatColors.white, size: 32),
+              const SizedBox(width: 10),
               Text(
                 "Lägg till",
                 style: IMatText.bodyL.copyWith(
@@ -58,13 +167,20 @@ class AddToCartButton extends StatelessWidget {
       );
     }
 
-    // --- 2. I KUNDVAGNEN → MÄNGDKONTROLL ---
+    //  KUNDVAGNEN
     return Container(
-      height: 52,
+      height: 68,
       decoration: BoxDecoration(
         color: IMatColors.greenLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: IMatColors.green, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,26 +195,36 @@ class AddToCartButton extends StatelessWidget {
               }
             },
             child: Container(
-              width: 52,
+              width: 68,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: IMatColors.green,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
                 Icons.remove,
-                size: 28,
+                size: 32,
                 color: IMatColors.white,
               ),
             ),
           ),
 
           // ANTAL
-          Text(
-            quantity.toString(),
-            style: IMatText.h3.copyWith(
-              fontWeight: FontWeight.bold,
-              color: IMatColors.black,
+          GestureDetector(
+            behavior:
+                HitTestBehavior.translucent, // fångar ALLA klick i området
+            onTap: () => _showEditAmountDialog(context, quantity, iMat),
+            child: Container(
+              width: 110, // större klickyta, mycket enklare för äldre
+              height: double.infinity,
+              alignment: Alignment.center,
+              child: Text(
+                quantity.toString(),
+                style: IMatText.h2.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: IMatColors.black,
+                ),
+              ),
             ),
           ),
 
@@ -108,13 +234,13 @@ class AddToCartButton extends StatelessWidget {
               iMat.shoppingCartUpdate(ShoppingItem(product), delta: 1);
             },
             child: Container(
-              width: 52,
+              width: 68,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: IMatColors.green,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(Icons.add, size: 28, color: IMatColors.white),
+              child: const Icon(Icons.add, size: 32, color: IMatColors.white),
             ),
           ),
         ],

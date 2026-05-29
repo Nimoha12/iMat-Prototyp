@@ -6,6 +6,7 @@ import 'package:imat_repo/Pages/favorites/favorites_page.dart';
 import 'package:imat_repo/Pages/history/history_page.dart';
 import 'package:imat_repo/Pages/search/search_page.dart';
 import 'package:imat_repo/Widgets/Cart_Parts/Cart.dart';
+import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/cart.button.dart';
 import 'package:imat_repo/Widgets/home/login_overlay_scope.dart';
 import 'package:imat_repo/model/AuthState.dart';
@@ -17,11 +18,13 @@ import 'logo.dart';
 
 enum NavbarPage { none, favorites, history, profile }
 
-class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
+class IMatNavbar extends StatefulWidget
+    implements PreferredSizeWidget {
   final VoidCallback? onLoginTap;
   final NavbarPage activePage;
   final String? searchQuery;
   final bool highlightSearchQuery;
+  final List<BreadcrumbItem> breadcrumbContext;
 
   const IMatNavbar({
     super.key,
@@ -29,20 +32,23 @@ class IMatNavbar extends StatefulWidget implements PreferredSizeWidget {
     this.activePage = NavbarPage.none,
     this.searchQuery,
     this.highlightSearchQuery = false,
+    this.breadcrumbContext = const [],
   });
 
   @override
   State<IMatNavbar> createState() => _IMatNavbarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(88); // något högre för större innehåll
+  Size get preferredSize => const Size.fromHeight(84);
 }
 
 class _IMatNavbarState extends State<IMatNavbar>
     with SingleTickerProviderStateMixin {
   final SpeechToText _speech = SpeechToText();
 
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller =
+      TextEditingController();
+
   final FocusNode _searchFocusNode = FocusNode();
 
   bool _isListening = false;
@@ -148,6 +154,7 @@ class _IMatNavbarState extends State<IMatNavbar>
 
         if (result.finalResult) {
           _stopListening();
+
           _onSearchSubmitted(
             context,
             result.recognizedWords,
@@ -168,30 +175,79 @@ class _IMatNavbarState extends State<IMatNavbar>
     _pulseController.value = 1.0;
   }
 
+  NavbarPage _resolvedActivePage(BuildContext context) {
+    if (widget.activePage != NavbarPage.none) {
+      return widget.activePage;
+    }
+
+    final routeName = ModalRoute.of(context)?.settings.name;
+    if (routeName == FavoritesPage.routeName) {
+      return NavbarPage.favorites;
+    }
+    if (routeName == HistoryPage.routeName) {
+      return NavbarPage.history;
+    }
+    if (routeName == ProfilePage.routeName) {
+      return NavbarPage.profile;
+    }
+
+    return NavbarPage.none;
+  }
+
+  bool _isOnNavbarPage(BuildContext context) {
+    return _resolvedActivePage(context) != NavbarPage.none;
+  }
+
+  void _navigateToNavbarPage(
+    BuildContext context,
+    Widget page,
+    String routeName,
+  ) {
+    final route = MaterialPageRoute(
+      settings: RouteSettings(name: routeName),
+      builder: (_) => page,
+    );
+
+    if (_isOnNavbarPage(context)) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
+  }
+
   void _onFavoritesTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.favorites) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const FavoritesPage(),
-      ),
+      const FavoritesPage(),
+      FavoritesPage.routeName,
     );
   }
 
   void _onHistoryTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.history) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const HistoryPage(),
-      ),
+      const HistoryPage(),
+      HistoryPage.routeName,
     );
   }
 
   void _onUserTapLoggedIn(BuildContext context) {
-    Navigator.push(
+    if (_resolvedActivePage(context) == NavbarPage.profile) {
+      return;
+    }
+
+    _navigateToNavbarPage(
       context,
-      MaterialPageRoute(
-        builder: (_) => const ProfilePage(),
-      ),
+      const ProfilePage(),
+      ProfilePage.routeName,
     );
   }
 
@@ -209,14 +265,22 @@ class _IMatNavbarState extends State<IMatNavbar>
 
     _flashSearchField();
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SearchPage(
-          query: trimmedQuery,
-        ),
+    final route = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: SearchPage.routeName),
+      builder: (_) => SearchPage(
+        query: trimmedQuery,
+        breadcrumbContext: widget.breadcrumbContext,
       ),
     );
+
+    final alreadyOnSearch =
+        ModalRoute.of(context)?.settings.name == SearchPage.routeName;
+
+    if (alreadyOnSearch) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
   }
 
   @override
@@ -238,7 +302,7 @@ class _IMatNavbarState extends State<IMatNavbar>
     return AppBar(
       backgroundColor: IMatColors.green,
       elevation: 0,
-      toolbarHeight: 88,
+      toolbarHeight: 84,
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       title: LayoutBuilder(
@@ -248,7 +312,7 @@ class _IMatNavbarState extends State<IMatNavbar>
 
           return Row(
             children: [
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
 
               IMatLogo(
                 onTap: () {
@@ -260,32 +324,46 @@ class _IMatNavbarState extends State<IMatNavbar>
                 },
               ),
 
-              const SizedBox(width: 24),
+              const SizedBox(width: 28),
 
+              // SEARCH
               Expanded(
                 flex: isSmallScreen ? 2 : 3,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                  padding: const EdgeInsets.only(
+                    right: 18,
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxWidth: 620,
+                        maxWidth: 560,
                       ),
                       child: AnimatedContainer(
                         duration: const Duration(
                           milliseconds: 700,
                         ),
                         curve: Curves.easeOutCubic,
-                        height: 46,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: _isSearchFlashActive
-                              ? const Color.fromARGB(255, 32, 32, 32)
+                              ? const Color.fromARGB(
+                                  255,
+                                  32,
+                                  32,
+                                  32,
+                                )
                               : Colors.white,
                           borderRadius:
-                              BorderRadius.circular(10),
+                              BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withOpacity(0.08),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: TextField(
                           controller: _controller,
@@ -293,36 +371,42 @@ class _IMatNavbarState extends State<IMatNavbar>
                           cursorColor: IMatColors.black,
                           textInputAction:
                               TextInputAction.search,
-
-                          style: IMatText.bodyM.copyWith(
+                          style:
+                              IMatText.bodyM.copyWith(
                             color: IMatColors.black,
-                            fontSize: 25,
+                            fontSize: 18,
                             decoration:
                                 TextDecoration.none,
                           ),
-
                           onSubmitted: (query) {
                             _onSearchSubmitted(
                               context,
                               query,
                             );
                           },
-
                           decoration: InputDecoration(
                             hintText: "Sök varor...",
 
                             hintStyle:
                                 IMatText.bodyM.copyWith(
-                              color: const Color.fromARGB(255, 53, 53, 53),
+                              color:
+                                  const Color.fromARGB(
+                                255,
+                                70,
+                                70,
+                                70,
+                              ),
+                              fontSize: 17,
                             ),
 
                             prefixIcon: const Icon(
                               Icons.search,
                               color: IMatColors.black,
-                              size: 28,
+                              size: 24,
                             ),
 
-                            suffixIcon: GestureDetector(
+                            suffixIcon:
+                                GestureDetector(
                               onTap: () {
                                 _isListening
                                     ? _stopListening()
@@ -334,19 +418,22 @@ class _IMatNavbarState extends State<IMatNavbar>
                                 builder:
                                     (context, child) {
                                   return Transform.scale(
-                                    scale: _isListening
-                                        ? _pulseController
-                                            .value
-                                        : 1.0,
+                                    scale:
+                                        _isListening
+                                            ? _pulseController
+                                                .value
+                                            : 1.0,
                                     child: Icon(
                                       _isListening
                                           ? Icons.mic
-                                          : Icons.mic_none,
-                                      color: _isListening
-                                          ? Colors.red
-                                          : IMatColors
-                                              .black,
-                                      size: 28,
+                                          : Icons
+                                              .mic_none,
+                                      color:
+                                          _isListening
+                                              ? Colors.red
+                                              : IMatColors
+                                                  .black,
+                                      size: 24,
                                     ),
                                   );
                                 },
@@ -356,7 +443,7 @@ class _IMatNavbarState extends State<IMatNavbar>
                             contentPadding:
                                 const EdgeInsets.symmetric(
                               horizontal: 16,
-                              vertical: 10,
+                              vertical: 11,
                             ),
 
                             border: InputBorder.none,
@@ -368,21 +455,27 @@ class _IMatNavbarState extends State<IMatNavbar>
                 ),
               ),
 
-              CartButton(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      opaque: false,
-                      pageBuilder:
-                          (
-                            context,
-                            animation,
-                            secondaryAnimation,
-                          ) => const Cart(),
-                    ),
-                  );
-                },
+              // CART
+              Padding(
+                padding: const EdgeInsets.only(
+                  right: 10,
+                ),
+                child: CartButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        opaque: false,
+                        pageBuilder:
+                            (
+                              context,
+                              animation,
+                              secondaryAnimation,
+                            ) => const Cart(),
+                      ),
+                    );
+                  },
+                ),
               ),
 
               NavIcon(
@@ -396,7 +489,8 @@ class _IMatNavbarState extends State<IMatNavbar>
                         : Icons.favorite_border,
                 label: "Favoriter",
                 onTap: isLoggedIn
-                    ? () => _onFavoritesTapLoggedIn(
+                    ? () =>
+                        _onFavoritesTapLoggedIn(
                           context,
                         )
                     : () => showLogin(
@@ -415,7 +509,9 @@ class _IMatNavbarState extends State<IMatNavbar>
                 label: "Historik",
                 onTap: isLoggedIn
                     ? () =>
-                        _onHistoryTapLoggedIn(context)
+                        _onHistoryTapLoggedIn(
+                          context,
+                        )
                     : () => showLogin(
                           onLoginSuccess: () =>
                               _onHistoryTapLoggedIn(
@@ -438,16 +534,17 @@ class _IMatNavbarState extends State<IMatNavbar>
                     ? Icons.account_circle
                     : Icons.person_outline,
                 label: isLoggedIn
-                    ? "Användare"
+                    ? "Profil"
                     : "Logga in",
                 onTap: isLoggedIn
-                    ? () => _onUserTapLoggedIn(
+                    ? () =>
+                        _onUserTapLoggedIn(
                           context,
                         )
                     : () => showLogin(),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
             ],
           );
         },
