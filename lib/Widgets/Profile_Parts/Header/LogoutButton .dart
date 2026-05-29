@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:imat_repo/Pages/home_page.dart';
 import 'package:imat_repo/Theme/imat_theme.dart';
+import 'package:imat_repo/Widgets/Navigation/module_navigation.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:provider/provider.dart';
 
@@ -58,15 +58,12 @@ class _LogoutButtonState extends State<LogoutButton> {
   }
 
   void _logout() {
-    _removeWarning();
-    context.read<AuthState>().logout();
+  _removeWarning();
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
-      (route) => false,
-    );
-  }
+  context.read<AuthState>().logout();
+
+  ModuleNavigation.exit(context);
+}
 
   @override
   Widget build(BuildContext context) {

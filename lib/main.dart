@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Pages/Profile_page.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart'; // Provider
@@ -102,6 +103,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/checkout': (_) => const CheckoutPage(),
         HelpPage.routeName: (_) => const HelpPage(),
+        '/profile':(context) => const ProfilePage(), 
       },
       builder: (context, child) {
         return LoginOverlayScope(

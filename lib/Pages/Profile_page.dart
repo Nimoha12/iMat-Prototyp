@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Widgets/Navigation/navbar.dart';
-import 'package:imat_repo/Widgets/Profile_Parts/Header/LogoutButton%20.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
+import 'package:imat_repo/Widgets/Profile_Parts/Header/LogoutButton%20.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/profile_constants.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/profile_editable_field.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/profile_module_tabs.dart';
@@ -233,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       horizontalPadding,
-                      96,
+                      12,
                       horizontalPadding,
                       34,
                     ),
@@ -242,22 +242,35 @@ class _ProfilePageState extends State<ProfilePage> {
                         constraints: const BoxConstraints(
                           maxWidth: profileMaxWidth,
                         ),
-                        child: ProfileModuleTabs(
-                          tabs: [
-                            ProfileModuleTab(
-                              title: accountTabTitle,
-                              icon: Icons.person,
-                              child: _buildAccountModule(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: const [
+                                  LogoutButton()
+                                
+                              ],
                             ),
-                            ProfileModuleTab(
-                              title: addressTabTitle,
-                              icon: Icons.home,
-                              child: _buildAddressModule(),
-                            ),
-                            ProfileModuleTab(
-                              title: paymentTabTitle,
-                              icon: Icons.credit_card,
-                              child: _buildPaymentModule(),
+                            const SizedBox(height: 36),
+                            ProfileModuleTabs(
+                              tabs: [
+                                ProfileModuleTab(
+                                  title: accountTabTitle,
+                                  icon: Icons.person,
+                                  child: _buildAccountModule(),
+                                ),
+                                ProfileModuleTab(
+                                  title: addressTabTitle,
+                                  icon: Icons.home,
+                                  child: _buildAddressModule(),
+                                ),
+                                ProfileModuleTab(
+                                  title: paymentTabTitle,
+                                  icon: Icons.credit_card,
+                                  child: _buildPaymentModule(),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -265,7 +278,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                const Positioned(top: 24, left: 24, child: LogoutButton()),
                 const Positioned(
                   top: 12,
                   right: 16,
@@ -292,8 +304,15 @@ class _ProfilePageState extends State<ProfilePage> {
               controller: _firstNameController,
               onSave: (value) => _saveCustomer(firstName: value),
             ),
+
+            ProfileEditableField(
+              label: 'Användarnamn',
+              controller: _userNameController,
+              onSave: _saveUserName,
+            ),
             ProfileEditableField(
               label: 'E-post',
+              helperText: 'Detta kommer användas som e-post för faktura.',
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               onSave: (value) {
@@ -301,10 +320,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 _saveCustomer(email: value);
               },
             ),
+
             ProfileEditableField(
-              label: 'Efternamn',
-              controller: _lastNameController,
-              onSave: (value) => _saveCustomer(lastName: value),
+              label: 'Mobilnummer',
+              helperText:
+                  'Detta kommer användas som mobilnummer för faktura och Swish.',
+              controller: _mobilePhoneController,
+              keyboardType: TextInputType.phone,
+              onSave: (value) {
+                _invoicePhoneController.text = value;
+                _saveCustomer(mobilePhone: value);
+              },
             ),
 
             ProfileEditableField(
@@ -316,16 +342,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 _saveCustomer(mobilePhone: value);
               },
             ),
+
             ProfileEditableField(
               label: 'Telefon',
               controller: _phoneController,
               keyboardType: TextInputType.phone,
               onSave: (value) => _saveCustomer(phone: value),
-            ),
-            ProfileEditableField(
-              label: 'Användarnamn',
-              controller: _userNameController,
-              onSave: _saveUserName,
             ),
           ],
         ),
@@ -410,29 +432,6 @@ class _ProfilePageState extends State<ProfilePage> {
               keyboardType: TextInputType.number,
               maxLength: 4,
               onSave: (value) => _saveCard(year: value),
-            ),
-          ],
-        ),
-        ProfileFieldGroup(
-          title: 'Faktura',
-          fields: [
-            ProfileEditableField(
-              label: 'Faktura e-post',
-              controller: _invoiceEmailController,
-              keyboardType: TextInputType.emailAddress,
-              onSave: (value) {
-                _emailController.text = value;
-                _saveCustomer(email: value);
-              },
-            ),
-            ProfileEditableField(
-              label: 'Faktura telefon',
-              controller: _invoicePhoneController,
-              keyboardType: TextInputType.phone,
-              onSave: (value) {
-                _mobilePhoneController.text = value;
-                _saveCustomer(mobilePhone: value);
-              },
             ),
           ],
         ),
