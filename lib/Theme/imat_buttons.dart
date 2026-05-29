@@ -40,6 +40,15 @@ class IMatButton {
     textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
   );
 
+  static ButtonStyle outlinedRed = OutlinedButton.styleFrom(
+    foregroundColor: IMatColors.danger,
+    side: const BorderSide(color: IMatColors.danger, width: 2),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    textStyle: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
+  );
+
   static ButtonStyle primaryGreen = ElevatedButton.styleFrom(
     backgroundColor: IMatColors.green,
     disabledBackgroundColor: IMatColors.border,

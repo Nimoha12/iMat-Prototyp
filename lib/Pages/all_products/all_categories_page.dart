@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Widgets/product/product_filter_overlay.dart';
 import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
 import 'package:provider/provider.dart';
 
@@ -33,10 +34,31 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
 
   FilterSelection selection = const FilterSelection();
 
-  bool filterOpen = false;
-
   final ScrollController _scrollController = ScrollController();
   bool showScrollButton = false;
+
+  void _openFilter(BuildContext context) {
+    ProductFilterOverlay.show(
+      context,
+      maxPrice: maxPrice,
+      ecoFilter: ecoFilter,
+      sortBy: sortBy,
+      selection: selection,
+      onChanged: ({
+        required maxPrice,
+        required ecoFilter,
+        required sortBy,
+        required selection,
+      }) {
+        setState(() {
+          this.maxPrice = maxPrice;
+          this.ecoFilter = ecoFilter;
+          this.sortBy = sortBy;
+          this.selection = selection;
+        });
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -114,23 +136,23 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(
-                          items: [BreadcrumbItem(label: "Alla varor")],
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: BreadcrumbBar(
+                                items: [
+                                  BreadcrumbItem(label: "Alla varor"),
+                                ],
+                              ),
+                            ),
+                            FilterButton(
+                              onPressed: () => _openFilter(context),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: 1396,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Alla varor", style: IMatText.h2),
-                              FilterButton(
-                                onPressed: () =>
-                                    setState(() => filterOpen = true),
-                              ),
-                            ],
-                          ),
-                        ),
+                        Text("Alla varor", style: IMatText.h2),
                         const SizedBox(height: 24),
                         CategoryQuickAccessGrid(
                           onRecommendedTap: () {
@@ -167,43 +189,6 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
                   ).buildSlivers(),
                 ],
               ),
-            ),
-          ),
-
-          if (filterOpen)
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => setState(() => filterOpen = false),
-                child: AnimatedOpacity(
-                  opacity: filterOpen ? 1 : 0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Container(color: Colors.black.withOpacity(0.45)),
-                ),
-              ),
-            ),
-
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            right: filterOpen ? 0 : -350,
-            top: 0,
-            bottom: 0,
-            child: ProductFilterPanel(
-              maxPrice: maxPrice,
-              onPriceChange: (v) => setState(() => maxPrice = v),
-              ecoFilter: ecoFilter,
-              onEcoChange: (v) => setState(() => ecoFilter = v),
-              sortBy: sortBy,
-              onSortChange: (v) => setState(() => sortBy = v),
-              selection: selection,
-              onSelectionChanged: (s) => setState(() => selection = s),
-              contextCategory: null,
-              onClose: () => setState(() => filterOpen = false),
-              onApplyFilters: () {
-                setState(() {
-                  filterOpen = false;
-                });
-              },
             ),
           ),
 

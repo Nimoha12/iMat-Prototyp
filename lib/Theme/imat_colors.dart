@@ -27,4 +27,8 @@ class IMatColors {
 
   static const chipBackground = Color(0xFFF1F1F1);
   static const selectedChip = Color(0xFF3A7D6B); // matchar huvudgrön
+
+  /// Destructive actions (logga ut, töm varukorg, rensa filter).
+  static const danger = Color(0xFF8B1E1E);
+  static const dangerLight = Color(0xFFFFF1F1);
 }

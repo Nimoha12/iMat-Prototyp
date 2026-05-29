@@ -1,6 +1,4 @@
 kategori: Varukorg
-titel: Töm varukorgen och ångra
+titel: Töm varukorgen
 
-När du trycker på Töm varukorg får du först bekräfta valet. Tryck på Töm för att ta bort alla varor, eller Avbryt om du vill behålla varukorgen.
-
-Efter att varukorgen tömts visas Ångra. Den kan användas för att lägga tillbaka varorna som togs bort. Ångra finns kvar tills du lägger till något nytt i varukorgen.
+När du trycker på Töm varukorg försvinner texten och du får bekräfta valet. Tryck på Töm för att ta bort alla varor, eller Avbryt om du vill behålla varukorgen.

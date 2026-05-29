@@ -6,6 +6,7 @@ import 'package:imat_repo/Widgets/Category/product_ui_category_extension.dart';
 import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
+import 'package:imat_repo/Widgets/product/product_filter_overlay.dart';
 import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
 import 'package:imat_repo/Widgets/product/filter_selection.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
@@ -30,10 +31,31 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
-  bool filterOpen = false;
-
   // Multi-select kategori
   FilterSelection selection = const FilterSelection();
+
+  void _openFilter(BuildContext context) {
+    ProductFilterOverlay.show(
+      context,
+      maxPrice: maxPrice,
+      ecoFilter: ecoFilter,
+      sortBy: sortBy,
+      selection: selection,
+      onChanged: ({
+        required maxPrice,
+        required ecoFilter,
+        required sortBy,
+        required selection,
+      }) {
+        setState(() {
+          this.maxPrice = maxPrice;
+          this.ecoFilter = ecoFilter;
+          this.sortBy = sortBy;
+          this.selection = selection;
+        });
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -118,23 +140,21 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(items: breadcrumbItems),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: BreadcrumbBar(items: breadcrumbItems),
+                            ),
+                            FilterButton(
+                              onPressed: () => _openFilter(context),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: 1396,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                recommendedProductsTitle,
-                                style: IMatText.h2,
-                              ),
-                              FilterButton(
-                                onPressed: () =>
-                                    setState(() => filterOpen = true),
-                              ),
-                            ],
-                          ),
+                        Text(
+                          recommendedProductsTitle,
+                          style: IMatText.h2,
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -162,49 +182,6 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
                     lazyProductGridSliver(filtered),
                 ],
               ),
-            ),
-          ),
-
-          // Overlay
-          if (filterOpen)
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => setState(() => filterOpen = false),
-                child: AnimatedOpacity(
-                  opacity: filterOpen ? 1 : 0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Container(color: Colors.black.withOpacity(0.45)),
-                ),
-              ),
-            ),
-
-          // Filterpanel (samma som Alla varor)
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            right: filterOpen ? 0 : -350,
-            top: 0,
-            bottom: 0,
-            child: ProductFilterPanel(
-              maxPrice: maxPrice,
-              onPriceChange: (v) => setState(() => maxPrice = v),
-              ecoFilter: ecoFilter,
-              onEcoChange: (v) => setState(() => ecoFilter = v),
-              sortBy: sortBy,
-              onSortChange: (v) => setState(() => sortBy = v),
-
-              selection: selection,
-              onSelectionChanged: (s) => setState(() => selection = s),
-
-              contextCategory: null, // viktigt
-              showCategoryFilter: true, // viktigt
-
-              onClose: () => setState(() => filterOpen = false),
-              onApplyFilters: () {
-                setState(() {
-                  filterOpen = false;
-                });
-              },
             ),
           ),
 
