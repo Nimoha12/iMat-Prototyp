@@ -18,7 +18,9 @@ class IMatScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const IMatNavbar(), // gemensam navbar
+      appBar: IMatNavbar(
+        searchQuery: searchQuery,
+      ), // gemensam navbar
       body: body,
     );
   }

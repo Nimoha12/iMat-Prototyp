@@ -3,20 +3,31 @@ import 'package:imat_repo/Pages/checkout_page.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:provider/provider.dart';
 
-class CartFooter extends StatelessWidget {
+class CartFooter extends StatefulWidget {
   const CartFooter({super.key});
+
+  @override
+  State<CartFooter> createState() => _CartFooterState();
+}
+
+class _CartFooterState extends State<CartFooter> {
+  bool _showClearConfirmation = false;
 
   @override
   Widget build(BuildContext context) {
     var iMatHandler = context.watch<ImatDataHandler>();
     final total = iMatHandler.shoppingCartTotal(); // hämtar totalen
+    final cartIsEmpty = iMatHandler.getShoppingCart().items.isEmpty;
+    final canUndoClear = iMatHandler.canUndoShoppingCartClear;
+
+    if (cartIsEmpty && _showClearConfirmation) {
+      _showClearConfirmation = false;
+    }
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade300),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade300)),
       ),
       child: Column(
         children: [
@@ -24,10 +35,7 @@ class CartFooter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Totalt:",
-                style: TextStyle(fontSize: 22),
-              ),
+              const Text("Totalt:", style: TextStyle(fontSize: 22)),
               Text(
                 "${total.toStringAsFixed(2)} kr", // avrundar till 2 decimaler
                 style: TextStyle(
@@ -41,47 +49,151 @@ class CartFooter extends StatelessWidget {
 
           const SizedBox(height: 22),
 
-          // Checkout-knapp
-          SizedBox(
-            width: double.infinity,
-            height: 64,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade700,
-                foregroundColor: Colors.white,
+          if (canUndoClear)
+            SizedBox(
+              width: double.infinity,
+              height: 58,
+              child: OutlinedButton(
+                onPressed: iMatHandler.shoppingCartUndoClear,
+                child: const Text("Ångra", style: TextStyle(fontSize: 22)),
               ),
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    settings: const RouteSettings(name: '/checkout'),
-                    builder: (_) => const CheckoutPage(),
-                  ),
-                );
+            )
+          else if (!cartIsEmpty)
+            _ClearCartButton(
+              isExpanded: _showClearConfirmation,
+              onToggle: () {
+                setState(() {
+                  _showClearConfirmation = true;
+                });
               },
-              child: const Text(
-                "Gå till checkout",
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          // Töm varukorg-knapp
-          SizedBox(
-            width: double.infinity,
-            height: 58,
-            child: OutlinedButton(
-              onPressed: () {
+              onCancel: () {
+                setState(() {
+                  _showClearConfirmation = false;
+                });
+              },
+              onClear: () {
                 iMatHandler.shoppingCartClear();
+                setState(() {
+                  _showClearConfirmation = false;
+                });
               },
-              child: const Text(
-                "Töm varukorg",
-                style: TextStyle(fontSize: 22),
+            ),
+
+          if (!cartIsEmpty && !_showClearConfirmation) ...[
+            const SizedBox(height: 18),
+            // Checkout-knapp
+            SizedBox(
+              width: double.infinity,
+              height: 64,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade700,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: '/checkout'),
+                      builder: (_) => const CheckoutPage(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Gå till checkout",
+                  style: TextStyle(fontSize: 24),
+                ),
               ),
             ),
-          ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _ClearCartButton extends StatelessWidget {
+  final bool isExpanded;
+  final VoidCallback onToggle;
+  final VoidCallback onCancel;
+  final VoidCallback onClear;
+
+  const _ClearCartButton({
+    required this.isExpanded,
+    required this.onToggle,
+    required this.onCancel,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = Theme.of(context).colorScheme.outline;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      width: double.infinity,
+      height: isExpanded ? 134 : 58,
+      decoration: BoxDecoration(
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isExpanded ? null : onToggle,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Töm varukorg", style: TextStyle(fontSize: 22)),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  child: isExpanded
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 14),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red.shade700,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    onPressed: onClear,
+                                    icon: const Icon(Icons.delete_outline),
+                                    label: const Text(
+                                      "Töm",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: OutlinedButton(
+                                    onPressed: onCancel,
+                                    child: const Text(
+                                      "Avbryt",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

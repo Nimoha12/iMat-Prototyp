@@ -14,9 +14,7 @@ class Cart extends StatefulWidget {
   State<Cart> createState() => _CartState();
 }
 
-class _CartState extends State<Cart>
-    with SingleTickerProviderStateMixin {
-
+class _CartState extends State<Cart> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
 
@@ -34,12 +32,7 @@ class _CartState extends State<Cart>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(1, 0),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -59,20 +52,16 @@ class _CartState extends State<Cart>
   }
 
   @override
-  
   Widget build(BuildContext context) {
-    var iMatHandler =
-      context.watch<ImatDataHandler>();
+    var iMatHandler = context.watch<ImatDataHandler>();
 
-  var cartItems =
-      iMatHandler.getShoppingCart().items;
-      
+    var cartItems = iMatHandler.getShoppingCart().items;
+
     return Material(
       color: Colors.black54,
 
       child: Stack(
         children: [
-
           // CLICK OUTSIDE
           GestureDetector(
             onTap: closeCart,
@@ -99,10 +88,7 @@ class _CartState extends State<Cart>
                 child: SafeArea(
                   child: Column(
                     children: [
-
-                      CartHeader(
-                        onClose: closeCart,
-                      ),
+                      CartHeader(onClose: closeCart),
 
                       const Divider(height: 1),
 
@@ -110,13 +96,11 @@ class _CartState extends State<Cart>
                       Expanded(
                         child: cartItems.isEmpty
                             ? const EmptyCartView()
-                            : CartItemsView(
-                                cartItems: cartItems,
-                              ),
+                            : CartItemsView(cartItems: cartItems),
                       ),
-                      if (cartItems.isNotEmpty)
-                            const CartFooter(),
-                      
+                      if (cartItems.isNotEmpty ||
+                          iMatHandler.canUndoShoppingCartClear)
+                        const CartFooter(),
                     ],
                   ),
                 ),
