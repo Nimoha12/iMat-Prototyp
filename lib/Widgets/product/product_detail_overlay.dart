@@ -1,5 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/model/imat/product.dart';
+
 import 'product_detail_widget.dart';
 
 class ProductDetailOverlay extends StatelessWidget {
@@ -9,58 +13,67 @@ class ProductDetailOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      // Klick utanför stänger overlay
-      onTap: () => Navigator.pop(context),
+    return Scaffold(
+      backgroundColor: Colors.black.withValues(alpha: 0.48),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final panelWidth = math.min(constraints.maxWidth - 32, 980.0);
+            final panelHeight = math.min(constraints.maxHeight - 32, 760.0);
 
-      child: Scaffold(
-        backgroundColor: Colors.black.withOpacity(0.45),
-
-        body: Center(
-          child: GestureDetector(
-            // Hindrar klick inne i kortet från att bubbla ut
-            onTap: () {},
-
-            child: AnimatedScale(
-              scale: 1.0,
-              duration: const Duration(milliseconds: 160),
-              curve: Curves.easeOut,
-
-              child: Stack(
-                children: [
-                  // Själva produktdetaljen
-                  Container(
-                    constraints: const BoxConstraints(maxWidth: 900),
-                    child: ProductDetailWidget(product: product),
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(context).pop(),
                   ),
-
-                  // Stäng-knapp nära kortet (inte i hörnet)
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                ),
+                Center(
+                  child: SizedBox(
+                    width: panelWidth,
+                    height: panelHeight,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned.fill(
+                          child: Material(
+                            color: IMatColors.white,
+                            elevation: 18,
+                            shadowColor: Colors.black.withValues(alpha: 0.28),
+                            borderRadius: BorderRadius.circular(8),
+                            clipBehavior: Clip.antiAlias,
+                            child: ProductDetailWidget(product: product),
+                          ),
                         ),
-                        child: const Icon(Icons.close, size: 30),
-                      ),
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Semantics(
+                            button: true,
+                            label: 'Stäng produktinformation',
+                            child: IconButton.filled(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: IconButton.styleFrom(
+                                backgroundColor: IMatColors.white,
+                                foregroundColor: IMatColors.black,
+                                fixedSize: const Size(56, 56),
+                                side: const BorderSide(
+                                  color: IMatColors.border,
+                                ),
+                                shape: const CircleBorder(),
+                              ),
+                              icon: const Icon(Icons.close, size: 32),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
