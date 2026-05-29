@@ -1,0 +1,4 @@
+kategori: Varukorg
+titel: Töm varukorgen
+
+När du trycker på Töm varukorg försvinner texten och du får bekräfta valet. Tryck på Töm för att ta bort alla varor, eller Avbryt om du vill behålla varukorgen.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:imat_repo/Pages/home_page.dart';
 import 'package:imat_repo/Theme/imat_buttons.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
@@ -22,6 +23,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
   static const double _stageWidth = 860;
   static const double _backButtonWidth = 170;
   static const double _buttonGap = 14;
+
+  final _digitInputFormatters = [
+  FilteringTextInputFormatter.digitsOnly,
+];
+
+final _letterInputFormatters = [
+  FilteringTextInputFormatter.allow(
+    RegExp(r"[a-zA-ZåäöÅÄÖ\s\-]"),
+  ),
+];
 
   int _step = 0;
   bool _hasAutoSkippedLoginStep = false;
@@ -98,7 +109,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final iMat = context.watch<ImatDataHandler>();
+    final iMat = context.read<ImatDataHandler>();
     final customer = iMat.getCustomer();
 
     if (_loadedCustomer && !_shouldLoadCustomer(customer)) {
@@ -419,6 +430,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: _LabeledField(
                   label: 'Förnamn',
                   controller: _firstNameController,
+                  inputFormatters: _letterInputFormatters,
                 ),
               ),
               const SizedBox(width: 16),
@@ -427,11 +439,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   label: 'Postnummer',
                   controller: _postCodeController,
                   keyboardType: TextInputType.number,
+                  inputFormatters: _digitInputFormatters,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _LabeledField(label: 'Ort', controller: _cityController),
+                child: _LabeledField(
+                  label: 'Ort',
+                  controller: _cityController,
+                  inputFormatters: _letterInputFormatters,
+                ),
               ),
             ],
           ),
@@ -442,6 +459,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: _LabeledField(
                   label: 'Efternamn',
                   controller: _lastNameController,
+                  inputFormatters: _letterInputFormatters,
                 ),
               ),
               const SizedBox(width: 16),
@@ -462,6 +480,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   label: 'Mobilnummer',
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
+                  inputFormatters: _digitInputFormatters,
                 ),
               ),
               const SizedBox(width: 16),
@@ -515,6 +534,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               label: 'Mobilnummer för Swish',
               controller: _swishPhoneController,
               keyboardType: TextInputType.phone,
+              inputFormatters: _digitInputFormatters,
             )
           else
             Column(
@@ -524,6 +544,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   hint: 'XXXX-XXXX-XXXX-XXXX',
                   controller: _cardNumberController,
                   keyboardType: TextInputType.number,
+                  inputFormatters: _digitInputFormatters,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -534,6 +555,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         hint: '123',
                         controller: _cvcController,
                         keyboardType: TextInputType.number,
+                        inputFormatters: _digitInputFormatters,
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -543,6 +565,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         hint: 'MM',
                         controller: _cardMonthController,
                         keyboardType: TextInputType.number,
+                        inputFormatters: _digitInputFormatters,
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -552,6 +575,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         hint: 'ÅÅ',
                         controller: _cardYearController,
                         keyboardType: TextInputType.number,
+                        inputFormatters: _digitInputFormatters,
                       ),
                     ),
                   ],
@@ -1004,13 +1028,16 @@ class _LabeledField extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final List<TextInputFormatter>? inputFormatters;
 
   const _LabeledField({
+    super.key,
     required this.label,
     required this.controller,
     this.hint,
     this.keyboardType,
     this.obscureText = false,
+    this.inputFormatters,
   });
 
   @override
@@ -1031,22 +1058,32 @@ class _LabeledField extends StatelessWidget {
             controller: controller,
             keyboardType: keyboardType,
             obscureText: obscureText,
+            inputFormatters: inputFormatters,
             style: IMatText.bodyM,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: IMatText.bodyM.copyWith(color: Colors.grey.shade500),
+              hintStyle: IMatText.bodyM.copyWith(
+                color: Colors.grey.shade500,
+              ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Color(0xFF9C9C9C)),
+                borderSide: const BorderSide(
+                  color: Color(0xFF9C9C9C),
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Color(0xFF9C9C9C)),
+                borderSide: const BorderSide(
+                  color: Color(0xFF9C9C9C),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: IMatColors.green, width: 2),
+                borderSide: const BorderSide(
+                  color: IMatColors.green,
+                  width: 2,
+                ),
               ),
             ),
           ),

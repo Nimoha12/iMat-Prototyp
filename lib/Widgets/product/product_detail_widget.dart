@@ -127,32 +127,73 @@ class _ImageSection extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final size = compact ? 250.0 : 340.0;
+Widget build(BuildContext context) {
+  final size = compact ? 250.0 : 340.0;
+  final iMat = context.watch<ImatDataHandler>();
+  final isFavorite = iMat.isFavorite(product);
 
-    return Semantics(
-      image: true,
-      label: 'Produktbild av ${product.name}',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (product.isEcological)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: _Badge(icon: Icons.eco_outlined, label: 'Ekologisk'),
+  return Semantics(
+    image: true,
+    label: 'Produktbild av ${product.name}',
+    child: Center(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: image,
+              ),
             ),
-          if (product.isEcological) const SizedBox(height: 22),
-          Center(
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: FittedBox(fit: BoxFit.contain, child: image),
-            ),
+
+            Positioned(
+  top: -6,
+  right: -6,
+  child: GestureDetector(
+    onTap: () {
+      iMat.toggleFavorite(product);
+    },
+    child: Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.95),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isFavorite
+              ? Colors.red
+              : IMatColors.green,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-    );
-  }
+      child: Icon(
+        isFavorite
+            ? Icons.favorite
+            : Icons.favorite_border,
+        size: 30,
+        color: isFavorite
+            ? Colors.red
+            : IMatColors.green,
+      ),
+    ),
+  ),
+),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 }
 
 class _InfoSection extends StatelessWidget {
@@ -171,7 +212,6 @@ class _InfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _MetaLine(detail: detail),
         const SizedBox(height: 10),
         Text(
           product.name,
@@ -204,57 +244,38 @@ class _InfoSection extends StatelessWidget {
   }
 }
 
-class _MetaLine extends StatelessWidget {
-  final ProductDetail? detail;
 
-  const _MetaLine({required this.detail});
-
-  @override
-  Widget build(BuildContext context) {
-    final parts = [
-      if (_hasText(detail?.brand)) detail!.brand,
-      if (_hasText(detail?.origin)) detail!.origin,
-    ];
-
-    if (parts.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Text(
-      parts.join('  /  '),
-      style: IMatText.bodyXS.copyWith(
-        color: IMatColors.green,
-        fontWeight: FontWeight.w900,
-      ),
-    );
-  }
-}
 
 class _PurchaseArea extends StatelessWidget {
   final Product product;
   final String unit;
 
-  const _PurchaseArea({required this.product, required this.unit});
+  const _PurchaseArea({
+    required this.product,
+    required this.unit,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 360),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            '${product.price.toStringAsFixed(2)} kr/$unit',
-            style: IMatText.h1.copyWith(
-              color: IMatColors.green,
-              fontSize: 34,
-              fontWeight: FontWeight.w900,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${product.price.toStringAsFixed(2)} kr/$unit',
+          style: IMatText.h1.copyWith(
+            color: IMatColors.green,
+            fontSize: 34,
+            fontWeight: FontWeight.w900,
           ),
-          const SizedBox(height: 12),
-          AddToCartButton(product: product),
-        ],
-      ),
+        ),
+
+        const SizedBox(height: 12),
+
+        AddToCartButton(
+          product: product,
+          width: 250,
+        ),
+      ],
     );
   }
 }
@@ -323,19 +344,59 @@ class _ProductInfoTabsState extends State<_ProductInfoTabs> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (var index = 0; index < tabs.length; index++)
-                _TabButton(
-                  label: tabs[index].title,
-                  selected: index == selectedIndex,
-                  onTap: () => setState(() => _selectedIndex = index),
+        SizedBox(
+  height: 52,
+  child: Stack(
+    children: [
+      Row(
+        children: [
+          for (var index = 0; index < tabs.length; index++)
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+                child: Center(
+                  child: Text(
+                    tabs[index].title,
+                    style: IMatText.bodyS.copyWith(
+                      fontSize:15,
+                      color: index == selectedIndex
+                          ? IMatColors.green
+                          : IMatColors.black,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ),
-            ],
+              ),
+            ),
+        ],
+      ),
+
+      AnimatedAlign(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeInOutCubic,
+        alignment: switch (selectedIndex) {
+          0 => Alignment.bottomLeft,
+          1 => Alignment.bottomCenter,
+          _ => Alignment.bottomRight,
+        },
+        child: FractionallySizedBox(
+          widthFactor: 1 / tabs.length,
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              color: IMatColors.green,
+              borderRadius: BorderRadius.circular(999),
+            ),
           ),
         ),
+      ),
+    ],
+  ),
+),
         const Divider(height: 1, color: IMatColors.border),
         const SizedBox(height: 18),
         ConstrainedBox(

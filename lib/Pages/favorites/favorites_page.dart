@@ -10,6 +10,7 @@ import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 
+
 class FavoritesPage extends StatefulWidget {
   static const routeName = '/favorites';
 
@@ -21,7 +22,22 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPageState extends State<FavoritesPage> {
   final ScrollController scrollController = ScrollController();
-  
+  bool showScrollButton = false;
+
+
+  @override
+void initState() {
+  super.initState();
+
+  scrollController.addListener(() {
+    if (scrollController.offset > 300 && !showScrollButton) {
+      setState(() => showScrollButton = true);
+    } else if (scrollController.offset <= 300 && showScrollButton) {
+      setState(() => showScrollButton = false);
+    }
+  });
+}
+
   @override
   void dispose() {
     scrollController.dispose();
@@ -53,7 +69,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return Scaffold(
       appBar: const IMatNavbar(activePage: NavbarPage.favorites),
       backgroundColor: IMatColors.beige,
-      body: Padding(
+      body: Stack(children: [ Padding(
         // Keep scrollbar at far right while preserving left breathing room.
         padding: const EdgeInsets.only(left: 24),
         child: CustomScrollView(
@@ -62,7 +78,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
             if (visibleSections.isNotEmpty)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 24, right: 16, bottom: 16),
+                  padding: const EdgeInsets.only(
+                    top: 24,
+                    right: 16,
+                    bottom: 16,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -92,15 +112,19 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     ],
                   ),
                 ),
+                
               ),
             if (favorites.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 24, right: 16),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: const CloseProfileButton(),
+                  padding: const EdgeInsets.only(
+                    top: 24,
+                    right: 16,
+                    bottom: 80,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [CloseProfileButton()],
                   ),
                 ),
               )
@@ -129,6 +153,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       ),
                     ),
                   ),
+                  
                 ),
                 lazyProductGridSliver(entry.value),
                 const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
@@ -137,6 +162,24 @@ class _FavoritesPageState extends State<FavoritesPage> {
           ],
         ),
       ),
+          if (showScrollButton)
+      Positioned(
+        right: 24,
+        bottom: 24,
+        child: FloatingActionButton.large(
+          backgroundColor: IMatColors.green,
+          onPressed: () {
+            scrollController.jumpTo(0);
+          },
+          child: const Icon(
+            Icons.arrow_upward,
+            size: 34,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      ]
+      )
     );
   }
 }

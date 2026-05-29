@@ -111,9 +111,7 @@ class _CategoryPageState extends State<CategoryPage> {
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AllCategoriesPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const AllCategoriesPage()),
           );
         },
       ),
@@ -265,10 +263,10 @@ class _CategoryPageState extends State<CategoryPage> {
             Positioned(
               right: 24,
               bottom: 24,
-              child: FloatingActionButton(
+              child: FloatingActionButton.large(
                 backgroundColor: IMatColors.green,
                 onPressed: () => _scrollController.jumpTo(0),
-                child: const Icon(Icons.arrow_upward, color: Colors.white),
+                child: const Icon(Icons.arrow_upward, size: 34, color: Colors.white),
               ),
             ),
         ],

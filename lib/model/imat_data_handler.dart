@@ -8,8 +8,6 @@ import 'package:imat_repo/model/imat/order.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/model/imat/product_detail.dart';
 
-
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:imat_repo/model/imat/settings.dart';
@@ -18,8 +16,6 @@ import 'package:imat_repo/model/imat/shopping_item.dart';
 import 'package:imat_repo/model/imat/user.dart';
 import 'package:imat_repo/model/internet_handler.dart';
 import 'package:imat_repo/model/recommended_products.dart';
-
-
 
 class ImatDataHandler extends ChangeNotifier {
   // Initializes the IMatDataHandler
@@ -319,6 +315,7 @@ class ImatDataHandler extends ChangeNotifier {
   // Uppdaterar till servern och meddelar GUI:t att kundvagnen ändrats.
   void shoppingCartAdd(ShoppingItem item) {
     //print('Adding ${item.product.name}');
+    _lastClearedShoppingCartItems = null;
     _shoppingCart.addItem(item);
 
     // Update and notify listeners
@@ -350,9 +347,31 @@ class ImatDataHandler extends ChangeNotifier {
   // Tömmer kundvagnen.
   // Uppdaterar på servern och meddelar GUI:t.
   void shoppingCartClear() {
+    _lastClearedShoppingCartItems = _shoppingCart.items
+        .map((item) => ShoppingItem(item.product, amount: item.amount))
+        .toList();
     _shoppingCart.clear();
 
     // Update and notify listeners
+    setShoppingCart();
+  }
+
+  bool get canUndoShoppingCartClear =>
+      _shoppingCart.items.isEmpty &&
+      _lastClearedShoppingCartItems != null &&
+      _lastClearedShoppingCartItems!.isNotEmpty;
+
+  void shoppingCartUndoClear() {
+    final clearedItems = _lastClearedShoppingCartItems;
+    if (clearedItems == null || clearedItems.isEmpty) {
+      return;
+    }
+
+    _shoppingCart.items = clearedItems
+        .map((item) => ShoppingItem(item.product, amount: item.amount))
+        .toList();
+    _lastClearedShoppingCartItems = null;
+
     setShoppingCart();
   }
 
@@ -418,6 +437,8 @@ class ImatDataHandler extends ChangeNotifier {
   CreditCard _creditCard = CreditCard('', '', 12, 25, '', 0);
 
   ShoppingCart _shoppingCart = ShoppingCart([]);
+
+  List<ShoppingItem>? _lastClearedShoppingCartItems;
 
   final List<Order> _orders = [];
 

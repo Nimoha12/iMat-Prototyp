@@ -1,0 +1,6 @@
+kategori: Favoriter
+titel: Spara varor som favoriter
+
+Tryck på hjärtat på ett varukort för att spara varan som favorit. Favoriter gör det lättare att hitta tillbaka till varor du köper ofta.
+
+Du behöver vara inloggad för att använda favoriter. Om du trycker på hjärtat utan att vara inloggad får du först logga in.

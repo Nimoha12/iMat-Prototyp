@@ -56,11 +56,12 @@ class ProductFilterPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 430,
-      height: double.infinity,
+    return Material(
       color: IMatColors.white,
-      child: SafeArea(
+      child: SizedBox(
+        width: 430,
+        height: double.infinity,
+        child: SafeArea(
         child: Column(
           children: [
             Padding(
@@ -351,6 +352,7 @@ class ProductFilterPanel extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

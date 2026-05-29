@@ -120,9 +120,7 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
       grouped[cat] = filtered.where((p) => p.uiCategory == cat).toList();
     }
 
-    final breadcrumbItems = [
-      BreadcrumbItem(label: "Alla varor"),
-    ];
+    final breadcrumbItems = [BreadcrumbItem(label: "Alla varor")];
 
     return IMatScaffold(
       breadcrumbContext: breadcrumbItems,
@@ -198,10 +196,10 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
             Positioned(
               right: 24,
               bottom: 24,
-              child: FloatingActionButton(
+              child: FloatingActionButton.large(
                 backgroundColor: IMatColors.green,
                 onPressed: () => _scrollController.jumpTo(0),
-                child: const Icon(Icons.arrow_upward, color: Colors.white),
+                child: const Icon(Icons.arrow_upward, size: 34, color: Colors.white),
               ),
             ),
         ],

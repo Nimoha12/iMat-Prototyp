@@ -9,8 +9,9 @@ import 'package:provider/provider.dart';
 
 class AddToCartButton extends StatelessWidget {
   final Product product;
+  final double? width;
 
-  const AddToCartButton({super.key, required this.product});
+  const AddToCartButton({super.key, required this.product, this.width});
 
   int getAmount(ShoppingCart cart, Product product) {
     for (final item in cart.items) {
@@ -137,13 +138,14 @@ class AddToCartButton extends StatelessWidget {
           iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
         },
         child: Container(
-          height: 68, // större, mer premium
+          width: width,
+          height: 52,
           decoration: BoxDecoration(
             color: IMatColors.green,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -152,11 +154,11 @@ class AddToCartButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.add, color: IMatColors.white, size: 32),
+              const Icon(Icons.add, color: IMatColors.white, size: 24),
               const SizedBox(width: 10),
               Text(
                 "Lägg till",
-                style: IMatText.bodyL.copyWith(
+                style: IMatText.bodyM.copyWith(
                   color: IMatColors.white,
                   fontWeight: FontWeight.w700,
                 ),
@@ -169,14 +171,15 @@ class AddToCartButton extends StatelessWidget {
 
     //  KUNDVAGNEN
     return Container(
-      height: 68,
+      width: width,
+      height: 52,
       decoration: BoxDecoration(
         color: IMatColors.greenLight,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: IMatColors.green, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -195,15 +198,15 @@ class AddToCartButton extends StatelessWidget {
               }
             },
             child: Container(
-              width: 68,
+              width: 56,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: IMatColors.green,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.remove,
-                size: 32,
+                size: 24,
                 color: IMatColors.white,
               ),
             ),
@@ -215,12 +218,12 @@ class AddToCartButton extends StatelessWidget {
                 HitTestBehavior.translucent, // fångar ALLA klick i området
             onTap: () => _showEditAmountDialog(context, quantity, iMat),
             child: Container(
-              width: 110, // större klickyta, mycket enklare för äldre
+              width: 92,
               height: double.infinity,
               alignment: Alignment.center,
               child: Text(
                 quantity.toString(),
-                style: IMatText.h2.copyWith(
+                style: IMatText.bodyL.copyWith(
                   fontWeight: FontWeight.w800,
                   color: IMatColors.black,
                 ),
@@ -234,13 +237,13 @@ class AddToCartButton extends StatelessWidget {
               iMat.shoppingCartUpdate(ShoppingItem(product), delta: 1);
             },
             child: Container(
-              width: 68,
+              width: 56,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: IMatColors.green,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.add, size: 32, color: IMatColors.white),
+              child: const Icon(Icons.add, size: 24, color: IMatColors.white),
             ),
           ),
         ],

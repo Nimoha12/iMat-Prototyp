@@ -118,14 +118,15 @@ class _AllProductsPageState extends State<AllProductsPage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Row(
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Breadcrumbs
+                      Row(
                         children: [
                           GestureDetector(
                             onTap: () {
@@ -188,31 +189,36 @@ class _AllProductsPageState extends State<AllProductsPage> {
                           ],
                         ],
                       ),
-                    ),
-                    FilterButton(
-                      onPressed: () => _openFilter(context),
-                    ),
-                  ],
+
+                      const SizedBox(height: 24),
+
+                      // Titel + filterknapp
+                      SizedBox(
+                        width: 1396,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(title, style: IMatText.h2),
+                            FilterButton(
+                              onPressed: () =>
+                                  setState(() => filterOpen = true),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 24),
-
-                Text(title, style: IMatText.h2),
-
-                const SizedBox(height: 24),
-
-                // Produktgrid
-                Expanded(
-                  child: GridView.builder(
-                    controller: _scrollController,
-                    itemCount: products.length,
-                    gridDelegate: productGridDelegate,
-                    itemBuilder: (context, index) {
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: ProductCard(product: products[index]),
-                      );
-                    },
+                SliverGrid(
+                  gridDelegate: productGridDelegate,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => Align(
+                      alignment: Alignment.topCenter,
+                      child: ProductCard(product: products[index]),
+                    ),
+                    childCount: products.length,
                   ),
                 ),
               ],
@@ -224,12 +230,12 @@ class _AllProductsPageState extends State<AllProductsPage> {
             Positioned(
               right: 24,
               bottom: 24,
-              child: FloatingActionButton(
+              child: FloatingActionButton.large(
                 backgroundColor: IMatColors.green,
                 onPressed: () {
                   _scrollController.jumpTo(0);
                 },
-                child: const Icon(Icons.arrow_upward, color: Colors.white),
+                child: const Icon(Icons.arrow_upward, size: 34, color: Colors.white),
               ),
             ),
         ],

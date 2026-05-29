@@ -1,0 +1,6 @@
+kategori: Inloggning
+titel: Logga in på ditt konto
+
+Tryck på Logga in i navigeringen för att öppna inloggningsrutan. När du är inloggad kan du använda funktioner som favoriter, profil och orderhistorik.
+
+Om en funktion kräver inloggning öppnas inloggningsrutan automatiskt. Efter en lyckad inloggning fortsätter du till det du försökte göra.
