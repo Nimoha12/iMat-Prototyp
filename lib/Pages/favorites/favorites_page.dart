@@ -166,13 +166,14 @@ void initState() {
       Positioned(
         right: 24,
         bottom: 24,
-        child: FloatingActionButton(
+        child: FloatingActionButton.large(
           backgroundColor: IMatColors.green,
           onPressed: () {
             scrollController.jumpTo(0);
           },
           child: const Icon(
             Icons.arrow_upward,
+            size: 34,
             color: Colors.white,
           ),
         ),
