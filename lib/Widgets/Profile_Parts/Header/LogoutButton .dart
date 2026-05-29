@@ -4,8 +4,6 @@ import 'package:imat_repo/Theme/imat_theme.dart';
 import 'package:imat_repo/model/AuthState.dart';
 import 'package:provider/provider.dart';
 
-const Color logoutDangerColor = Color(0xFF8B1E1E);
-const Color logoutDangerLightColor = Color(0xFFFFF1F1);
 const String logoutButtonText = 'Logga ut';
 const String logoutWarningText = 'Vill du logga ut?';
 const String logoutConfirmText = 'Ja';
@@ -77,14 +75,13 @@ class _LogoutButtonState extends State<LogoutButton> {
         height: 48,
         child: OutlinedButton(
           onPressed: _toggleWarning,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: logoutDangerColor,
-            side: const BorderSide(color: logoutDangerColor, width: 2.5),
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+          style: IMatButton.outlinedRed.copyWith(
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 14),
             ),
-            textStyle: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
+            textStyle: WidgetStateProperty.all(
+              IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
+            ),
           ),
           child: const Text(logoutButtonText),
         ),
@@ -112,7 +109,7 @@ class _LogoutWarning extends StatelessWidget {
           decoration: BoxDecoration(
             color: IMatColors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: logoutDangerColor, width: 2),
+            border: Border.all(color: IMatColors.danger, width: 2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.14),
@@ -160,7 +157,7 @@ class _LogoutWarning extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onConfirm,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: logoutDangerColor,
+                        backgroundColor: IMatColors.danger,
                         foregroundColor: IMatColors.white,
                         elevation: 0,
                         minimumSize: const Size(0, 48),

@@ -70,7 +70,7 @@ class CartFooter extends StatelessWidget {
               onPressed: () {
                 iMatHandler.shoppingCartClear();
               },
-              style: IMatButton.outlinedGreen,
+              style: IMatButton.outlinedRed,
               child: const Text('Töm varukorg'),
             ),
           ),

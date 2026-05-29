@@ -1232,9 +1232,6 @@ class _OrderSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visibleItems = items.take(2).toList();
-    final hiddenCount = items.length - visibleItems.length;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1269,7 +1266,7 @@ class _OrderSummary extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          for (final item in visibleItems) ...[
+          for (final item in items) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1299,15 +1296,6 @@ class _OrderSummary extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: IMatText.bodyS,
-            ),
-            const SizedBox(height: 10),
-          ],
-          if (hiddenCount > 0) ...[
-            Text(
-              '+ $hiddenCount fler varor',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: IMatText.bodyS.copyWith(color: IMatColors.textSecondary),
             ),
             const SizedBox(height: 10),
           ],

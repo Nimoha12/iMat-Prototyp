@@ -7,6 +7,7 @@ import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
+import 'package:imat_repo/Widgets/product/product_filter_overlay.dart';
 import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
 import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
 import '../../Widgets/Category/ui_categories.dart';
@@ -39,11 +40,33 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
-  bool filterOpen = false;
-
   // används bara för att matcha ProductFilterPanel-signaturen,
   // men ingen kategori-filtering på denna sida
   FilterSelection selection = const FilterSelection();
+
+  void _openFilter(BuildContext context) {
+    ProductFilterOverlay.show(
+      context,
+      maxPrice: maxPrice,
+      ecoFilter: ecoFilter,
+      sortBy: sortBy,
+      selection: selection,
+      showCategoryFilter: false,
+      onChanged: ({
+        required maxPrice,
+        required ecoFilter,
+        required sortBy,
+        required selection,
+      }) {
+        setState(() {
+          this.maxPrice = maxPrice;
+          this.ecoFilter = ecoFilter;
+          this.sortBy = sortBy;
+          this.selection = selection;
+        });
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -141,8 +164,7 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                               child: BreadcrumbBar(items: breadcrumbItems),
                             ),
                             FilterButton(
-                              onPressed: () =>
-                                  setState(() => filterOpen = true),
+                              onPressed: () => _openFilter(context),
                             ),
                           ],
                         ),
@@ -165,46 +187,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                     lazyProductGridSliver(filtered),
                 ],
               ),
-            ),
-          ),
-
-          // Overlay
-          if (filterOpen)
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => setState(() => filterOpen = false),
-                child: AnimatedOpacity(
-                  opacity: filterOpen ? 1 : 0,
-                  duration: const Duration(milliseconds: 250),
-                  child: Container(color: Colors.black.withOpacity(0.45)),
-                ),
-              ),
-            ),
-
-          // Filterpanel (utan kategoridel)
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            right: filterOpen ? 0 : -350,
-            top: 0,
-            bottom: 0,
-            child: ProductFilterPanel(
-              maxPrice: maxPrice,
-              onPriceChange: (v) => setState(() => maxPrice = v),
-              ecoFilter: ecoFilter,
-              onEcoChange: (v) => setState(() => ecoFilter = v),
-              sortBy: sortBy,
-              onSortChange: (v) => setState(() => sortBy = v),
-              selection: selection,
-              onSelectionChanged: (s) => setState(() => selection = s),
-              contextCategory: null,
-              showCategoryFilter: false,
-              onClose: () => setState(() => filterOpen = false),
-              onApplyFilters: () {
-                setState(() {
-                  filterOpen = false;
-                });
-              },
             ),
           ),
 
