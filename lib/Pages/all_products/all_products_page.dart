@@ -95,104 +95,107 @@ class _AllProductsPageState extends State<AllProductsPage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Breadcrumbs
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/',
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        "Hem",
-                        style: IMatText.bodyS.copyWith(
-                          color: IMatColors.green,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                    const Icon(Icons.chevron_right, size: 18),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/',
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        "Alla varor",
-                        style: IMatText.bodyS.copyWith(
-                          color: IMatColors.green,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                    const Icon(Icons.chevron_right, size: 18),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/',
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        widget.uiCategory.label,
-                        style: IMatText.bodyS.copyWith(
-                          color: IMatColors.green,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                    if (widget.subCategoryTitle != null) ...[
-                      const Icon(Icons.chevron_right, size: 18),
-                      Text(
-                        widget.subCategoryTitle!,
-                        style: IMatText.bodyS.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // Titel + filterknapp
-                SizedBox(
-                  width: 1396,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: IMatText.h2),
-                      FilterButton(
-                        onPressed: () => setState(() => filterOpen = true),
+                      // Breadcrumbs
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              "Hem",
+                              style: IMatText.bodyS.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, size: 18),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              "Alla varor",
+                              style: IMatText.bodyS.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, size: 18),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              widget.uiCategory.label,
+                              style: IMatText.bodyS.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          if (widget.subCategoryTitle != null) ...[
+                            const Icon(Icons.chevron_right, size: 18),
+                            Text(
+                              widget.subCategoryTitle!,
+                              style: IMatText.bodyS.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
+
+                      const SizedBox(height: 24),
+
+                      // Titel + filterknapp
+                      SizedBox(
+                        width: 1396,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(title, style: IMatText.h2),
+                            FilterButton(
+                              onPressed: () =>
+                                  setState(() => filterOpen = true),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 24),
-
-                // Produktgrid
-                Expanded(
-                  child: GridView.builder(
-                    controller: _scrollController,
-                    itemCount: products.length,
-                    gridDelegate: productGridDelegate,
-                    itemBuilder: (context, index) {
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: ProductCard(product: products[index]),
-                      );
-                    },
+                SliverGrid(
+                  gridDelegate: productGridDelegate,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => Align(
+                      alignment: Alignment.topCenter,
+                      child: ProductCard(product: products[index]),
+                    ),
+                    childCount: products.length,
                   ),
                 ),
               ],

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart'; // Provider
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'Pages/home_page.dart';
 import 'Pages/checkout_page.dart';
+import 'Pages/help/help_page.dart';
 import 'Widgets/home/login_overlay_scope.dart';
 import 'Widgets/home/login_page.dart';
 
@@ -100,6 +101,7 @@ class _MyAppState extends State<MyApp> {
       home: const HomePage(),
       routes: {
         '/checkout': (_) => const CheckoutPage(),
+        HelpPage.routeName: (_) => const HelpPage(),
       },
       builder: (context, child) {
         return LoginOverlayScope(

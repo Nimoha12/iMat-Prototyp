@@ -97,9 +97,7 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AllCategoriesPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const AllCategoriesPage()),
           );
         },
       ),
