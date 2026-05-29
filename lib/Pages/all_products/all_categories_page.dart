@@ -116,23 +116,24 @@ class _AllCategoriesPageState extends State<AllCategoriesPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(
-                          items: [BreadcrumbItem(label: "Alla varor")],
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: BreadcrumbBar(
+                                items: [
+                                  BreadcrumbItem(label: "Alla varor"),
+                                ],
+                              ),
+                            ),
+                            FilterButton(
+                              onPressed: () =>
+                                  setState(() => filterOpen = true),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: 1396,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Alla varor", style: IMatText.h2),
-                              FilterButton(
-                                onPressed: () =>
-                                    setState(() => filterOpen = true),
-                              ),
-                            ],
-                          ),
-                        ),
+                        Text("Alla varor", style: IMatText.h2),
                         const SizedBox(height: 24),
                         CategoryQuickAccessGrid(
                           onRecommendedTap: () {

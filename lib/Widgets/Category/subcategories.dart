@@ -26,9 +26,6 @@ final Map<UiCategory, List<_SubCategoryGroup>> subCategoryGroups = {
     _SubCategoryGroup("Kött", [ProductCategory.MEAT]),
     _SubCategoryGroup("Fisk", [ProductCategory.FISH]),
   ],
-  UiCategory.mejeriAgg: [
-    _SubCategoryGroup("Mejeri & Ägg", [ProductCategory.DAIRIES]),
-  ],
   UiCategory.torrvaror: [
     _SubCategoryGroup("Pasta & Ris", [
       ProductCategory.PASTA,
@@ -41,12 +38,6 @@ final Map<UiCategory, List<_SubCategoryGroup>> subCategoryGroups = {
       ProductCategory.POD,
       ProductCategory.NUTS_AND_SEEDS,
     ]),
-  ],
-  UiCategory.brod: [
-    _SubCategoryGroup("Bröd", [ProductCategory.BREAD]),
-  ],
-  UiCategory.snacks: [
-    _SubCategoryGroup("Snacks & Sötsaker", [ProductCategory.SWEET]),
   ],
   UiCategory.dryck: [
     _SubCategoryGroup("Kalla drycker", [ProductCategory.COLD_DRINKS]),

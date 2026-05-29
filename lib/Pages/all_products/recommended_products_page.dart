@@ -120,23 +120,22 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(items: breadcrumbItems),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: BreadcrumbBar(items: breadcrumbItems),
+                            ),
+                            FilterButton(
+                              onPressed: () =>
+                                  setState(() => filterOpen = true),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: 1396,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                recommendedProductsTitle,
-                                style: IMatText.h2,
-                              ),
-                              FilterButton(
-                                onPressed: () =>
-                                    setState(() => filterOpen = true),
-                              ),
-                            ],
-                          ),
+                        Text(
+                          recommendedProductsTitle,
+                          style: IMatText.h2,
                         ),
                         const SizedBox(height: 8),
                         Text(

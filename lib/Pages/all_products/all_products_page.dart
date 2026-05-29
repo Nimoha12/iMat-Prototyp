@@ -98,86 +98,83 @@ class _AllProductsPageState extends State<AllProductsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Breadcrumbs
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/',
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        "Hem",
-                        style: IMatText.bodyS.copyWith(
-                          color: IMatColors.green,
-                          decoration: TextDecoration.underline,
-                        ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              "Hem",
+                              style: IMatText.bodyS.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, size: 18),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              "Alla varor",
+                              style: IMatText.bodyS.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, size: 18),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              widget.uiCategory.label,
+                              style: IMatText.bodyS.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          if (widget.subCategoryTitle != null) ...[
+                            const Icon(Icons.chevron_right, size: 18),
+                            Text(
+                              widget.subCategoryTitle!,
+                              style: IMatText.bodyS.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    const Icon(Icons.chevron_right, size: 18),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/',
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        "Alla varor",
-                        style: IMatText.bodyS.copyWith(
-                          color: IMatColors.green,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
+                    FilterButton(
+                      onPressed: () => setState(() => filterOpen = true),
                     ),
-                    const Icon(Icons.chevron_right, size: 18),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/',
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        widget.uiCategory.label,
-                        style: IMatText.bodyS.copyWith(
-                          color: IMatColors.green,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                    if (widget.subCategoryTitle != null) ...[
-                      const Icon(Icons.chevron_right, size: 18),
-                      Text(
-                        widget.subCategoryTitle!,
-                        style: IMatText.bodyS.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
 
                 const SizedBox(height: 24),
 
-                // Titel + filterknapp
-                SizedBox(
-                  width: 1396,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(title, style: IMatText.h2),
-                      FilterButton(
-                        onPressed: () => setState(() => filterOpen = true),
-                      ),
-                    ],
-                  ),
-                ),
+                Text(title, style: IMatText.h2),
 
                 const SizedBox(height: 24),
 

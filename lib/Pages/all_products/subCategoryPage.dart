@@ -134,49 +134,20 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BreadcrumbBar(
-                          items: [
-                            BreadcrumbItem(
-                              label: "Alla varor",
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const AllCategoriesPage(),
-                                  ),
-                                );
-                              },
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: BreadcrumbBar(items: breadcrumbItems),
                             ),
-                            BreadcrumbItem(
-                              label: widget.parentCategory.label,
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => CategoryPage(
-                                      uiCategory: widget.parentCategory,
-                                    ),
-                                  ),
-                                );
-                              },
+                            FilterButton(
+                              onPressed: () =>
+                                  setState(() => filterOpen = true),
                             ),
-                            BreadcrumbItem(label: widget.title),
                           ],
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: 1396,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(widget.title, style: IMatText.h2),
-                              FilterButton(
-                                onPressed: () =>
-                                    setState(() => filterOpen = true),
-                              ),
-                            ],
-                          ),
-                        ),
+                        Text(widget.title, style: IMatText.h2),
                         const SizedBox(height: 24),
                       ],
                     ),
