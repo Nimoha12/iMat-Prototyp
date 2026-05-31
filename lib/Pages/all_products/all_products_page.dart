@@ -5,7 +5,7 @@ import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
-import 'package:imat_repo/Theme/imat_colors.dart';
+import 'package:imat_repo/Widgets/imat_link_text.dart';
 import 'package:imat_repo/Widgets/Navigation/filter_button.dart';
 import '../../Widgets/Category/ui_categories.dart';
 import '../../Widgets/product/product_filter_overlay.dart';
@@ -110,7 +110,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
                       // Breadcrumbs
                       Row(
                         children: [
-                          GestureDetector(
+                          IMatLinkText(
+                            text: 'Hem',
+                            style: IMatText.bodyS,
                             onTap: () {
                               Navigator.pushNamedAndRemoveUntil(
                                 context,
@@ -118,16 +120,11 @@ class _AllProductsPageState extends State<AllProductsPage> {
                                 (route) => false,
                               );
                             },
-                            child: Text(
-                              "Hem",
-                              style: IMatText.bodyS.copyWith(
-                                color: IMatColors.green,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
                           ),
                           const Icon(Icons.chevron_right, size: 18),
-                          GestureDetector(
+                          IMatLinkText(
+                            text: 'Alla varor',
+                            style: IMatText.bodyS,
                             onTap: () {
                               Navigator.pushNamedAndRemoveUntil(
                                 context,
@@ -135,16 +132,11 @@ class _AllProductsPageState extends State<AllProductsPage> {
                                 (route) => false,
                               );
                             },
-                            child: Text(
-                              "Alla varor",
-                              style: IMatText.bodyS.copyWith(
-                                color: IMatColors.green,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
                           ),
                           const Icon(Icons.chevron_right, size: 18),
-                          GestureDetector(
+                          IMatLinkText(
+                            text: widget.uiCategory.label,
+                            style: IMatText.bodyS,
                             onTap: () {
                               Navigator.pushNamedAndRemoveUntil(
                                 context,
@@ -152,13 +144,6 @@ class _AllProductsPageState extends State<AllProductsPage> {
                                 (route) => false,
                               );
                             },
-                            child: Text(
-                              widget.uiCategory.label,
-                              style: IMatText.bodyS.copyWith(
-                                color: IMatColors.green,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
                           ),
                           if (widget.subCategoryTitle != null) ...[
                             const Icon(Icons.chevron_right, size: 18),

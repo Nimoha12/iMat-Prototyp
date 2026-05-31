@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:imat_repo/Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/imat_link_text.dart';
 import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/model/imat/product.dart';
@@ -73,7 +74,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: GestureDetector(
+                            child: IMatLinkText(
+                              text: visibleSections.first.key.label,
+                              style: IMatText.h3,
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -84,13 +87,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   ),
                                 );
                               },
-                              child: Text(
-                                visibleSections.first.key.label,
-                                style: IMatText.h3.copyWith(
-                                  color: IMatColors.green,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -120,7 +116,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 16, right: 16),
-                        child: GestureDetector(
+                        child: IMatLinkText(
+                          text: entry.key.label,
+                          style: IMatText.h3,
                           onTap: () {
                             Navigator.push(
                               context,
@@ -130,13 +128,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                               ),
                             );
                           },
-                          child: Text(
-                            entry.key.label,
-                            style: IMatText.h3.copyWith(
-                              color: IMatColors.green,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
                         ),
                       ),
                     ),

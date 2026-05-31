@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/home_page.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
+import 'package:imat_repo/Widgets/imat_link_text.dart';
 
 class BreadcrumbBar extends StatelessWidget {
   final List<BreadcrumbItem> items;
@@ -11,12 +12,21 @@ class BreadcrumbBar extends StatelessWidget {
     required this.items,
   });
 
+  static const _linkStyle = TextStyle(
+    fontWeight: FontWeight.w700,
+  );
+
+  static const _linkPadding = EdgeInsets.symmetric(vertical: 8);
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        GestureDetector(
+        IMatLinkText(
+          text: 'Hem',
+          style: IMatText.bodyL.merge(_linkStyle),
+          padding: _linkPadding,
           onTap: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -24,21 +34,11 @@ class BreadcrumbBar extends StatelessWidget {
               (route) => false,
             );
           },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              "Hem",
-              style: IMatText.bodyL.copyWith(
-                color: IMatColors.green,
-                fontWeight: FontWeight.w700,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
         ),
 
         ...items.map((item) {
           final bool isLast = item == items.last;
+          final bool isClickable = item.onTap != null && !isLast;
 
           return Row(
             mainAxisSize: MainAxisSize.min,
@@ -52,24 +52,24 @@ class BreadcrumbBar extends StatelessWidget {
                 ),
               ),
 
-              GestureDetector(
-                onTap: item.onTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+              if (isClickable)
+                IMatLinkText(
+                  text: item.label,
+                  style: IMatText.bodyL.merge(_linkStyle),
+                  padding: _linkPadding,
+                  onTap: item.onTap!,
+                )
+              else
+                Padding(
+                  padding: _linkPadding,
                   child: Text(
                     item.label,
                     style: IMatText.bodyL.copyWith(
-                      color: isLast
-                          ? IMatColors.black
-                          : IMatColors.green,
+                      color: IMatColors.black,
                       fontWeight: FontWeight.w700,
-                      decoration: isLast
-                          ? TextDecoration.none
-                          : TextDecoration.underline,
                     ),
                   ),
                 ),
-              ),
             ],
           );
         }),

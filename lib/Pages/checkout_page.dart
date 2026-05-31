@@ -452,6 +452,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           Row(
             children: [
               Expanded(
+                flex: 2,
                 child: _LabeledField(
                   label: 'Efternamn',
                   controller: _lastNameController,
@@ -639,6 +640,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _SummaryBox(
@@ -660,6 +662,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           const SizedBox(height: 14),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _SummaryBox(
@@ -1189,25 +1192,14 @@ class _PaymentTab extends StatelessWidget {
   }
 }
 
-class _SummaryBox extends StatefulWidget {
+class _SummaryBox extends StatelessWidget {
   final String title;
   final List<String> lines;
 
   const _SummaryBox({required this.title, required this.lines});
 
   @override
-  State<_SummaryBox> createState() => _SummaryBoxState();
-}
-
-class _SummaryBoxState extends State<_SummaryBox> {
-  bool _expanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final visibleLines = _expanded
-        ? widget.lines
-        : widget.lines.take(2).toList();
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1219,20 +1211,11 @@ class _SummaryBoxState extends State<_SummaryBox> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.title,
+            title,
             style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
-          for (final line in visibleLines) Text(line, style: IMatText.bodyS),
-          if (widget.lines.length > 2)
-            TextButton(
-              onPressed: () => setState(() => _expanded = !_expanded),
-              style: TextButton.styleFrom(padding: EdgeInsets.zero),
-              child: Text(
-                _expanded ? 'Visa mindre' : 'Visa mer',
-                style: IMatText.bodyS.copyWith(color: IMatColors.green),
-              ),
-            ),
+          for (final line in lines) Text(line, style: IMatText.bodyS),
         ],
       ),
     );

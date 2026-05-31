@@ -6,7 +6,7 @@ import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
-import 'package:imat_repo/Theme/imat_colors.dart';
+import 'package:imat_repo/Widgets/imat_link_text.dart';
 import 'package:imat_repo/Widgets/product/product_filter_overlay.dart';
 import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
 import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
@@ -208,7 +208,9 @@ class _CategoryPageState extends State<CategoryPage> {
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 16),
-                          child: GestureDetector(
+                          child: IMatLinkText(
+                            text: group.title,
+                            style: IMatText.h3,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -221,13 +223,6 @@ class _CategoryPageState extends State<CategoryPage> {
                                 ),
                               );
                             },
-                            child: Text(
-                              group.title,
-                              style: IMatText.h3.copyWith(
-                                color: IMatColors.green,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
                           ),
                         ),
                       ),
