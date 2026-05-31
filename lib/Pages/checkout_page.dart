@@ -1031,7 +1031,6 @@ class _LabeledField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
 
   const _LabeledField({
-    super.key,
     required this.label,
     required this.controller,
     this.hint,

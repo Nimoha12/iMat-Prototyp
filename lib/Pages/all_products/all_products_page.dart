@@ -13,6 +13,8 @@ import '../../Widgets/product/product_filter_panel.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
+import 'package:imat_repo/Widgets/Navigation/scroll_to_top_button.dart';
+
 class AllProductsPage extends StatefulWidget {
   final UiCategory uiCategory;
   final String? subCategoryTitle;
@@ -33,11 +35,9 @@ class _AllProductsPageState extends State<AllProductsPage> {
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
-  // Nytt: krävs av ProductFilterPanel
   FilterSelection selection = const FilterSelection();
 
   final ScrollController _scrollController = ScrollController();
-  bool showScrollButton = false;
 
   void _openFilter(BuildContext context) {
     ProductFilterOverlay.show(
@@ -64,19 +64,6 @@ class _AllProductsPageState extends State<AllProductsPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !showScrollButton) {
-        setState(() => showScrollButton = true);
-      } else if (_scrollController.offset <= 300 && showScrollButton) {
-        setState(() => showScrollButton = false);
-      }
-    });
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -87,24 +74,19 @@ class _AllProductsPageState extends State<AllProductsPage> {
     final iMat = context.watch<ImatDataHandler>();
     var products = iMat.selectProducts;
 
-    // Vilka kategorier ska visas?
     final List<ProductCategory> cats =
         widget.subCategories ?? categoryMap[widget.uiCategory]!;
 
-    // Filtrera på kategori
     products = products.where((p) => cats.contains(p.category)).toList();
 
-    // Ekologiskt
     if (ecoFilter == EcoFilter.eco) {
       products = products.where((p) => p.isEcological).toList();
     } else if (ecoFilter == EcoFilter.inteEco) {
       products = products.where((p) => !p.isEcological).toList();
     }
 
-    // Maxpris
     products = products.where((p) => p.price <= maxPrice).toList();
 
-    // Sortering
     if (sortBy == "priceAsc") {
       products.sort((a, b) => a.price.compareTo(b.price));
     } else if (sortBy == "priceDesc") {
@@ -199,10 +181,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(title, style: IMatText.h2),
-                            FilterButton(
-                              onPressed: () =>
-                                  setState(() => _openFilter(context)),
-                            ),
+                            FilterButton(onPressed: () => _openFilter(context)),
                           ],
                         ),
                       ),
@@ -210,6 +189,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
                     ],
                   ),
                 ),
+
                 SliverGrid(
                   gridDelegate: productGridDelegate,
                   delegate: SliverChildBuilderDelegate(
@@ -224,19 +204,8 @@ class _AllProductsPageState extends State<AllProductsPage> {
             ),
           ),
 
-          // Scroll-to-top
-          if (showScrollButton)
-            Positioned(
-              right: 24,
-              bottom: 24,
-              child: FloatingActionButton.large(
-                backgroundColor: IMatColors.green,
-                onPressed: () {
-                  _scrollController.jumpTo(0);
-                },
-                child: const Icon(Icons.arrow_upward, size: 34, color: Colors.white),
-              ),
-            ),
+          // GLOBAL scroll-to-top button
+          ScrollToTopButton(controller: _scrollController),
         ],
       ),
     );

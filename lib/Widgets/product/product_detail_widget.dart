@@ -428,43 +428,6 @@ class _ProductInfoTabsState extends State<_ProductInfoTabs> {
   }
 }
 
-class _TabButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _TabButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(0, 14, 28, 14),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: selected ? IMatColors.green : Colors.transparent,
-              width: 3,
-            ),
-          ),
-        ),
-        child: Text(
-          label,
-          style: IMatText.bodyS.copyWith(
-            color: selected ? IMatColors.green : IMatColors.black,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _EmptyInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

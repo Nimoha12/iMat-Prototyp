@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_repo/Pages/Profile_page.dart';
 import 'package:imat_repo/Pages/help/help_page.dart';
-import 'package:imat_repo/Pages/Profile_page.dart';
 import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Pages/favorites/favorites_page.dart';
@@ -189,10 +188,6 @@ class _IMatNavbarState extends State<IMatNavbar>
     }
 
     return NavbarPage.none;
-  }
-
-  bool _isOnNavbarPage(BuildContext context) {
-    return _resolvedActivePage(context) != NavbarPage.none;
   }
 
   void _navigateToNavbarPage(
