@@ -333,15 +333,6 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
 
-            ProfileEditableField(
-              label: 'Mobilnummer',
-              controller: _mobilePhoneController,
-              keyboardType: TextInputType.phone,
-              onSave: (value) {
-                _invoicePhoneController.text = value;
-                _saveCustomer(mobilePhone: value);
-              },
-            ),
 
             ProfileEditableField(
               label: 'Telefon',

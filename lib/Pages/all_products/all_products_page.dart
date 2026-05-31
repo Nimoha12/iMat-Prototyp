@@ -185,7 +185,6 @@ class _AllProductsPageState extends State<AllProductsPage> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 24),
                     ],
                   ),

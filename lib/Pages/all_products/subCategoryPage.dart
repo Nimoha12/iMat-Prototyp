@@ -6,7 +6,6 @@ import 'package:imat_repo/layout/imat_scaffold.dart';
 import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:imat_repo/model/imat/product.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
-import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Widgets/product/product_filter_overlay.dart';
 import 'package:imat_repo/Widgets/product/product_filter_panel.dart';
 import 'package:imat_repo/Pages/all_products/all_categories_page.dart';
