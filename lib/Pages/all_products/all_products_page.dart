@@ -201,12 +201,11 @@ class _AllProductsPageState extends State<AllProductsPage> {
                             Text(title, style: IMatText.h2),
                             FilterButton(
                               onPressed: () =>
-                                  setState(() => filterOpen = true),
+                                  setState(() => _openFilter(context)),
                             ),
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 24),
                     ],
                   ),
