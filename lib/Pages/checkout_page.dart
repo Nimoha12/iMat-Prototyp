@@ -682,7 +682,7 @@ final _letterInputFormatters = [
             ],
           ),
           const SizedBox(height: 18),
-          _OrderSummary(items: items, total: total),
+          _OrderSummary(items: items, total: total,),
         ],
       ),
     );
@@ -1303,39 +1303,11 @@ class _OrderSummary extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          for (final item in items) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    item.product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(
-                    '${item.total.toStringAsFixed(2)} kr',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.right,
-                    style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${_formatAmount(item.amount)} x ${item.product.price.toStringAsFixed(2)} kr',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: IMatText.bodyS,
-            ),
-            const SizedBox(height: 10),
-          ],
+          for (final item in items) ...[ 
+            _CheckoutReviewItem(item: item),
+
+            const SizedBox(height: 14),
+  ],
           const Divider(height: 18, color: IMatColors.green),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1371,6 +1343,162 @@ class _OrderSummary extends StatelessWidget {
     }
 
     return '${items.length} varor';
+  }
+}
+
+class _QuantityButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _QuantityButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(100),
+        child: Ink(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.grey.shade300,
+            ),
+          ),
+          child: Icon(
+            icon,
+            size: 22,
+            color: Colors.grey.shade700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CheckoutReviewItem extends StatelessWidget {
+  final dynamic item;
+
+  const _CheckoutReviewItem({
+    required this.item,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final iMat = context.watch<ImatDataHandler>();
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: IMatColors.border,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 52,
+            height: 52,
+            child: iMat.getImage(item.product),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.product.name,
+                  style: IMatText.bodyM.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  '${item.product.price.toStringAsFixed(2)} kr/st',
+                  style: IMatText.bodyS.copyWith(
+                    color: IMatColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          _QuantityButton(
+            icon: Icons.remove,
+            onPressed: () {
+              iMat.shoppingCartUpdate(
+                item,
+                delta: -1,
+              );
+            },
+          ),
+
+          const SizedBox(width: 12),
+
+          SizedBox(
+            width: 30,
+            child: Text(
+              item.amount.toInt().toString(),
+              textAlign: TextAlign.center,
+              style: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          _QuantityButton(
+            icon: Icons.add,
+            onPressed: () {
+              iMat.shoppingCartUpdate(
+                item,
+                delta: 1,
+              );
+            },
+          ),
+
+          const SizedBox(width: 16),
+
+          IconButton(
+            tooltip: 'Ta bort',
+            onPressed: () {
+              iMat.shoppingCartRemove(item);
+            },
+            icon: const Icon(
+              Icons.delete,
+              color: Color(0xFFD86464),
+            ),
+          ),
+
+          const SizedBox(width: 8),
+
+          SizedBox(
+            width: 90,
+            child: Text(
+              '${item.total.toStringAsFixed(2)} kr',
+              textAlign: TextAlign.end,
+              style: IMatText.bodyM.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
