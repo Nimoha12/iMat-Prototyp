@@ -5,6 +5,7 @@ import 'package:imat_repo/Theme/imat_colors.dart';
 import 'package:imat_repo/Theme/imat_text.dart';
 import 'package:imat_repo/Widgets/Navigation/breadcrumb_bar.dart';
 import 'package:imat_repo/Widgets/Navigation/navbar.dart';
+import 'package:imat_repo/Widgets/Profile_Parts/Header/CloseProfile_Button.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/layout/imat_scaffold.dart';
 
@@ -72,7 +73,8 @@ class _HelpPageState extends State<HelpPage> {
     return IMatScaffold(
       activePage: NavbarPage.help,
       breadcrumbContext: breadcrumbs,
-      body: FutureBuilder<List<HelpCategory>>(
+      body: Stack(
+    children: [FutureBuilder<List<HelpCategory>>(
         future: _categoriesFuture,
         builder: (context, snapshot) {
           final isLoading = snapshot.connectionState != ConnectionState.done;
@@ -171,6 +173,13 @@ class _HelpPageState extends State<HelpPage> {
           );
         },
       ),
+      const Positioned(
+        top: 12,
+        right: 16,
+        child: CloseProfileButton(),
+      )
+    ]
+      )
     );
   }
 
