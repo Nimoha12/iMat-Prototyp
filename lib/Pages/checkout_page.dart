@@ -24,15 +24,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   static const double _backButtonWidth = 170;
   static const double _buttonGap = 14;
 
-  final _digitInputFormatters = [
-  FilteringTextInputFormatter.digitsOnly,
-];
+  final _digitInputFormatters = [FilteringTextInputFormatter.digitsOnly];
 
-final _letterInputFormatters = [
-  FilteringTextInputFormatter.allow(
-    RegExp(r"[a-zA-ZåäöÅÄÖ\s\-]"),
-  ),
-];
+  final _letterInputFormatters = [
+    FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZåäöÅÄÖ\s\-]")),
+  ];
 
   int _step = 0;
   bool _hasAutoSkippedLoginStep = false;
@@ -682,7 +678,7 @@ final _letterInputFormatters = [
             ],
           ),
           const SizedBox(height: 18),
-          _OrderSummary(items: items, total: total,),
+          _OrderSummary(items: items, total: total),
         ],
       ),
     );
@@ -870,7 +866,7 @@ class _CheckoutSidebar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(28, 34, 22, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-       
+
         children: [
           SizedBox(
             width: double.infinity,
@@ -1061,28 +1057,19 @@ class _LabeledField extends StatelessWidget {
             style: IMatText.bodyM,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: IMatText.bodyM.copyWith(
-                color: Colors.grey.shade500,
-              ),
+              hintStyle: IMatText.bodyM.copyWith(color: Colors.grey.shade500),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(
-                  color: Color(0xFF9C9C9C),
-                ),
+                borderSide: const BorderSide(color: Color(0xFF9C9C9C)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(
-                  color: Color(0xFF9C9C9C),
-                ),
+                borderSide: const BorderSide(color: Color(0xFF9C9C9C)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(
-                  color: IMatColors.green,
-                  width: 2,
-                ),
+                borderSide: const BorderSide(color: IMatColors.green, width: 2),
               ),
             ),
           ),
@@ -1202,57 +1189,49 @@ class _PaymentTab extends StatelessWidget {
   }
 }
 
-class _SummaryBox extends StatelessWidget {
+class _SummaryBox extends StatefulWidget {
   final String title;
   final List<String> lines;
 
   const _SummaryBox({required this.title, required this.lines});
 
   @override
-  Widget build(BuildContext context) {
-    final visibleLines = lines
-        .where((line) => line.trim().isNotEmpty)
-        .take(2)
-        .toList();
+  State<_SummaryBox> createState() => _SummaryBoxState();
+}
 
-    final hiddenCount =
-        lines.where((line) => line.trim().isNotEmpty).length -
-        visibleLines.length;
+class _SummaryBoxState extends State<_SummaryBox> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleLines = _expanded
+        ? widget.lines
+        : widget.lines.take(2).toList();
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 92),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(color: IMatColors.border),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
+        color: IMatColors.white,
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: IMatText.bodyS.copyWith(fontWeight: FontWeight.w800),
+            widget.title,
+            style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 6),
-          for (final line in visibleLines)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
+          const SizedBox(height: 8),
+          for (final line in visibleLines) Text(line, style: IMatText.bodyS),
+          if (widget.lines.length > 2)
+            TextButton(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              style: TextButton.styleFrom(padding: EdgeInsets.zero),
               child: Text(
-                line,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: IMatText.bodyS.copyWith(color: IMatColors.textSecondary),
+                _expanded ? 'Visa mindre' : 'Visa mer',
+                style: IMatText.bodyS.copyWith(color: IMatColors.green),
               ),
-            ),
-          if (hiddenCount > 0)
-            Text(
-              '+ $hiddenCount rad${hiddenCount == 1 ? '' : 'er'}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: IMatText.bodyXS.copyWith(color: IMatColors.textSecondary),
             ),
         ],
       ),
@@ -1302,11 +1281,11 @@ class _OrderSummary extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          for (final item in items) ...[ 
+          for (final item in items) ...[
             _CheckoutReviewItem(item: item),
 
             const SizedBox(height: 14),
-  ],
+          ],
           const Divider(height: 18, color: IMatColors.green),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1328,14 +1307,6 @@ class _OrderSummary extends StatelessWidget {
     );
   }
 
-  String _formatAmount(double amount) {
-    if (amount == amount.roundToDouble()) {
-      return amount.toInt().toString();
-    }
-
-    return amount.toStringAsFixed(1);
-  }
-
   String get _itemCountLabel {
     if (items.length == 1) {
       return '1 vara';
@@ -1349,10 +1320,7 @@ class _QuantityButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  const _QuantityButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _QuantityButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -1366,15 +1334,9 @@ class _QuantityButton extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.grey.shade300,
-            ),
+            border: Border.all(color: Colors.grey.shade300),
           ),
-          child: Icon(
-            icon,
-            size: 22,
-            color: Colors.grey.shade700,
-          ),
+          child: Icon(icon, size: 22, color: Colors.grey.shade700),
         ),
       ),
     );
@@ -1384,9 +1346,7 @@ class _QuantityButton extends StatelessWidget {
 class _CheckoutReviewItem extends StatelessWidget {
   final dynamic item;
 
-  const _CheckoutReviewItem({
-    required this.item,
-  });
+  const _CheckoutReviewItem({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -1397,18 +1357,12 @@ class _CheckoutReviewItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: IMatColors.border,
-        ),
+        border: Border.all(color: IMatColors.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 52,
-            height: 52,
-            child: iMat.getImage(item.product),
-          ),
+          SizedBox(width: 52, height: 52, child: iMat.getImage(item.product)),
 
           const SizedBox(width: 12),
 
@@ -1418,9 +1372,7 @@ class _CheckoutReviewItem extends StatelessWidget {
               children: [
                 Text(
                   item.product.name,
-                  style: IMatText.bodyM.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
                 ),
 
                 const SizedBox(height: 4),
@@ -1438,10 +1390,7 @@ class _CheckoutReviewItem extends StatelessWidget {
           _QuantityButton(
             icon: Icons.remove,
             onPressed: () {
-              iMat.shoppingCartUpdate(
-                item,
-                delta: -1,
-              );
+              iMat.shoppingCartUpdate(item, delta: -1);
             },
           ),
 
@@ -1452,9 +1401,7 @@ class _CheckoutReviewItem extends StatelessWidget {
             child: Text(
               item.amount.toInt().toString(),
               textAlign: TextAlign.center,
-              style: IMatText.bodyM.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+              style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
             ),
           ),
 
@@ -1463,10 +1410,7 @@ class _CheckoutReviewItem extends StatelessWidget {
           _QuantityButton(
             icon: Icons.add,
             onPressed: () {
-              iMat.shoppingCartUpdate(
-                item,
-                delta: 1,
-              );
+              iMat.shoppingCartUpdate(item, delta: 1);
             },
           ),
 
@@ -1477,10 +1421,7 @@ class _CheckoutReviewItem extends StatelessWidget {
             onPressed: () {
               iMat.shoppingCartRemove(item);
             },
-            icon: const Icon(
-              Icons.delete,
-              color: Color(0xFFD86464),
-            ),
+            icon: const Icon(Icons.delete, color: Color(0xFFD86464)),
           ),
 
           const SizedBox(width: 8),
@@ -1490,9 +1431,7 @@ class _CheckoutReviewItem extends StatelessWidget {
             child: Text(
               '${item.total.toStringAsFixed(2)} kr',
               textAlign: TextAlign.end,
-              style: IMatText.bodyM.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+              style: IMatText.bodyM.copyWith(fontWeight: FontWeight.w800),
             ),
           ),
         ],
