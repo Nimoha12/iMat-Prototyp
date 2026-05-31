@@ -322,6 +322,12 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
 
             ProfileEditableField(
+              label: 'Efternamn',
+              controller: _lastNameController,
+              onSave: (value) => _saveCustomer(lastName: value),
+            ),
+
+            ProfileEditableField(
               label: 'Mobilnummer',
               helperText:
                   'Detta kommer användas som mobilnummer för faktura och Swish.',
