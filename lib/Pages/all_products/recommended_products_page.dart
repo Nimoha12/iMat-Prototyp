@@ -16,6 +16,8 @@ import 'package:imat_repo/model/imat_data_handler.dart';
 import 'package:imat_repo/model/recommended_products.dart';
 import 'package:provider/provider.dart';
 
+import 'package:imat_repo/Widgets/Navigation/scroll_to_top_button.dart';
+
 class RecommendedProductsPage extends StatefulWidget {
   const RecommendedProductsPage({super.key});
 
@@ -26,12 +28,10 @@ class RecommendedProductsPage extends StatefulWidget {
 
 class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
   final ScrollController _scrollController = ScrollController();
-  bool showScrollButton = false;
 
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
-  // Multi-select kategori
   FilterSelection selection = const FilterSelection();
 
   void _openFilter(BuildContext context) {
@@ -57,46 +57,23 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !showScrollButton) {
-        setState(() => showScrollButton = true);
-      } else if (_scrollController.offset <= 300 && showScrollButton) {
-        setState(() => showScrollButton = false);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   List<Product> _applyFilters(List<Product> products) {
     var filtered = List<Product>.from(products);
 
-    // Huvudkategori-filter (multi-select)
     if (selection.selectedMainCategories.isNotEmpty) {
       filtered = filtered
           .where((p) => selection.selectedMainCategories.contains(p.uiCategory))
           .toList();
     }
 
-    // Ekologiskt
     if (ecoFilter == EcoFilter.eco) {
       filtered = filtered.where((p) => p.isEcological).toList();
     } else if (ecoFilter == EcoFilter.inteEco) {
       filtered = filtered.where((p) => !p.isEcological).toList();
     }
 
-    // Maxpris
     filtered = filtered.where((p) => p.price <= maxPrice).toList();
 
-    // Sortering
     if (sortBy == "priceAsc") {
       filtered.sort((a, b) => a.price.compareTo(b.price));
     } else if (sortBy == "priceDesc") {
@@ -107,9 +84,16 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final iMat = context.watch<ImatDataHandler>();
     final isLoggedIn = context.watch<AuthState>().isLoggedIn;
+
     final recommended = iMat.getRecommendedProducts(isLoggedIn: isLoggedIn);
     final filtered = _applyFilters(recommended);
 
@@ -130,71 +114,62 @@ class _RecommendedProductsPageState extends State<RecommendedProductsPage> {
       breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: BreadcrumbBar(items: breadcrumbItems),
-                            ),
-                            FilterButton(
-                              onPressed: () => _openFilter(context),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          recommendedProductsTitle,
-                          style: IMatText.h2,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isLoggedIn
-                              ? "Baserat på dina tidigare köp."
-                              : "Populära varor att börja med.",
-                          style: IMatText.bodyM.copyWith(
-                            color: IMatColors.textSecondary,
+          // FIX: INGEN Positioned.fill
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: BreadcrumbBar(items: breadcrumbItems),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
-                  if (filtered.isEmpty)
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Text(
-                          "Inga produkter hittades",
-                          style: IMatText.bodyL,
+                          FilterButton(
+                            onPressed: () => _openFilter(context),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        recommendedProductsTitle,
+                        style: IMatText.h2,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isLoggedIn
+                            ? "Baserat på dina tidigare köp."
+                            : "Populära varor att börja med.",
+                        style: IMatText.bodyM.copyWith(
+                          color: IMatColors.textSecondary,
                         ),
                       ),
-                    )
-                  else
-                    lazyProductGridSliver(filtered),
-                ],
-              ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+
+                if (filtered.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(
+                        "Inga produkter hittades",
+                        style: IMatText.bodyL,
+                      ),
+                    ),
+                  )
+                else
+                  lazyProductGridSliver(filtered),
+              ],
             ),
           ),
 
-          if (showScrollButton)
-            Positioned(
-              right: 24,
-              bottom: 24,
-              child: FloatingActionButton(
-                backgroundColor: IMatColors.green,
-                onPressed: () => _scrollController.jumpTo(0),
-                child: const Icon(Icons.arrow_upward, color: Colors.white),
-              ),
-            ),
+          ScrollToTopButton(controller: _scrollController),
         ],
       ),
     );

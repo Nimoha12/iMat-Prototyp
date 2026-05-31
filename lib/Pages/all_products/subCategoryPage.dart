@@ -15,17 +15,20 @@ import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'category_page.dart';
 import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
+// GLOBAL scroll-to-top button
+import 'package:imat_repo/Widgets/Navigation/scroll_to_top_button.dart';
+
 class SubCategoryPage extends StatefulWidget {
   final String title;
   final List<ProductCategory> categories;
-  final UiCategory parentCategory; // ny parameter för huvudkategori
+  final UiCategory parentCategory;
   final bool showParentBreadcrumb;
 
   const SubCategoryPage({
     super.key,
     required this.title,
     required this.categories,
-    required this.parentCategory, //  krävs nu vid anrop
+    required this.parentCategory,
     this.showParentBreadcrumb = true,
   });
 
@@ -35,13 +38,10 @@ class SubCategoryPage extends StatefulWidget {
 
 class _SubCategoryPageState extends State<SubCategoryPage> {
   final ScrollController _scrollController = ScrollController();
-  bool showScrollButton = false;
 
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
   String sortBy = "none";
-  // används bara för att matcha ProductFilterPanel-signaturen,
-  // men ingen kategori-filtering på denna sida
   FilterSelection selection = const FilterSelection();
 
   void _openFilter(BuildContext context) {
@@ -69,19 +69,6 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !showScrollButton) {
-        setState(() => showScrollButton = true);
-      } else if (_scrollController.offset <= 300 && showScrollButton) {
-        setState(() => showScrollButton = false);
-      }
-    });
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -92,22 +79,18 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
     final iMat = context.watch<ImatDataHandler>();
     final allProducts = iMat.selectProducts;
 
-    // Filtrera produkter som tillhör denna underkategori
     var filtered = allProducts
         .where((p) => widget.categories.contains(p.category))
         .toList();
 
-    // Ekologiskt-filter
     if (ecoFilter == EcoFilter.eco) {
       filtered = filtered.where((p) => p.isEcological).toList();
     } else if (ecoFilter == EcoFilter.inteEco) {
       filtered = filtered.where((p) => !p.isEcological).toList();
     }
 
-    // Maxpris
     filtered = filtered.where((p) => p.price <= maxPrice).toList();
 
-    // Sortering
     if (sortBy == "priceAsc") {
       filtered.sort((a, b) => a.price.compareTo(b.price));
     } else if (sortBy == "priceDesc") {
@@ -143,60 +126,50 @@ class _SubCategoryPageState extends State<SubCategoryPage> {
       breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: BreadcrumbBar(items: breadcrumbItems),
-                            ),
-                            FilterButton(
-                              onPressed: () => _openFilter(context),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Text(widget.title, style: IMatText.h2),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
-                  if (filtered.isEmpty)
-                    SliverToBoxAdapter(
-                      child: Center(
-                        child: Text(
-                          "Inga produkter hittades",
-                          style: IMatText.bodyL,
-                        ),
+          // FIX: INGEN Positioned.fill
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: BreadcrumbBar(items: breadcrumbItems),
+                          ),
+                          FilterButton(
+                            onPressed: () => _openFilter(context),
+                          ),
+                        ],
                       ),
-                    )
-                  else
-                    lazyProductGridSliver(filtered),
-                ],
-              ),
+                      const SizedBox(height: 24),
+                      Text(widget.title, style: IMatText.h2),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+
+                if (filtered.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(
+                        "Inga produkter hittades",
+                        style: IMatText.bodyL,
+                      ),
+                    ),
+                  )
+                else
+                  lazyProductGridSliver(filtered),
+              ],
             ),
           ),
 
-          // Scroll-to-top button
-          if (showScrollButton)
-            Positioned(
-              right: 24,
-              bottom: 24,
-              child: FloatingActionButton.large(
-                backgroundColor: IMatColors.green,
-                onPressed: () => _scrollController.jumpTo(0),
-                child: const Icon(Icons.arrow_upward, size: 34, color: Colors.white),
-              ),
-            ),
+          ScrollToTopButton(controller: _scrollController),
         ],
       ),
     );

@@ -47,7 +47,7 @@ class NavIcon extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: iconColor, size: 34),
+                Icon(icon, color: iconColor, size: 36),
 
                 const SizedBox(height: 10),
 
@@ -57,7 +57,7 @@ class NavIcon extends StatelessWidget {
                   style: TextStyle(
                     color: textColor,
                     fontWeight: FontWeight.w600,
-                    fontSize: 15.5,
+                    fontSize: 17,
                     letterSpacing: 0.3,
                   ),
                 ),

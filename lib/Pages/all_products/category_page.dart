@@ -17,6 +17,8 @@ import '../../Widgets/Category/ui_categories.dart';
 import 'package:imat_repo/Widgets/product/lazy_product_grid.dart';
 import 'package:imat_repo/Widgets/product/filter_selection.dart';
 
+import 'package:imat_repo/Widgets/Navigation/scroll_to_top_button.dart';
+
 class CategoryPage extends StatefulWidget {
   final UiCategory uiCategory;
 
@@ -28,7 +30,6 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   final ScrollController _scrollController = ScrollController();
-  bool showScrollButton = false;
 
   double maxPrice = 200;
   EcoFilter ecoFilter = EcoFilter.alla;
@@ -60,19 +61,6 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !showScrollButton) {
-        setState(() => showScrollButton = true);
-      } else if (_scrollController.offset <= 300 && showScrollButton) {
-        setState(() => showScrollButton = false);
-      }
-    });
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -84,7 +72,6 @@ class _CategoryPageState extends State<CategoryPage> {
     final allProducts = iMat.selectProducts;
     final groups = subCategoryGroups[widget.uiCategory] ?? [];
 
-    // Filtreringsfunktion
     List<Product> applyFilters(List<Product> products) {
       var list = products;
 
@@ -122,153 +109,140 @@ class _CategoryPageState extends State<CategoryPage> {
       breadcrumbContext: breadcrumbItems,
       body: Stack(
         children: [
-          // Huvudinnehåll
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: BreadcrumbBar(
-                                items: [
-                                  BreadcrumbItem(
-                                    label: "Alla varor",
-                                    onTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              const AllCategoriesPage(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  BreadcrumbItem(
-                                    label: widget.uiCategory.label,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            FilterButton(
-                              onPressed: () => _openFilter(context),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Text(widget.uiCategory.label, style: IMatText.h2),
-                        const SizedBox(height: 24),
-                        if (groups.isNotEmpty)
-                          CategoryQuickAccessButtonWrap(
-                            labels: groups.map((g) => g.title).toList(),
-                            onTap: (index) {
-                              final g = groups[index];
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => SubCategoryPage(
-                                    title: g.title,
-                                    categories: g.categories,
-                                    parentCategory: widget.uiCategory,
-                                  ),
+          // FIX: INGEN Positioned.fill
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: BreadcrumbBar(
+                              items: [
+                                BreadcrumbItem(
+                                  label: "Alla varor",
+                                  onTap: () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const AllCategoriesPage(),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                                BreadcrumbItem(label: widget.uiCategory.label),
+                              ],
+                            ),
                           ),
-                        const SizedBox(height: 32),
-                      ],
-                    ),
+                          FilterButton(
+                            onPressed: () => _openFilter(context),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Text(widget.uiCategory.label, style: IMatText.h2),
+                      const SizedBox(height: 24),
+
+                      if (groups.isNotEmpty)
+                        CategoryQuickAccessButtonWrap(
+                          labels: groups.map((g) => g.title).toList(),
+                          onTap: (index) {
+                            final g = groups[index];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SubCategoryPage(
+                                  title: g.title,
+                                  categories: g.categories,
+                                  parentCategory: widget.uiCategory,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+
+                      const SizedBox(height: 32),
+                    ],
                   ),
-                  if (groups.isEmpty) ...() {
-                    final categories =
-                        categoryMap[widget.uiCategory] ?? [];
+                ),
+
+                if (groups.isEmpty) ...() {
+                  final categories = categoryMap[widget.uiCategory] ?? [];
+                  final filtered = applyFilters(
+                    allProducts
+                        .where((p) => categories.contains(p.category))
+                        .toList(),
+                  );
+                  if (filtered.isEmpty) return <Widget>[];
+
+                  return [
+                    lazyProductGridSliver(filtered),
+                    const SliverPadding(
+                      padding: EdgeInsets.only(bottom: 32),
+                    ),
+                  ];
+                }(),
+
+                for (final group in groups)
+                  ...() {
+                    if (selection.selectedSubCategories.isNotEmpty &&
+                        !selection.selectedSubCategories.contains(group.title)) {
+                      return <Widget>[];
+                    }
+
                     final filtered = applyFilters(
                       allProducts
-                          .where((p) => categories.contains(p.category))
+                          .where((p) => group.categories.contains(p.category))
                           .toList(),
                     );
                     if (filtered.isEmpty) return <Widget>[];
 
                     return [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => SubCategoryPage(
+                                    title: group.title,
+                                    categories: group.categories,
+                                    parentCategory: widget.uiCategory,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              group.title,
+                              style: IMatText.h3.copyWith(
+                                color: IMatColors.green,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       lazyProductGridSliver(filtered),
                       const SliverPadding(
                         padding: EdgeInsets.only(bottom: 32),
                       ),
                     ];
                   }(),
-                  for (final group in groups)
-                    ...() {
-                      // Multi-select underkategorier: om något är valt, visa bara de valda
-                      if (selection.selectedSubCategories.isNotEmpty &&
-                          !selection.selectedSubCategories.contains(
-                            group.title,
-                          )) {
-                        return <Widget>[];
-                      }
-
-                      final filtered = applyFilters(
-                        allProducts
-                            .where((p) => group.categories.contains(p.category))
-                            .toList(),
-                      );
-                      if (filtered.isEmpty) return <Widget>[];
-
-                      return [
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => SubCategoryPage(
-                                      title: group.title,
-                                      categories: group.categories,
-                                      parentCategory: widget.uiCategory,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                group.title,
-                                style: IMatText.h3.copyWith(
-                                  color: IMatColors.green,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        lazyProductGridSliver(filtered),
-                        const SliverPadding(
-                          padding: EdgeInsets.only(bottom: 32),
-                        ),
-                      ];
-                    }(),
-                ],
-              ),
+              ],
             ),
           ),
 
-          // Scroll-to-top button
-          if (showScrollButton)
-            Positioned(
-              right: 24,
-              bottom: 24,
-              child: FloatingActionButton.large(
-                backgroundColor: IMatColors.green,
-                onPressed: () => _scrollController.jumpTo(0),
-                child: const Icon(Icons.arrow_upward, size: 34, color: Colors.white),
-              ),
-            ),
+          // GLOBAL scroll-to-top button
+          ScrollToTopButton(controller: _scrollController),
         ],
       ),
     );
